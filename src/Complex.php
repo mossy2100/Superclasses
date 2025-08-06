@@ -81,7 +81,7 @@ class Complex implements Stringable
         get {
             // Compute if necessary.
             if ($this->_mag === null) {
-                $this->_mag = $this->isReal() ? 
+                $this->_mag = $this->isReal() ?
                     abs($this->real) :
                     sqrt(($this->real * $this->real) + ($this->imag * $this->imag));
             }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Superclasses;
@@ -12,6 +13,16 @@ class Type
     public static function isNumber(mixed $value)
     {
         return is_int($value) || is_float($value);
+    }
+
+    public static function getClassName(object $value): string
+    {
+        $class = get_class($value);
+        $nulpos = strpos($class, "\0");
+        if ($nulpos !== false) {
+            $class = substr($class, 0, $nulpos);
+        }
+        return $class;
     }
 
     /**

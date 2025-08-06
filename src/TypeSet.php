@@ -1,12 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Superclasses;
 
-use Stringable, Countable, IteratorAggregate, Traversable, ArrayIterator;
+use Stringable;
+use Countable;
+use IteratorAggregate;
+use Traversable;
+use ArrayIterator;
 use InvalidArgumentException;
 
-include __DIR__ . '/Type.php';
+require_once __DIR__ . '/Type.php';
 
 class TypeSet implements Stringable, Countable, IteratorAggregate
 {
@@ -57,7 +62,8 @@ class TypeSet implements Stringable, Countable, IteratorAggregate
      * Helper function to get a type name for a given value.
      * A more specific type name is preferred when possible.
      */
-    public static function getType(mixed $value) {
+    public static function getType(mixed $value)
+    {
         $type = get_debug_type($value);
 
         // Resources.
@@ -67,20 +73,21 @@ class TypeSet implements Stringable, Countable, IteratorAggregate
         }
 
         // Anonymous classes.
-        if (str_ends_with($type, '@anonymous')) {
+        if (str_contains($type, '@anonymous')) {
             // Return the base class or interface name if there is one, otherwise generic 'object'.
             $class = substr($type, 0, -10);
             return $class === 'class' ? 'object' : $class;
         }
 
-        // Return null, bool, int, float, string, or array. 
+        // Return null, bool, int, float, string, or array.
         return $type;
     }
 
     /**
-     * Get the type name from a value and add it to the set. 
+     * Get the type name from a value and add it to the set.
      */
-    public function addValueType(mixed $value) {
+    public function addValueType(mixed $value)
+    {
         return $this->add(self::getType($value));
     }
 
@@ -97,7 +104,7 @@ class TypeSet implements Stringable, Countable, IteratorAggregate
      */
     public function match(mixed $value): bool
     {
-        // If the types include 'mixed' then any type is allowed. 
+        // If the types include 'mixed' then any type is allowed.
         if (in_array('mixed', $this->types)) {
             return true;
         }
@@ -169,7 +176,7 @@ class TypeSet implements Stringable, Countable, IteratorAggregate
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Stringable implementation
-    
+
     public function __toString(): string
     {
         return implode('|', $this->types);
@@ -177,7 +184,7 @@ class TypeSet implements Stringable, Countable, IteratorAggregate
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Countable implementation
-    
+
     public function count(): int
     {
         return count($this->types);

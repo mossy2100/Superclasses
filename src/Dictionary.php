@@ -1,18 +1,23 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Superclasses;
 
-use ArrayAccess, Countable, IteratorAggregate, Traversable;
-use InvalidArgumentException, OutOfBoundsException;
+use ArrayAccess;
+use Countable;
+use IteratorAggregate;
+use Traversable;
+use InvalidArgumentException;
+use OutOfBoundsException;
 
-include __DIR__ . '/TypeSet.php';
-include __DIR__ . '/KeyValuePair.php';
+require_once __DIR__ . '/TypeSet.php';
+require_once __DIR__ . '/KeyValuePair.php';
 
 /**
  * Dictionary class that permits keys and values of any type, including scalar, complex, nullable,
  * and union types.
- * 
+ *
  * @example
  * $customers = new Dictionary('int', 'Customer');
  * $sales_data = new Dictionary('DateTime', 'float');
@@ -23,21 +28,21 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
 {
     /**
      * Set of valid types for keys.
-     * 
+     *
      * @var TypeSet
      */
     public private(set) TypeSet $keyTypes;
 
     /**
      * Set of valid types for values.
-     * 
+     *
      * @var TypeSet
      */
     public private(set) TypeSet $valueTypes;
 
     /**
      * Array of key-value pairs in the dictionary.
-     * 
+     *
      * @var KeyValuePair[]
      */
     public private(set) array $items = [];
@@ -66,11 +71,12 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
             throw new InvalidArgumentException("Value types cannot be only null.");
         }
     }
-    
+
     /**
      * Construct a new Dictionary from an existing collection.
      */
-    public static function fromIterable(iterable $src) {
+    public static function fromIterable(iterable $src)
+    {
         // Collect the key and value types.
         $key_types = new TypeSet();
         $value_types = new TypeSet();
@@ -201,13 +207,13 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Set an item by key.
-     * 
+     *
      * If they key is in use, the corresponding key-value pair will be replaced.
      * If not, a new key-value pair will be added to the dictionary.
      *
      * @param mixed $key
      * @param mixed $value
-     * 
+     *
      * @throws OutOfBoundsException If no key or a null key is specified.
      * @throws InvalidArgumentException If the key or value has an invalid type.
      */
