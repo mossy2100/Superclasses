@@ -4,27 +4,33 @@ declare(strict_types=1);
 
 namespace Superclasses;
 
-use ArrayAccess, Countable, IteratorAggregate, Traversable, ArrayIterator;
-use InvalidArgumentException, BadFunctionCallException, UnderflowException;
+use ArrayAccess;
+use Countable;
+use IteratorAggregate;
+use Traversable;
+use ArrayIterator;
+use InvalidArgumentException;
+use BadFunctionCallException;
+use UnderflowException;
 
-include __DIR__ . '/TypeSet.php';
+require_once __DIR__ . '/TypeSet.php';
 
 /**
  * A type-safe array implementation that enforces item types at runtime.
- * 
+ *
  * Supports union types and provides array-like access through ArrayAccess and Iterator interfaces.
  * Automatically generates sensible defaults for basic types or allows explicit default values.
- * 
+ *
  * ## Supported Type Specifications
- * 
+ *
  * ### Basic Types
  * - 'string' - String values
- * - 'int' - Integer values  
+ * - 'int' - Integer values
  * - 'float' - Floating point values
  * - 'bool' - Boolean values (true/false)
  * - 'null' - Null values
  * - 'array' - Array values
- * 
+ *
  * ### Pseudo-types
  * - 'mixed' - Any type (no restrictions)
  * - 'scalar' - Any scalar type (string|int|float|bool)
@@ -33,23 +39,23 @@ include __DIR__ . '/TypeSet.php';
  * - 'resource' - Any resource type
  * - 'iterable' - Arrays, iterators, generators (anything iterable)
  * - 'callable' - Functions, methods, closures, invokables
- * 
+ *
  * ### Specific Types
  * - Class names: 'DateTime', 'MyClass' (includes inheritance)
  * - Interface names: 'Countable', 'JsonSerializable' (includes implementations)
  * - Resource types: 'stream', 'curl' (specific resource types)
- * 
+ *
  * ### Union Types
  * Use pipe syntax to allow multiple types:
  * - 'string|int' - String OR integer values
  * - 'array|object' - Array OR object values
  * - 'DateTime|null' - DateTime objects OR null
- * 
- * ### Nullable Types  
+ *
+ * ### Nullable Types
  * Use question mark syntax for nullable types:
  * - '?string' - Equivalent to 'string|null'
  * - '?DateTime' - Equivalent to 'DateTime|null'
- * 
+ *
  * ## Automatic Defaults
  * When no explicit default is provided, the following defaults are used:
  * - null → null
@@ -61,23 +67,23 @@ include __DIR__ . '/TypeSet.php';
  * - string → '' (empty string)
  * - bool → false
  * - array → [] (empty array)
- * 
+ *
  * All other types require an explicit default value to be provided.
- * 
+ *
  * @example Basic usage
  * $strings = new Sequence('string');
  * $strings->append('hello');
  * $strings[] = 'world';
- * 
+ *
  * @example Union types with custom default
  * $mixed = new Sequence('string|int', 'default');
  * $mixed->append('text');
  * $mixed->append(42);
- * 
+ *
  * @example Object types
  * $dates = new Sequence('DateTime', new DateTime());
  * $dates->append(new DateTime('tomorrow'));
- * 
+ *
  * @example Interface types
  * $countables = new Sequence('Countable', []);
  * $countables->append([1, 2, 3]);         // Arrays are countable
@@ -87,28 +93,28 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 {
     /**
      * The valid types for this sequence.
-     * 
+     *
      * @var TypeSet
      */
     public private(set) TypeSet $types;
 
     /**
      * The items in the sequence.
-     * 
+     *
      * @var array
      */
     public private(set) array $items = [];
 
     /**
      * The default value. This will have a type matching one of the allowed types.
-     * 
+     *
      * @var mixed
      */
     public private(set) mixed $defaultValue;
 
     /**
      * Create a new Sequence with specified type constraints and a default value.
-     * 
+     *
      * @param string|iterable $types Type specification (e.g., 'string', 'int|null', ['string', 'int']).
      * @param mixed $default_value Default value for new items. Auto-generated for basic types if omitted.
      * @throws InvalidArgumentException If no default can be generated or provided default is invalid.
@@ -171,7 +177,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Validate index parameters and optionally check bounds.
-     * 
+     *
      * @param mixed $index The index to validate.
      * @param bool $check_lower_bound Whether to check if index is non-negative.
      * @param bool $check_upper_bound Whether to check if index is within array bounds.
@@ -210,7 +216,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Get an item from the array.
-     * 
+     *
      * @param int $index The zero-based index position of the value to get.
      * @return mixed The value at the given index.
      * @throws InvalidArgumentException If the index is not an integer or out of range.
@@ -223,17 +229,17 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Set an item to a given value by index.
-     * 
+     *
      * If the index is out of range, the sequence will be increased in size to accommodate it.
      * Any intermediate positions will be filled with the default value.
-     * 
+     *
      * If no item value is provided, the position will be set to the default value.
      * When an item value is provided, it must be compatible with the allowed types.
      *
      * @param int $index The zero-based index position to set.
      * @param mixed $item The value to set (optional). If omitted, uses the default value.
      * @throws InvalidArgumentException If the index is negative or the item type is invalid.
-     * 
+     *
      * @example
      * $sequence = new Sequence('string', 'default');
      * $sequence->set(0, 'hello');  // Sets position 0 to 'hello'
@@ -265,7 +271,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Set an item to null.
      * This method does not remove an item from the sequence.
-     * 
+     *
      * @param int $index The zero-based index position to unset.
      */
     public function unset(int $index): void
@@ -284,13 +290,13 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Add one or more items to the end of the array.
-     * 
+     *
      * @param array $items The items to add to the sequence.
      * @throws InvalidArgumentException If any of the items have an invalid type.
-     * 
+     *
      * @example
      * $sequence->append($new_item);
-     * 
+     *
      * To add a collection of items to the sequence, use the splat operator.
      * @example
      * $sequence->append(...$new_items);
@@ -308,13 +314,13 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Add one or more items to the start of the array.
-     * 
+     *
      * @param array $items The items to add to the sequence.
      * @throws InvalidArgumentException If any of the items have an invalid type.
-     * 
+     *
      * @example
      * $sequence->prepend($new_item);
-     * 
+     *
      * To add a collection of items to the sequence, use the splat operator.
      * @example
      * $sequence->prepend(...$new_items);
@@ -332,10 +338,10 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Remove an item from the array.
-     * 
+     *
      * The indices of items at higher indices will be reduced by one, i.e. shifted down,
      * and the array length will be shortened by one.
-     * 
+     *
      * @param int $index The zero-based index position of the item to remove.
      * @return mixed The removed value.
      * @throws InvalidArgumentException If the index is not an integer or out of range.
@@ -358,7 +364,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Remove all items matching a given value.
      * Strict equality is used to find matching values.
-     * 
+     *
      * @param mixed $value The value to remove.
      * @return int The number of items removed.
      */
@@ -370,7 +376,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
         // Filter the sequence to remove the matching values.
         $this->items = array_values(array_filter(
             $this->items,
-            fn($item) => $item !== $value
+            fn ($item) => $item !== $value
         ));
 
         // Return the number of items removed.
@@ -379,7 +385,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Remove the first item from the sequence.
-     * 
+     *
      * @return mixed The removed item.
      * @throws UnderflowException If the sequence is empty.
      */
@@ -396,7 +402,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Remove the last item from the sequence.
-     * 
+     *
      * @return mixed The removed item.
      * @throws UnderflowException If the sequence is empty.
      */
@@ -413,10 +419,10 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Get a slice of the sequence.
-     * 
+     *
      * The offset and length and parameters can be negative. They work the same as for array_slice().
      * @see https://www.php.net/manual/en/function.array-slice.php
-     * 
+     *
      * @param int $offset The start position of the slice.
      * @param ?int $length The length of the slice.
      * @return Sequence The slice.
@@ -439,14 +445,14 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Return a sequence with all items matching a certain filter.
-     * 
+     *
      * @param callable $fn The filter function that returns true for items to keep.
      * @return Sequence A new sequence containing only the matching items.
      */
     public function filter(callable $fn): Sequence
     {
         // Get the matching values.
-        $items = array_filter($this->items, fn($item) => $fn($item));
+        $items = array_filter($this->items, fn ($item) => $fn($item));
 
         // Construct the result.
         $result = new Sequence($this->types);
@@ -457,7 +463,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Find all indexes of items matching a specific value.
      * Strict equality is used to find matching values.
-     * 
+     *
      * @param mixed $value The value to search for.
      * @return array An array of indexes where the value was found.
      */
@@ -465,7 +471,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     {
         return array_keys(array_filter(
             $this->items,
-            fn($item) => $item === $value
+            fn ($item) => $item === $value
         ));
     }
 
@@ -474,7 +480,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * Strict equality is used to compare values.
      * No check is made on the provided value; if a value with an invalid type is provided then the
      * result will be false.
-     * 
+     *
      * @param mixed $value The value to search for.
      * @return bool True if the value exists in the sequence, false otherwise.
      */
@@ -493,7 +499,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Check if the sequence is empty.
-     * 
+     *
      * @return bool If the sequence is empty.
      */
     public function isEmpty(): bool
@@ -506,7 +512,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Append or set a sequence item.
-     * 
+     *
      * @param int $index The zero-based index position to set, or null for append.
      * @param mixed $item The value to set.
      * @throws InvalidArgumentException If the index or item type is invalid.
@@ -524,7 +530,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Get a value from the sequence.
-     * 
+     *
      * @param mixed $index The zero-based index position to set.
      * @return mixed The value at the specified index.
      * @throws InvalidArgumentException If the index is not an integer or out of range.
@@ -537,7 +543,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Check if a given index is valid.
-     * 
+     *
      * @param mixed $index The zero-based index position to set.
      * @return bool If the given index exists in the sequence.
      */
@@ -548,11 +554,11 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Set a sequence item to null.
-     * 
+     *
      * This method does not remove an item from the sequence, as with an ordinary PHP array,
      * because with this data structure we want to maintain indices from 0 to sequence size - 1.
      * To remove an item from the sequence, use one of the remove*() methods.
-     * 
+     *
      * @param mixed $index The zero-based index position to set.
      * @throws InvalidArgumentException If the index is not an integer or out of range.
      */
@@ -566,7 +572,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Get the number of items in the sequence.
-     * 
+     *
      * @return int The number of items in the sequence.
      */
     public function count(): int

@@ -1,11 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Superclasses;
 
 use DateTime;
 
-include __DIR__ . '/../src/Dictionary.php';
+require_once __DIR__ . '/../src/Dictionary.php';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

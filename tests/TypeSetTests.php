@@ -1,11 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Superclasses;
 
-use ArrayObject, DateTime, Countable;
+use ArrayObject;
+use DateTime;
+use Countable;
 
-include __DIR__ . '/../src/TypeSet.php';
+require_once __DIR__ . '/../src/TypeSet.php';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -18,13 +21,18 @@ echo $typeSet->match('hello') . PHP_EOL;           // true
 echo $typeSet->match(new ArrayObject()) . PHP_EOL; // true (implements Serializable)
 
 // Trait usage
-trait TraitA {
-    public function sayHello() {
+trait TraitA
+{
+    public function sayHello()
+    {
         echo 'Hello';
     }
 }
 
-class MyClass { use TraitA; }
+class MyClass
+{
+    use TraitA;
+}
 echo $typeSet->match(new MyClass()) . PHP_EOL;     // true (uses TraitA)
 
 // Complex scenario
@@ -32,9 +40,10 @@ $typeSet = new TypeSet('iterable|Countable');
 echo $typeSet->match([1, 2, 3]) . PHP_EOL;         // true (array is iterable)
 echo $typeSet->match(new ArrayObject()) . PHP_EOL; // true (implements Countable)
 
-$x = new class extends DateTime implements Countable {
+$x = new class () extends DateTime implements Countable {
     public array $items;
-    public function count(): int {
+    public function count(): int
+    {
         return count($this->items);
     }
 };

@@ -1,11 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Superclasses;
 
 use DateTime;
 
-include __DIR__ . '/../src/Sequence.php';
+require_once __DIR__ . '/../src/Sequence.php';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

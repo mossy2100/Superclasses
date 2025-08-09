@@ -79,7 +79,7 @@ class DateTimeUtilities
     public static function today()
     {
         $now = self::now();
-        return $now->date();
+        return self::getDateOnly($now);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ class DateTimeUtilities
      */
     public function __construct()
     {
-        // All arguments are optional and several serve multiple roles, so it's simpler not to include parameters in the
+        // All arguments are optional and several serve multiple roles, so it's simpler not to require_once parameters in the
         // function signature, and instead just grab them as follows:
         $n_args = func_num_args();
         $args = func_get_args();

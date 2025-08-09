@@ -1,11 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Superclasses;
 
-require __DIR__ . '/../src/Complex.php';
-
-
+require '../src/Complex.php';
 
 // Example usage:
 $z1 = new Complex(3, 4);     // 3 + 4i
@@ -18,13 +17,13 @@ echo "z2 = " . $z2 . "\n";   // 1 - 2i
 $sum = $z1->add($z2);
 echo "z1 + z2 = " . $sum . "\n";        // 4 + 2i
 
-$diff = $z1->subtract($z2);
+$diff = $z1->sub($z2);
 echo "z1 - z2 = " . $diff . "\n";       // 2 + 6i
 
-$product = $z1->multiply($z2);
+$product = $z1->mul($z2);
 echo "z1 * z2 = " . $product . "\n";    // 11 + 2i
 
-$quotient = $z1->divide($z2);
+$quotient = $z1->div($z2);
 echo "z1 / z2 = " . $quotient . "\n";   // -1 + 2i
 
 // Square roots

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Superclasses;
 
 use Countable;
+use ArrayIterator;
 use Traversable;
 
 /**
  * Set class. Emulates sets, i.e. unordered collections with no duplicates.
  */
-class Set implements Countable, Traversable
+class Set implements Countable
 {
     /**
      * Items in the set.
@@ -182,7 +183,7 @@ class Set implements Countable, Traversable
      */
     public function __toString()
     {
-        $item_strings = array_map(fn ($item) => EnhancedJson::encode($item), $this->items);
+        $item_strings = array_map(fn ($item) => Stringify::encode($item), $this->items);
         return '{' . implode(', ', $item_strings) . '}';
     }
 
@@ -197,5 +198,16 @@ class Set implements Countable, Traversable
     public function count(): int
     {
         return count($this->items);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // IteratorAggregate implementation
+
+    /**
+     * Get iterator for foreach loops.
+     */
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->items);
     }
 }

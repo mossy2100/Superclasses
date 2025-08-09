@@ -1,13 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Superclasses;
 
-include __DIR__ . '/../src/Dictionary.php';
+require_once __DIR__ . '/../src/Dictionary.php';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-enum DayOfWeek: string {
+enum DayOfWeek: string
+{
     case Monday = 'Mon';
     case Tuesday = 'Tue';
     case Wednesday = 'Wed';
