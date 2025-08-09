@@ -25,247 +25,118 @@ class Color
   protected $value;
 
   /**
-   * Constructor.  Multiple function signatures supported.
+   * Constructor.
    *
-   * General pattern:
-   *   new Color();
-   *   new Color($color);
-   *   new Color($color, $alpha);
-   *   new Color($red, $green, $blue);
-   *   new Color($red, $green, $blue, $alpha);
-   *   new Color($hue, $saturation, $lightness, TRUE);
-   *   new Color($hue, $saturation, $lightness, $alpha, TRUE);
+   * Accepts a CSS color name or a hex string (3, 4, 6, or 8 digits, with or
+   * without a leading '#').
    *
-   * $color can be:
-   *   - a hex color string (3 or 6-digit, with or without leading '#')
-   *   - a color name or 'transparent'
-   *   - a 24-bit RGB integer, as would be returned from imagecolorat()
-   *   - a Color object to clone
-   *   - CSS-style color string of the form:
-   *     - 'rgb(red, green, blue)'
-   *     - 'rgba(red, green, blue, alpha)'
-   *     - 'hsl(hue, saturation, lightness)'
-   *     - 'hsla(hue, saturation, lightness, alpha)'
+   * @param string $color
+   *   Color string.
    *
-   * $red, $green and $blue can be:
-   *   - integer from 0..255
-   *   - string from 0%..100%
-   *
-   * $alpha, $saturation and $lightness can be:
-   *   - float from 0.0..1.0
-   *   - string from 0%..100%
-   *
-   * $hue can be any float, which will be normalized to the range [0..360)
-   *
-   * NOTE if alpha is defined in both the first and second params, they will be multiplied.
-   *
-   * Examples:
-   *
-   * Hex #rrggbb:
-   *   new Color('#ABCDEF');
-   *   new Color('#ABCDEF', 0.75);
-   *   new Color('#ABCDEF', '75%');
-   *   new Color('ABCDEF');
-   *   new Color('ABCDEF', 0.75);
-   *   new Color('ABCDEF', '75%');
-   *
-   * Hex #rgb:
-   *   new Color('#ABC');
-   *   new Color('#ABC', 0.75);
-   *   new Color('#ABC', '75%');
-   *   new Color('ABC');
-   *   new Color('ABC', 0.75);
-   *   new Color('ABC', '75%');
-   *
-   * Named colors:
-   *   new Color('Orange');
-   *   new Color('Orange', 0.75);
-   *   new Color('Orange', '75%');
-   *   new Color('Transparent');
-   *
-   * 24-bit color integer:
-   *   new Color(0xABCDEF);
-   *   new Color(0xABCDEF, 0.75);
-   *   new Color(0xABCDEF, '75%');
-   *   new Color(imagecolorat($image, $x, $y));
-   *   new Color(imagecolorat($image, $x, $y), 0.75);
-   *   new Color(imagecolorat($image, $x, $y), '75%');
-   *
-   * Clone:
-   *   new Color($otherColorObject);
-   *   new Color($otherColorObject, 0.75);
-   *   new Color($otherColorObject, '75%');
-   *
-   * RGBA:
-   *   new Color(100, 200, 150);
-   *   new Color(100, 200, 150, 0.75);
-   *   new Color(100, 200, 150, '75%');
-   *   new Color('30%', '50%', '40%');
-   *   new Color('30%', '50%', '40%', 0.75);
-   *   new Color('30%', '50%', '40%', '75%');
-   *
-   * HSLA:
-   *   new Color(120, '80%', '30%', TRUE);
-   *   new Color(120, '80%', '30%', 0.75, TRUE);
-   *   new Color(120, '80%', '30%', '75%', TRUE);
-   *
-   * CSS :
-   *   new Color('rgb(100, 200, 150)');
-   *   new Color('rgba(100, 200, 150, 0.75)');
-   *   new Color('rgb(30%, 90%, 12%)');
-   *   new Color('rgba(30%, 90%, 12%, 0.75)');
-   *   new Color('hsl(120, 59%, 72%)');
-   *   new Color('hsla(120, 59%, 72%, 0.75)');
-   *
-   * Array:
-   *   new Color(array('red' => 100, 'green' => 200, 'blue' => 150));
-   *   new Color(array('red' => 100, 'green' => 200, 'blue' => 150), 0.75);
-   *   new Color(array('red' => 100, 'green' => 200, 'blue' => 150), '75%');
-   *   new Color(array('red' => 100, 'green' => 200, 'blue' => 150, 'alpha' => 0.75));
-   *
-   * @param string|int|float|Color $param1
-   *   Color string or int, Color, red, or hue
-   * @param string|int|float $param2
-   *   Alpha, green or saturation
-   * @param string|int|float $param3
-   *   Blue or lightness
-   * @param string|float|bool $param4
-   *   Alpha value or FALSE for RGB, TRUE for HSL
-   * @param bool $param5
-   *   TRUE for HSL, FALSE for RGB (default)
+   * @throws \InvalidArgumentException
+   *   If the color string is invalid.
    */
-  public function __construct($param1 = NULL, $param2 = NULL, $param3 = NULL, $param4 = NULL, $param5 = FALSE)
+  public function __construct(string $color)
   {
-    $n_args = func_num_args();
+    $rgba = self::parseColorString($color);
+    $this->rgba($rgba['red'], $rgba['green'], $rgba['blue'], $rgba['alpha']);
+  }
 
-    if ($n_args == 0) {
-      // Default to fully-opaque black:
-      $this->rgba(0, 0, 0, 1);
-      return;
+  /**
+   * Create a color from RGBA values.
+   *
+   * @param int|string $red
+   * @param int|string $green
+   * @param int|string $blue
+   * @param float|string $alpha
+   *
+   * @return self
+   */
+  public static function fromRgba($red, $green, $blue, $alpha = 1): self
+  {
+    $color = new self('#000');
+    $color->rgba($red, $green, $blue, $alpha);
+    return $color;
+  }
+
+  /**
+   * Create a color from HSLA values.
+   *
+   * @param float $hue
+   * @param float|string $saturation
+   * @param float|string $lightness
+   * @param float|string $alpha
+   *
+   * @return self
+   */
+  public static function fromHsla($hue, $saturation, $lightness, $alpha = 1): self
+  {
+    $color = new self('#000');
+    $color->hsla($hue, $saturation, $lightness, $alpha);
+    return $color;
+  }
+
+  /**
+   * Magic getter for color components.
+   *
+   * @param string $name
+   * @return mixed
+   */
+  public function __get($name)
+  {
+    switch ($name) {
+      case 'red':
+        return $this->red();
+      case 'green':
+        return $this->green();
+      case 'blue':
+        return $this->blue();
+      case 'alpha':
+        return $this->alpha();
+      case 'hue':
+        return $this->hue();
+      case 'saturation':
+        return $this->saturation();
+      case 'lightness':
+        return $this->lightness();
     }
+    trigger_error('Undefined property: ' . __CLASS__ . '::$' . $name, E_USER_NOTICE);
+    return NULL;
+  }
 
-    if ($n_args <= 2) {
-
-      // Second param is alpha, default to 1:
-      $alpha = self::normalizeFraction($param2);
-
-      if (is_numeric($param1)) {
-        // Integer representing a 24-bit RGB color, as would be supplied by imagecolorat().
-        $this->value = (((int) $param1) & 0xFFFFFF) << 8;
-        $this->alpha($alpha);
-        return;
-      }
-
-      if (is_string($param1)) {
-
-        // Transparent:
-        if (strcasecmp($param1, 'transparent') == 0) {
-          // Use same value as CSS for transparent. Alpha is 0, color is black by default.
-          $this->value = 0;
-          return;
-        }
-
-        // Check for color name:
-        if (self::isColorName($param1)) {
-          $rgb = self::hex2rgb(self::colorName2hex($param1));
-          $this->rgba($rgb['red'], $rgb['green'], $rgb['blue'], $alpha);
-          return;
-        }
-
-        // Check for hex color string:
-        if (self::isHexString($param1)) {
-          $rgb = self::hex2rgb($param1);
-          $this->rgba($rgb['red'], $rgb['green'], $rgb['blue'], $alpha);
-          return;
-        }
-
-        // Regular expressions:
-        $num = "((\d*\.)?\d+)";
-        $pc = "\s*($num%?)\s*";
-        $deg = "\s*(-?$num)\s*";
-
-        // Check for rgb():
-        $pattern = "/^rgb\($pc,$pc,$pc\)$/i";
-        $n_matches = preg_match($pattern, $param1, $matches);
-        if ($n_matches) {
-          $this->rgba($matches[1], $matches[4], $matches[7], $alpha);
-          return;
-        }
-
-        // Check for rgba():
-        $pattern = "/^rgba\($pc,$pc,$pc,$pc\)$/i";
-        $n_matches = preg_match($pattern, $param1, $matches);
-        if ($n_matches) {
-          $alpha *= self::normalizeFraction($matches[10]);
-          $this->rgba($matches[1], $matches[4], $matches[7], $alpha);
-          return;
-        }
-
-        // Check for hsl():
-        $pattern = "/^hsl\($deg,$pc,$pc\)$/i";
-        $n_matches = preg_match($pattern, $param1, $matches);
-        if ($n_matches) {
-          $this->hsla($matches[1], $matches[4], $matches[7], $alpha);
-          return;
-        }
-
-        // Check for hsla():
-        $pattern = "/^hsla\($deg,$pc,$pc,$pc\)$/i";
-        $n_matches = preg_match($pattern, $param1, $matches);
-        if ($n_matches) {
-          $alpha *= self::normalizeFraction($matches[10]);
-          $this->hsla($matches[1], $matches[4], $matches[7], $alpha);
-          return;
-        }
-      }
-
-      if (is_array($param1)) {
-        // RGB or RGBA array.
-        $red    = isset($param1['red'])   ? $param1['red']   : 0;
-        $green  = isset($param1['green']) ? $param1['green'] : 0;
-        $blue   = isset($param1['blue'])  ? $param1['blue']  : 0;
-        $alpha2 = isset($param1['alpha']) ? $param1['alpha'] : 1;
-        $this->rgba($red, $green, $blue, $alpha * $alpha2);
-        return;
-      }
-
-      if ($param1 instanceof self) {
-        // Copy the object, taking into account the alpha parameter if provided:
-        $rgba = $param1->rgba();
-        $this->rgba($rgba['red'], $rgba['green'], $rgba['blue'], $rgba['alpha'] * $alpha);
-        return;
-      }
-    } elseif ($n_args >= 3) {
-
-      if ($n_args == 3) {
-        // RGB with no alpha:
-        $alpha = 1;
-        $hsl = FALSE;
-      } elseif ($n_args == 4) {
-        if (is_bool($param4)) {
-          // HSL or RGB with unspecified alpha, default to 1:
-          $alpha = 1;
-          $hsl = $param4;
-        } else {
-          // RGB with alpha:
-          $alpha = (float) $param4;
-          $hsl = FALSE;
-        }
-      } else {
-        // HSL or RGB with alpha:
-        $alpha = (float) $param4;
-        $hsl = (bool) $param5;
-      }
-
-      if ($hsl) {
-        $this->hsla($param1, $param2, $param3, $alpha);
-      } else {
-        $this->rgba($param1, $param2, $param3, $alpha);
-      }
-      return;
+  /**
+   * Magic setter for color components.
+   *
+   * @param string $name
+   * @param mixed $value
+   */
+  public function __set($name, $value)
+  {
+    switch ($name) {
+      case 'red':
+        $this->red($value);
+        break;
+      case 'green':
+        $this->green($value);
+        break;
+      case 'blue':
+        $this->blue($value);
+        break;
+      case 'alpha':
+        $this->alpha($value);
+        break;
+      case 'hue':
+        $this->hue($value);
+        break;
+      case 'saturation':
+        $this->saturation($value);
+        break;
+      case 'lightness':
+        $this->lightness($value);
+        break;
+      default:
+        trigger_error('Undefined property: ' . __CLASS__ . '::$' . $name, E_USER_NOTICE);
     }
-
-    trigger_error("Color::__construct() - Invalid parameters.", E_USER_WARNING);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -601,7 +472,7 @@ class Color
 
   /**
    * Returns true if the string is a hex color string.
-   * Leading '#' is optional.  Can be 6-digit or 3-digit.
+   * Leading '#' is optional. Can be 3, 4, 6 or 8-digit.
    *
    * @return  bool
    * @param   string  $str
@@ -609,7 +480,7 @@ class Color
   public static function isHexString($str)
   {
     $hex_digit = "[a-f0-9]";
-    $pattern = "/^#?($hex_digit{6}|$hex_digit{3})$/i";
+    $pattern = "/^#?($hex_digit{3}|$hex_digit{4}|$hex_digit{6}|$hex_digit{8})$/i";
     return (bool) preg_match($pattern, $str);
   }
 
@@ -617,8 +488,8 @@ class Color
    * Mix two colors.
    * If called with only two parameters then the colors are mixed 50-50.
    *
-   * @param int|string|Color $color1
-   * @param int|string|Color $color2
+   * @param string|Color $color1
+   * @param string|Color $color2
    * @param float $frac1
    *   0.0..1.0 Fraction of $color1
    * @return Color
@@ -645,7 +516,7 @@ class Color
     $alpha = ($color1->alpha() * $frac1) + ($color2->alpha() * $frac2);
 
     // Create and return the mixed color:
-    return new self($red, $green, $blue, $alpha);
+    return self::fromRgba($red, $green, $blue, $alpha);
   }
 
   /**
@@ -658,8 +529,8 @@ class Color
    * @see http://www.w3.org/TR/2003/REC-SVG11-20030114/masking.html#SimpleAlphaBlending
    * @see http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
    *
-   * @param int|string|Color $top_color
-   * @param int|string|Color $bottom_color
+   * @param string|Color $top_color
+   * @param string|Color $bottom_color
    * @return Color
    */
   public static function blend($top_color, $bottom_color)
@@ -681,7 +552,7 @@ class Color
     }
 
     // Create and return new color:
-    return new self($rgb3['red'], $rgb3['green'], $rgb3['blue'], $a3);
+    return self::fromRgba($rgb3['red'], $rgb3['green'], $rgb3['blue'], $a3);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -912,14 +783,51 @@ class Color
   }
 
   /**
+   * Parse a color string into RGBA components.
+   *
+   * @param string $color
+   * @return array
+   *
+   * @throws \InvalidArgumentException
+   */
+  protected static function parseColorString(string $color): array
+  {
+    $str = trim($color);
+
+    if (strcasecmp($str, 'transparent') === 0) {
+      return ['red' => 0, 'green' => 0, 'blue' => 0, 'alpha' => 0.0];
+    }
+
+    if (self::isColorName($str)) {
+      $rgba = self::hex2rgb(self::colorName2hex($str));
+      $rgba['alpha'] = $rgba['alpha'] ?? 1.0;
+      return $rgba;
+    }
+
+    if (self::isHexString($str)) {
+      $rgba = self::hex2rgb($str);
+      $rgba['alpha'] = $rgba['alpha'] ?? 1.0;
+      return $rgba;
+    }
+
+    throw new \InvalidArgumentException('Invalid color string: ' . $color);
+  }
+
+  /**
    * Converts value to a Color, if not one already.
    * Use this to avoid creating a new object if the param is already a Color.
    *
-   * @param int|string|Color $color
+   * @param string|Color $color
    */
   protected static function normalizeColor($color)
   {
-    return ($color instanceof self) ? $color : new self($color);
+    if ($color instanceof self) {
+      return $color;
+    }
+    if (is_string($color)) {
+      return new self($color);
+    }
+    throw new \InvalidArgumentException('Invalid color value');
   }
 
   /////////////////////////////////////////////////////////////////////////
@@ -1109,23 +1017,41 @@ class Color
       $hex = substr($hex, 1);
     }
 
-    if (strlen($hex) == 6) {
-      // 6-digit hex string. Split string into bytes:
+    $len = strlen($hex);
+    if ($len === 8) {
+      // 8-digit hex string (RRGGBBAA).
       $red   = hexdec(substr($hex, 0, 2));
       $green = hexdec(substr($hex, 2, 2));
       $blue  = hexdec(substr($hex, 4, 2));
+      $alpha = hexdec(substr($hex, 6, 2));
+    } elseif ($len === 6) {
+      // 6-digit hex string.
+      $red   = hexdec(substr($hex, 0, 2));
+      $green = hexdec(substr($hex, 2, 2));
+      $blue  = hexdec(substr($hex, 4, 2));
+    } elseif ($len === 4) {
+      // 4-digit hex string (RGBA). Double each digit.
+      $red   = hexdec(str_repeat($hex[0], 2));
+      $green = hexdec(str_repeat($hex[1], 2));
+      $blue  = hexdec(str_repeat($hex[2], 2));
+      $alpha = hexdec(str_repeat($hex[3], 2));
     } else {
       // 3-digit hex string. Double each hex digit:
-      $red   = hexdec($hex[0] . $hex[0]);
-      $green = hexdec($hex[1] . $hex[1]);
-      $blue  = hexdec($hex[2] . $hex[2]);
+      $red   = hexdec(str_repeat($hex[0], 2));
+      $green = hexdec(str_repeat($hex[1], 2));
+      $blue  = hexdec(str_repeat($hex[2], 2));
     }
 
-    return array(
+    $result = array(
       'red'   => $red,
       'green' => $green,
       'blue'  => $blue,
     );
+    if (isset($alpha)) {
+      $result['alpha'] = $alpha / 255;
+    }
+
+    return $result;
   }
 
   /////////////////////////////////////////////////////////////////////////
