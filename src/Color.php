@@ -4,1249 +4,1148 @@ declare(strict_types=1);
 
 namespace Superclasses;
 
+use InvalidArgumentException;
+use Stringable;
+
+require_once __DIR__ . '/Angles.php';
+
 /**
  * Color class.
  *
- * @author  Shaun Moss
+ * @author Shaun Moss
  * @version 2012-08-11
  *
- * @todo TEST THIS CLASS!
- *
  * @idea Also provide properties for cyan, magenta, yellow and black.
+ *
+ * NOTE RE COLOR COMPONENTS
+ * Color components (red, green, blue, alpha) can be provided as ints or floats. These have
+ * different meanings.
+ * - If an int, this is taken to be the byte value and must be in the range 0-255.
+ * - If a float, this is taken to be the fraction and it must be in the range 0.0-1.0.
+ * Therefore, there is a risk of confusion if the value is equal to 1:
+ *      - if it's an int the component's byte value will be 1
+ *      - if it's a float (i.e. 1.0) then the component's byte value will be 255 (0xff)
+ * SO: be careful you don't pass integer 1 when you really mean 1.0 or '100%'.
  */
-class Color
+class Color implements Stringable
 {
+    private const MAX_U32 = 0xffffffff;
 
-  /**
-   * The color value, a 32-bit integer with bytes organised as ARGB.
-   *
-   * @var int
-   */
-  protected $value;
+    /**
+     * The color value, a 32-bit integer with bytes organised as RGBA (i.e. 0xRRGGBBAA).
+     *
+     * @var int
+     */
+    public int $value = 0 {
+        set(int $value) {
+            // Check the provided color value is in the valid range for 32-bit color.
+            if ($value < 0 || $value > self::MAX_U32) {
+                throw new InvalidArgumentException('Invalid color value. Must be in the range 0 to ' . self::MAX_U32 . ' (0xffffffff).');
+            }
 
-  /**
-   * Constructor.
-   *
-   * Accepts a CSS color name or a hex string (3, 4, 6, or 8 digits, with or
-   * without a leading '#').
-   *
-   * @param string $color
-   *   Color string.
-   *
-   * @throws \InvalidArgumentException
-   *   If the color string is invalid.
-   */
-  public function __construct(string $color)
-  {
-    $rgba = self::parseColorString($color);
-    $this->rgba($rgba['red'], $rgba['green'], $rgba['blue'], $rgba['alpha']);
-  }
-
-  /**
-   * Create a color from RGBA values.
-   *
-   * @param int|string $red
-   * @param int|string $green
-   * @param int|string $blue
-   * @param float|string $alpha
-   *
-   * @return self
-   */
-  public static function fromRgba($red, $green, $blue, $alpha = 1): self
-  {
-    $color = new self('#000');
-    $color->rgba($red, $green, $blue, $alpha);
-    return $color;
-  }
-
-  /**
-   * Create a color from HSLA values.
-   *
-   * @param float $hue
-   * @param float|string $saturation
-   * @param float|string $lightness
-   * @param float|string $alpha
-   *
-   * @return self
-   */
-  public static function fromHsla($hue, $saturation, $lightness, $alpha = 1): self
-  {
-    $color = new self('#000');
-    $color->hsla($hue, $saturation, $lightness, $alpha);
-    return $color;
-  }
-
-  /**
-   * Magic getter for color components.
-   *
-   * @param string $name
-   * @return mixed
-   */
-  public function __get($name)
-  {
-    switch ($name) {
-      case 'red':
-        return $this->red();
-      case 'green':
-        return $this->green();
-      case 'blue':
-        return $this->blue();
-      case 'alpha':
-        return $this->alpha();
-      case 'hue':
-        return $this->hue();
-      case 'saturation':
-        return $this->saturation();
-      case 'lightness':
-        return $this->lightness();
-    }
-    trigger_error('Undefined property: ' . __CLASS__ . '::$' . $name, E_USER_NOTICE);
-    return NULL;
-  }
-
-  /**
-   * Magic setter for color components.
-   *
-   * @param string $name
-   * @param mixed $value
-   */
-  public function __set($name, $value)
-  {
-    switch ($name) {
-      case 'red':
-        $this->red($value);
-        break;
-      case 'green':
-        $this->green($value);
-        break;
-      case 'blue':
-        $this->blue($value);
-        break;
-      case 'alpha':
-        $this->alpha($value);
-        break;
-      case 'hue':
-        $this->hue($value);
-        break;
-      case 'saturation':
-        $this->saturation($value);
-        break;
-      case 'lightness':
-        $this->lightness($value);
-        break;
-      default:
-        trigger_error('Undefined property: ' . __CLASS__ . '::$' . $name, E_USER_NOTICE);
-    }
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // Methods for getting/setting properties.
-
-  /**
-   * Gets/sets the 32-bit RGBA color value.
-   *
-   * @param null|int $value
-   *   0..0xFFFFFFFF
-   * @return int|null
-   *   0..0xFFFFFFFF
-   */
-  public function value($value = NULL)
-  {
-    if ($value === NULL) {
-      // Get the value:
-      return $this->value;
+            $this->value = $value;
+        }
     }
 
-    // Set the value. Convert to 32-bit int:
-    $this->value = ((int) $value) & 0xFFFFFFFF;
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Virtual properties
 
-    return $this;
-  }
+    public int $red {
+        get => ($this->value >> 24) & 0xff;
 
-  /**
-   * Gets/sets the red value.
-   *
-   * @param null|int|string $red
-   *   0..255 or 0%..100%
-   * @return int|null
-   *   0..255
-   */
-  public function red($red = NULL)
-  {
-    if ($red === NULL) {
-      // Get the red value:
-      return ($this->value >> 24) & 0xFF;
+        set(int|float|string $r) {
+            // Check the provided value is valid.
+            $r = self::checkColorComponent($r)[0];
+
+            // Update the value.
+            $this->value = ($this->value & 0x00ffffff) | ($r << 24);
+        }
     }
 
-    // Set the red value:
-    $red = self::normalizeByte($red);
-    $this->value = ($this->value & 0x00FFFFFF) | ($red << 24);
+    public int $green {
+        get => ($this->value >> 16) & 0xff;
 
-    return $this;
-  }
+        set(int|float|string $g) {
+            // Check the provided value is valid.
+            $g = self::checkColorComponent($g)[0];
 
-  /**
-   * Gets/sets the green value.
-   *
-   * @param null|int|string $green
-   *   0..255 or 0%..100%
-   * @return int|null
-   *   0..255
-   */
-  public function green($green = NULL)
-  {
-    if ($green === NULL) {
-      // Get the green value:
-      return ($this->value >> 16) & 0xFF;
+            // Update the value.
+            $this->value = ($this->value & 0xff00ffff) | ($g << 16);
+        }
     }
 
-    // Set the green value:
-    $green = self::normalizeByte($green);
-    $this->value = ($this->value & 0xFF00FFFF) | ($green << 16);
+    public int $blue {
+        get => ($this->value >> 8) & 0xff;
 
-    return $this;
-  }
+        set(int|float|string $b) {
+            // Check the provided value is valid.
+            $b = self::checkColorComponent($b)[0];
 
-  /**
-   * Gets/sets the blue value.
-   *
-   * @param null|int|string $blue
-   *   0..255 or 0%..100%
-   * @return int|null
-   *   0..255
-   */
-  public function blue($blue = NULL)
-  {
-    if ($blue === NULL) {
-      // Get the blue value:
-      return ($this->value >> 8) & 0xFF;
+            // Update the value.
+            $this->value = ($this->value & 0xffff00ff) | ($b << 8);
+        }
     }
 
-    // Set the blue value:
-    $blue = self::normalizeByte($blue);
-    $this->value = ($this->value & 0xFFFF00FF) | ($blue << 8);
+    public int $alpha {
+        get => $this->value & 0xff;
 
-    return $this;
-  }
+        set(int|float|string $a) {
+            // Check the provided value is valid.
+            $a = self::checkColorComponent($a)[0];
 
-  /**
-   * Gets/sets the alpha value.
-   *
-   * @param null|float|string $alpha
-   *   0.0..1.0 or 0%..100%
-   * @return float|null
-   *   0.0..1.0
-   */
-  public function alpha($alpha = NULL)
-  {
-    if ($alpha === NULL) {
-      // Get the alpha value as a fraction in the range 0.0..1.0:
-      return ($this->value & 0xFF) / 255;
+            // Update the value.
+            $this->value = ($this->value & 0xffffff00) | $a;
+        }
     }
 
-    // Set the alpha value:
-    $alpha = self::normalizeFractionByte($alpha);
-    $this->value = ($this->value & 0xFFFFFF00) | $alpha;
+    public float $hue {
+        get => $this->toHsl()['hue'];
 
-    return $this;
-  }
+        set(float|string $hue) {
+            // Check the provided value is valid.
+            $h = self::checkAngle($hue);
 
-  /**
-   * Gets/sets the hue.
-   *
-   * @param null|float $hue
-   *   0..360
-   * @return float|null
-   *   0..360
-   */
-  public function hue($hue = NULL)
-  {
-    if ($hue === NULL) {
-      // Get the hue:
-      $hsl = $this->hsl();
-      return $hsl['hue'];
+            // Get the current saturation and lightness values.
+            ['saturation' => $s, 'lightness' => $l] = $this->toHsl();
+
+            // Update the value.
+            $this->_setRgbaBytesFromHsl($h, $s, $l);
+        }
     }
 
-    // Set the hue:
-    $hue = self::normalizeDegree($hue);
-    $hsl = $this->hsl();
-    $this->hsl($hue, $hsl['saturation'], $hsl['lightness']);
+    public float $saturation {
+        get => $this->toHsl()['saturation'];
 
-    return $this;
-  }
+        set(float|string $saturation) {
+            // Check the provided value is valid.
+            $s = self::checkFrac($saturation);
 
-  /**
-   * Gets/sets the saturation.
-   *
-   * @param null|float|string $saturation
-   *   0.0..1.0 or 0%..100%
-   * @return float|null
-   *   0.0..1.0
-   */
-  public function saturation($saturation = NULL)
-  {
-    if ($saturation === NULL) {
-      // Get the saturation:
-      $hsl = $this->hsl();
-      return $hsl['saturation'];
+            // Get the current hue and lightness values.
+            ['hue' => $h, 'lightness' => $l] = $this->toHsl();
+
+            // Update the value.
+            $this->_setRgbaBytesFromHsl($h, $s, $l);
+        }
     }
 
-    // Set the saturation:
-    $saturation = self::normalizeFraction($saturation);
-    $hsl = $this->hsl();
-    $this->hsl($hsl['hue'], $saturation, $hsl['lightness']);
+    public float $lightness {
+        get => $this->toHsl()['lightness'];
 
-    return $this;
-  }
+        set(float|string $lightness) {
+            // Check the provided value is valid.
+            $l = self::checkFrac($lightness);
 
-  /**
-   * Gets/sets the lightness.
-   *
-   * @param null|float|string $lightness
-   *   0.0..1.0 or 0%..100%
-   * @return float|null
-   *   0.0..1.0
-   */
-  public function lightness($lightness = NULL)
-  {
-    if ($lightness === NULL) {
-      // Get the lightness:
-      $hsl = $this->hsl();
-      return $hsl['lightness'];
+            // Get the current hue and saturation values.
+            ['hue' => $h, 'saturation' => $s] = $this->toHsl();
+
+            // Update the value.
+            $this->_setRgbaBytesFromHsl($h, $s, $l);
+        }
     }
 
-    // Set the lightness:
-    $lightness = self::normalizeFraction($lightness);
-    $hsl = $this->hsla();
-    $this->hsl($hsl['hue'], $hsl['saturation'], $lightness);
+    /**
+     * Constructor.
+     *
+     * Accepts a CSS color name or a hex string (3, 4, 6, or 8 digits, with or
+     * without a leading '#').
+     *
+     * @param int|string $color The 32-bit color value or color string.
+     * @throws InvalidArgumentException If the provided color value is invalid.
+     */
+    public function __construct(int|string $color = 0)
+    {
+        // If we have an int, set the property. That will check the range.
+        if (is_int($color)) {
+            $this->value = $color;
+            return;
+        }
 
-    return $this;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // Public methods for getting/setting multiple properties.
-
-  /**
-   * Gets/sets all RGBA values.
-   *
-   * @param null|int|string $red
-   *   0..255 or 0%..100%
-   * @param null|int|string $green
-   *   0..255 or 0%..100%
-   * @param null|int|string $blue
-   *   0..255 or 0%..100%
-   * @param null|float|string $alpha
-   *   0.0..1.0 or 0%..100%
-   * @return  array
-   */
-  public function rgba($red = NULL, $green = NULL, $blue = NULL, $alpha = NULL)
-  {
-    if ($red === NULL) {
-      // Get the RGBA values:
-      return array_merge($this->rgb(), array('alpha' => $this->alpha()));
+        // Argument is a string, convert to RGBA bytes.
+        $rgba = self::colorStringToRgba($color);
+        $this->_setRgbaBytes($rgba['red'], $rgba['green'], $rgba['blue'], $rgba['alpha']);
     }
 
-    // Set the RGBA values:
-    $this->red($red);
-    $this->green($green);
-    $this->blue($blue);
-    $this->alpha($alpha);
-
-    return $this;
-  }
-
-  /**
-   * Gets/sets all RGB values.
-   *
-   * @param null|int|string $red
-   *   0..255 or 0%..100%
-   * @param null|int|string $green
-   *   0..255 or 0%..100%
-   * @param null|int|string $blue
-   *   0..255 or 0%..100%
-   * @return  array
-   */
-  public function rgb($red = NULL, $green = NULL, $blue = NULL)
-  {
-    if ($red === NULL) {
-      // Get the RGB values:
-      return array(
-        'red'   => $this->red(),
-        'green' => $this->green(),
-        'blue'  => $this->blue(),
-      );
+    /**
+     * Set the red, green, blue, and alpha components all at the same time.
+     * This is an internal function and arguments are assumed to be valid.
+     *
+     * @param int $red The red component as a byte.
+     * @param int $green The green component as a byte.
+     * @param int $blue The blue component as a byte.
+     * @param int $alpha The alpha value as a byte.
+     */
+    protected function _setRgbaBytes(int $red, int $green, int $blue, int $alpha): void
+    {
+        $this->value = ($red << 24) | ($green << 16) | ($blue << 8) | $alpha;
     }
 
-    // Set the RGB values:
-    $this->red($red);
-    $this->green($green);
-    $this->blue($blue);
-
-    return $this;
-  }
-
-  /**
-   * Gets/sets all HSLA values.
-   *
-   * @param null|float $hue
-   *   0..360
-   * @param null|float|string $saturation
-   *   0.0..1.0 or 0%..100%
-   * @param null|float|string $lightness
-   *   0.0..1.0 or 0%..100%
-   * @param null|float|string $alpha
-   *   0.0..1.0 or 0%..100%
-   * @return array|null
-   *   hue        => 0..360
-   *   saturation => 0.0..1.0
-   *   lightness  => 0.0..1.0
-   *   alpha      => 0.0..1.0
-   */
-  public function hsla($hue = NULL, $saturation = NULL, $lightness = NULL, $alpha = NULL)
-  {
-    if ($hue === NULL) {
-      // Get the HSLA values:
-      return array_merge($this->hsl(), array('alpha' => $this->alpha()));
+    /**
+     * Sets the RGB components of this color from HSL values, preserving the current alpha.
+     * This is an internal function and arguments are assumed to be valid.
+     *
+     * @param float $h The hue in degrees (0.0–360.0).
+     * @param float $s The saturation as a fraction (0.0–1.0).
+     * @param float $l The lightness as a fraction (0.0–1.0).
+     */
+    protected function _setRgbaBytesFromHsl(float $h, float $s, float $l): void
+    {
+        ['red' => $r, 'green' => $g, 'blue' => $b] = self::hslToRgb($h, $s, $l);
+        $this->_setRgbaBytes($r, $g, $b, $this->alpha);
     }
 
-    // Set the HSLA values:
-    $rgb = self::hsl2rgb($hue, $saturation, $lightness);
-    $this->rgba($rgb['red'], $rgb['green'], $rgb['blue'], $alpha);
+    /**
+     * Set the red, green, blue, and alpha components all at the same time.
+     *
+     * @param int|float|string $red The red component as a byte, fraction, or percentage string.
+     * @param int|float|string $green The green component as a byte, fraction, or percentage string.
+     * @param int|float|string $blue The blue component as a byte, fraction, or percentage string.
+     * @param int|float|string $alpha The alpha value as a byte, fraction, or percentage string (optional, defaults to 0xff).
+     * @throws InvalidArgumentException If any inputs are invalid.
+     */
+    public function setRgba(
+        int|float|string $red,
+        int|float|string $green,
+        int|float|string $blue,
+        int|float|string $alpha = 0xff
+    ) {
+        // Check the arguments and get the byte values.
+        $r = self::checkColorComponent($red)[0];
+        $g = self::checkColorComponent($green)[0];
+        $b = self::checkColorComponent($blue)[0];
+        $a = self::checkColorComponent($alpha)[0];
 
-    return $this;
-  }
-
-  /**
-   * Gets/sets all HSL values.
-   *
-   * @param null|float $hue
-   *   0..360
-   * @param null|float|string $saturation
-   *   0.0..1.0 or 0%..100%
-   * @param null|float|string $lightness
-   *   0.0..1.0 or 0%..100%
-   * @return array|null
-   *   hue        => 0..360
-   *   saturation => 0.0..1.0
-   *   lightness  => 0.0..1.0
-   */
-  public function hsl($hue = NULL, $saturation = NULL, $lightness = NULL)
-  {
-    if ($hue === NULL) {
-      // Get the HSL values:
-      return self::rgb2hsl($this->red(), $this->green(), $this->blue());
+        // Set the byte values.
+        $this->_setRgbaBytes($r, $g, $b, $a);
     }
 
-    // Set the HSL values:
-    $rgb = self::hsl2rgb($hue, $saturation, $lightness);
-    $this->rgb($rgb['red'], $rgb['green'], $rgb['blue']);
+    /**
+     * Parse a color string into RGBA component bytes.
+     *
+     * @param string $color
+     * @return array The RGBA component bytes of the color.
+     * @throws InvalidArgumentException If the string is not a valid color (named or hex).
+     */
+    public static function colorStringToRgba(string $color): array
+    {
+        $str = trim($color);
 
-    return $this;
-  }
+        // Transparent.
+        if (strcasecmp($str, 'transparent') === 0) {
+            return ['red' => 0, 'green' => 0, 'blue' => 0, 'alpha' => 0];
+        }
 
-  ///////////////////////////////////////////////////////////////////////////
-  // Lightness-related methods.
+        // Named color.
+        if (self::isColorName($str)) {
+            $str = self::colorNameToHex($str);
+        }
 
-  /**
-   * Returns true for a dark color.
-   *
-   * @return  bool
-   */
-  public function isDark()
-  {
-    return $this->lightness() < 0.5;
-  }
+        // Convert hex color string to RGBA color component bytes.
+        $rgba = self::hexToRgba($str);
 
-  /**
-   * Returns true for a light color.
-   *
-   * @return  bool
-   */
-  public function isLight()
-  {
-    return $this->lightness() >= 0.5;
-  }
+        // Check if invalid.
+        if ($rgba === null) {
+            throw new InvalidArgumentException("Invalid color string: '$color'.");
+        }
 
-  ///////////////////////////////////////////////////////////////////////////
-  // Miscellaneous static methods.
-
-  /**
-   * Returns true if the string is a hex color string.
-   * Leading '#' is optional. Can be 3, 4, 6 or 8-digit.
-   *
-   * @return  bool
-   * @param   string  $str
-   */
-  public static function isHexString($str)
-  {
-    $hex_digit = "[a-f0-9]";
-    $pattern = "/^#?($hex_digit{3}|$hex_digit{4}|$hex_digit{6}|$hex_digit{8})$/i";
-    return (bool) preg_match($pattern, $str);
-  }
-
-  /**
-   * Mix two colors.
-   * If called with only two parameters then the colors are mixed 50-50.
-   *
-   * @param string|Color $color1
-   * @param string|Color $color2
-   * @param float $frac1
-   *   0.0..1.0 Fraction of $color1
-   * @return Color
-   */
-  public static function mix($color1, $color2, $frac1 = 0.5)
-  {
-    $color1 = self::normalizeColor($color1);
-    $color2 = self::normalizeColor($color2);
-
-    $frac1 = (float) $frac1;
-    if ($frac1 <= 0) {
-      return $color2;
+        return $rgba;
     }
 
-    if ($frac1 >= 1) {
-      return $color1;
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Factory methods
+
+    /**
+     * Create a color from RGBA values.
+     *
+     * @param int|float|string $red The red component as a byte, fraction, or percentage string.
+     * @param int|float|string $green The green component as a byte, fraction, or percentage string.
+     * @param int|float|string $blue The blue component as a byte, fraction, or percentage string.
+     * @param int|float|string $alpha The alpha value as a byte, fraction, or percentage string (optional, defaults to 100%).
+     * @return self
+     * @throws InvalidArgumentException If any inputs are invalid.
+     */
+    public static function fromRgba(
+        int|float|string $red,
+        int|float|string $green,
+        int|float|string $blue,
+        int|float|string $alpha = 0xff
+    ): self {
+        $color = new self();
+        $color->setRgba($red, $green, $blue, $alpha);
+        return $color;
     }
 
-    // Get the red, green, blue and alpha parts of the new color:
-    $frac2 = 1 - $frac1;
-    $red   = round(($color1->red()   * $frac1) + ($color2->red()   * $frac2));
-    $green = round(($color1->green() * $frac1) + ($color2->green() * $frac2));
-    $blue  = round(($color1->blue()  * $frac1) + ($color2->blue()  * $frac2));
-    $alpha = ($color1->alpha() * $frac1) + ($color2->alpha() * $frac2);
+    /**
+     * Create a color from HSLA values.
+     *
+     * @param float|string $hue The hue in degrees or as an angle string.
+     * @param float|string $saturation The saturation as a fraction or percentage string.
+     * @param float|string $lightness The lightness as a fraction or percentage string.
+     * @param float|string $alpha The alpha value as a byte, fraction, or percentage string (optional, defaults to 100%).
+     *
+     * @return self
+     */
+    public static function fromHsla(
+        float|string $hue,
+        float|string $saturation,
+        float|string $lightness,
+        float|string $alpha = 0xff
+    ): self {
+        // Check the arguments.
+        $h = self::checkAngle($hue);
+        $s = self::checkFrac($saturation);
+        $l = self::checkFrac($lightness);
+        $a = self::checkColorComponent($alpha)[0];
 
-    // Create and return the mixed color:
-    return self::fromRgba($red, $green, $blue, $alpha);
-  }
+        // Convert the HSL components to RGB components.
+        ['red' => $r, 'green' => $g, 'blue' => $b] = self::hslToRgb($h, $s, $l);
 
-  /**
-   * Blend two colors.
-   *
-   * This method is for setting one pixel ($color1) on top of another ($color2) on an image.
-   * @see StarImage::setPixel
-   *
-   * For formulas:
-   * @see http://www.w3.org/TR/2003/REC-SVG11-20030114/masking.html#SimpleAlphaBlending
-   * @see http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
-   *
-   * @param string|Color $top_color
-   * @param string|Color $bottom_color
-   * @return Color
-   */
-  public static function blend($top_color, $bottom_color)
-  {
-    $top_color = self::normalizeColor($top_color);
-    $bottom_color = self::normalizeColor($bottom_color);
-
-    // Calculate resultant alpha:
-    $a1 = $top_color->alpha();
-    $a2 = $bottom_color->alpha();
-    $a3 = $a1 + $a2 * (1 - $a1);
-
-    // Calculate red, green and blue components of resultant color:
-    $rgb1 = $top_color->rgb();
-    $rgb2 = $bottom_color->rgb();
-    $rgb3 = array();
-    foreach ($rgb1 as $color => $value) {
-      $rgb3[$color] = (($value * $a1) + ($rgb2[$color] * $a2 * (1 - $a1))) / $a3;
+        // Construct a new Color.
+        return self::fromRgba($r, $g, $b, $a);
     }
 
-    // Create and return new color:
-    return self::fromRgba($rgb3['red'], $rgb3['green'], $rgb3['blue'], $a3);
-  }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Methods for converting a Color to an array.
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Output methods:
-
-  /**
-   * Outputs the color as an RGB CSS string.
-   *
-   * @return string
-   */
-  public function rgbString()
-  {
-    $red   = $this->red();
-    $green = $this->green();
-    $blue  = $this->blue();
-    return "rgb($red, $green, $blue)";
-  }
-
-  /**
-   * Outputs the color as an RGBA CSS string.
-   *
-   * @return string
-   */
-  public function rgbaString()
-  {
-    $red   = $this->red();
-    $green = $this->green();
-    $blue  = $this->blue();
-    $alpha = round($this->alpha(), 3);
-    return "rgba($red, $green, $blue, $alpha)";
-  }
-
-  /**
-   * Outputs the color as an HSL CSS string.
-   *
-   * @return string
-   */
-  public function hslString()
-  {
-    $hsl        = $this->hsl();
-    $hue        = round($hsl['hue']);
-    $saturation = round($hsl['saturation'] * 100) . '%';
-    $lightness  = round($hsl['lightness']  * 100) . '%';
-    return "hsl($hue, $saturation, $lightness)";
-  }
-
-  /**
-   * Outputs the color as an RGBA CSS string.
-   *
-   * @return string
-   */
-  public function hslaString()
-  {
-    $hsla       = $this->hsla();
-    $hue        = round($hsla['hue']);
-    $saturation = round($hsla['saturation'] * 100) . '%';
-    $lightness  = round($hsla['lightness']  * 100) . '%';
-    $alpha      = round($hsla['alpha'], 3);
-    return "hsla($hue, $saturation, $lightness, $alpha)";
-  }
-
-  /**
-   * Outputs the color as a 6-digit hexadecimal string, or 8-digit if alpha is included.
-   *
-   * @param bool $include_alpha
-   * @param bool $include_hash
-   * @return string
-   */
-  public function hex($include_alpha = FALSE, $include_hash = TRUE)
-  {
-    if ($include_alpha) {
-      $value = $this->value;
-      $n_chars = 8;
-    } else {
-      $value = ($this->value >> 8) & 0xFFFFFF;
-      $n_chars = 6;
-    }
-    return ($include_hash ? '#' : '') . str_pad(strtoupper(dechex($value)), $n_chars, '0', STR_PAD_LEFT);
-  }
-
-  /**
-   * Default string representation of color is 8-digit RGBA hex string.
-   * Not CSS compatible, but concise and informative.
-   *
-   * @return string
-   */
-  public function __toString()
-  {
-    return $this->hex(TRUE, TRUE);
-  }
-
-  /**
-   * Get the color as an informative array, with:
-   *   red
-   *   green
-   *   blue
-   *   alpha
-   *   hue
-   *   saturation
-   *   lightness
-   *   hex
-   *
-   * @return array
-   */
-  public function toArray()
-  {
-    return array_merge($this->rgba(), $this->hsl(), array('hex' => $this->hex()));
-  }
-
-  /////////////////////////////////////////////////////////////////////////
-  // Protected static methods to normalize parameters.
-
-  /**
-   * Convert a null, int, float or string to an int between 0..255.
-   * Used for red, green, blue.
-   *
-   * @static
-   * @param null|int|float|string $value
-   *   0..255 or 0%..100%
-   * @return int
-   *   0..255
-   */
-  protected static function normalizeByte($value)
-  {
-    // Default to 0:
-    if ($value === NULL) {
-      return 0;
+    /**
+     * Gets RGB color components as an array.
+     *
+     * @return array Array of color components as bytes.
+     */
+    public function toRgb(): array
+    {
+        return [
+            'red'   => $this->red,
+            'green' => $this->green,
+            'blue'  => $this->blue
+        ];
     }
 
-    // Look for % value:
-    if (is_string($value) && preg_match("/^((\d*\.)?\d+)%$/", trim($value), $matches)) {
-      $value = $matches[1] / 100 * 255;
+    /**
+     * Gets all RGBA values as an array.
+     *
+     * @return array Array of color components as bytes.
+     */
+    public function toRgba(): array
+    {
+        return [
+            'red'   => $this->red,
+            'green' => $this->green,
+            'blue'  => $this->blue,
+            'alpha' => $this->alpha
+        ];
     }
 
-    // Convert to int:
-    $value = (int) round((float) $value);
-
-    // Clamp value:
-    if ($value < 0) {
-      $value = 0;
-    } elseif ($value > 255) {
-      $value = 255;
+    /**
+     * Returns the Color as an array of numbers representing HSL values.
+     *
+     * Hue is represented as an angle in degrees (0-360).
+     * Saturation and lightness are represented as fractions (0.0-1.0).
+     *
+     * @return array Array of color components as numbers.
+     */
+    public function toHsl(): array
+    {
+        return self::rgbToHsl($this->red, $this->green, $this->blue);
     }
 
-    return $value;
-  }
-
-  /**
-   * Convert a value to a float between 0.0 and 1.0.
-   * Used for saturation and lightness.
-   *
-   * @static
-   * @param float|string $value
-   *   0.0..1.0 or 0%..100%
-   * @return float
-   *   0.0..1.0
-   */
-  protected static function normalizeFraction($value)
-  {
-    // Default to 1.0:
-    if ($value === NULL) {
-      return 1.0;
+    /**
+     * Returns the Color as an array of numbers representing HSLA values.
+     *
+     * Hue is represented as an angle in degrees (0-360).
+     * Saturation and lightness are represented as fractions (0.0-1.0).
+     * Alpha is represented as a byte (0-255).
+     *
+     * @return array Array of color components as numbers.
+     */
+    public function toHsla(): array
+    {
+        $hsla = self::rgbToHsl($this->red, $this->green, $this->blue);
+        $hsla['alpha'] = $this->alpha;
+        return $hsla;
     }
 
-    // Check for percentage:
-    if (is_string($value) && preg_match("/^((\d*\.)?\d+)%$/", trim($value), $matches)) {
-      $value = $matches[1] / 100;
+    /**
+     * Get the color as an informative array, with:
+     *   red
+     *   green
+     *   blue
+     *   alpha
+     *   hue
+     *   saturation
+     *   lightness
+     *   hex
+     *
+     * @return array An array of color properties.
+     */
+    public function toArray(): array
+    {
+        return array_merge(
+            $this->toRgba(),
+            $this->toHsl(),
+            ['hex' => $this->toHexString()]
+        );
     }
 
-    // Convert to float:
-    $value = (float) $value;
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Lightness-related methods
 
-    // Clamp value:
-    if ($value < 0) {
-      $value = 0;
-    } elseif ($value > 1) {
-      $value = 1;
+    /**
+     * Returns true for a dark color.
+     *
+     * @return  bool
+     */
+    public function isDark()
+    {
+        return $this->lightness < 0.5;
     }
 
-    return $value;
-  }
-
-  /**
-   * Convert a fractional value to a byte value.
-   * Used for alpha.
-   *
-   * @static
-   * @param float|string $value
-   *   0.0..1.0 or 0%..100%
-   * @return int
-   *   0..255
-   */
-  protected static function normalizeFractionByte($value)
-  {
-    return round(self::normalizeFraction($value) * 255);
-  }
-
-  /**
-   * Converts value to a float in the range 0..360.
-   * Used for hue.
-   *
-   * @param int|float $value
-   * @return float
-   *   0..360
-   */
-  protected static function normalizeDegree($value)
-  {
-    // Default to 0:
-    if ($value === NULL) {
-      return 0;
+    /**
+     * Returns true for a light color.
+     *
+     * @return  bool
+     */
+    public function isLight()
+    {
+        return $this->lightness >= 0.5;
     }
 
-    // Convert to float:
-    $value = (float) $value;
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Color mixing methods
 
-    // Shift value to valid range:
-    if ($value < 0) {
-      // Add multiples of 360 so it's within range:
-      return $value + (ceil(-$value / 360) * 360);
+    /**
+     * Mix two colors.
+     * If called with only two parameters then the colors are mixed 50-50.
+     *
+     * @param self $color2
+     * @param float|string $frac The fraction of the "this" color expressed as a float
+     *     (0.0 - 1.0) or percentage string (e.g. '50%').
+     * @return self
+     */
+    public function mix(Color $color2, float|string $frac = 0.5): self
+    {
+        // Validate fraction.
+        $frac = self::checkFrac($frac);
+
+        // Check for 100% this color.
+        $eps  = 1e-9;
+        if ($frac >= 1.0 - $eps) {
+            return clone $this;
+        }
+        // Check for 0% this color.
+        if ($frac <= $eps) {
+            return clone $color2;
+        }
+
+        // Compute the components of the new color.
+        $frac2 = 1.0 - $frac;
+        $r = (int)round(($this->red   * $frac) + ($color2->red   * $frac2));
+        $g = (int)round(($this->green * $frac) + ($color2->green * $frac2));
+        $b = (int)round(($this->blue  * $frac) + ($color2->blue  * $frac2));
+        $a = (int)round(($this->alpha * $frac) + ($color2->alpha * $frac2));
+
+        // Create and return the mixed color.
+        return self::fromRgba($r, $g, $b, $a);
     }
 
-    if ($value > 360) {
-      // Subtract multiples of 360 so it's within range:
-      return $value - (floor($value / 360) * 360);
+    /**
+     * Blend two colors.
+     *
+     * The $this color is the top color, and the argumentnt is the bottom color.
+     *
+     * This method is for setting one pixel ($color1) on top of another ($color2) on an image.
+     *
+     * For formulas:
+     * @see http://www.w3.org/TR/2003/REC-SVG11-20030114/masking.html#SimpleAlphaBlending
+     * @see http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
+     *
+     * @param self $bottom_color The underneath color.
+     * @return self The resulting color.
+     */
+    public function blend(Color $bottom_color)
+    {
+        // Calculate resultant alpha.
+        $a1 = self::byteToFrac($this->alpha);
+        $a2 = self::byteToFrac($bottom_color->alpha);
+        $a3 = $a1 + $a2 * (1 - $a1);
+
+        // Calculate red, green and blue components of resultant color:
+        $rgb1 = $this->toRgba();
+        $rgb2 = $bottom_color->toRgba();
+        $rgb3 = [];
+        foreach (['red', 'green', 'blue'] as $channel) {
+            $c1 = $rgb1[$channel] / 255;
+            $c2 = $rgb2[$channel] / 255;
+            $c3 = (($c1 * $a1) + ($c2 * $a2 * (1 - $a1))) / $a3;
+            $rgb3[$channel] = self::fracToByte($c3);
+        }
+
+        // Create and return new color.
+        return self::fromRgba($rgb3['red'], $rgb3['green'], $rgb3['blue'], self::fracToByte($a3));
     }
 
-    return $value;
-  }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Methods to validate arguments
 
-  /**
-   * Parse a color string into RGBA components.
-   *
-   * @param string $color
-   * @return array
-   *
-   * @throws \InvalidArgumentException
-   */
-  protected static function parseColorString(string $color): array
-  {
-    $str = trim($color);
+    /**
+     * Checks that the input value, which is meant to indicate a color component's value, is valid.
+     * The value can be:
+     *  - an integer in the range 0 - 255
+     *  - a float in the range 0.0 - 1.0
+     *  - a percentage string (e.g. '50%')
+     *
+     * @param int|float|string $value The value to check.
+     * @return array If the argument is valid, the equivalent byte and fraction.
+     * @throws InvalidArgumentException If the argument is invalid.
+     */
+    private static function checkColorComponent(int|float|string $value): array
+    {
+        // Set the error message.
+        $err_msg = "The value '$value' is invalid. A color component (red, green, blue, or alpha) must be provided as an integer in the range 0 to 255, a float in the range 0.0 to 1.0, or a percentage string (e.g. '50%').";
 
-    if (strcasecmp($str, 'transparent') === 0) {
-      return ['red' => 0, 'green' => 0, 'blue' => 0, 'alpha' => 0.0];
+        // Check int.
+        if (is_int($value)) {
+            // Check the range.
+            if ($value < 0 || $value > 255) {
+                throw new InvalidArgumentException($err_msg);
+            }
+
+            // Looks good.
+            return [$value, $value / 255.0];
+        }
+
+        // Check float.
+        if (is_float($value)) {
+            // Check the range.
+            if ($value < 0 || $value > 1) {
+                throw new InvalidArgumentException($err_msg);
+            }
+
+            // Convert to byte.
+            return [self::fracToByte($value), $value];
+        }
+
+        // Must be a string. Get the percentage as a fraction.
+        $frac = self::percentToFrac($value);
+        if ($frac === null) {
+            throw new InvalidArgumentException($err_msg);
+        }
+
+        // Convert to a byte.
+        return [self::fracToByte($frac), $frac];
     }
 
-    if (self::isColorName($str)) {
-      $rgba = self::hex2rgb(self::colorName2hex($str));
-      $rgba['alpha'] = $rgba['alpha'] ?? 1.0;
-      return $rgba;
+    /**
+     * Checks that the input value, which is meant to indicate an angle, is valid.
+     *
+     * If the argument is a number then it is treated as degrees. Negative values are ok.
+     *
+     * If the argument is a string, different units (deg, rad, grad, turn) are supported,
+     * as per CSS, plus also the degree symbol.
+     * There cannot be any spaces between the number and the unit.
+     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/angle
+     *
+     * If valid, the angle is returned in degrees normalized to the range [0-360).
+     * Otherwise, an exception is thrown.
+     *
+     * The purpose of the method is to check a value provided for hue.
+     *
+     * @param float|string $value The value to check.
+     * @return float If the argument is valid, the angle in degrees.
+     * @throws InvalidArgumentException If the argument is invalid.
+     */
+    private static function checkAngle(float|string $value): float
+    {
+        // Convert angle string to degrees.
+        if (is_string($value)) {
+            return Angles::parse($value);
+        }
+
+        // Normalize number to desired range [0-360).
+        return Angles::wrapDegrees($value);
     }
 
-    if (self::isHexString($str)) {
-      $rgba = self::hex2rgb($str);
-      $rgba['alpha'] = $rgba['alpha'] ?? 1.0;
-      return $rgba;
+    /**
+     * Check that a value provided for a fraction is valid.
+     * If a float, it must be in the range 0 - 1.
+     * If a string, it must be a valid percentage string (e.g. '50%').
+     * If valid, return the value as a fraction (float). Otherwise, throw an exception.
+     */
+    private static function checkFrac(float|string $value): float
+    {
+        $s = is_string($value) ? self::percentToFrac($value) : self::numToFrac($value);
+
+        if ($s === null) {
+            throw new InvalidArgumentException("Value '$value' is invalid. Fractional values must be provided either as a float in the range 0.0 to 1.0, or as a percentage string (e.g. '50%').");
+        }
+
+        return $s;
     }
 
-    throw new \InvalidArgumentException('Invalid color string: ' . $color);
-  }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Methods to convert values from one form to another
 
-  /**
-   * Converts value to a Color, if not one already.
-   * Use this to avoid creating a new object if the param is already a Color.
-   *
-   * @param string|Color $color
-   */
-  protected static function normalizeColor($color)
-  {
-    if ($color instanceof self) {
-      return $color;
-    }
-    if (is_string($color)) {
-      return new self($color);
-    }
-    throw new \InvalidArgumentException('Invalid color value');
-  }
+    /**
+     * Convert an input number to a fraction in the range 0.0 to 1.0.
+     */
+    public static function numToFrac(float $num): ?float
+    {
+        // Check the number is in range.
+        if ($num < 0 || $num > 1) {
+            return null;
+        }
 
-  /////////////////////////////////////////////////////////////////////////
-  // Static methods for converting between RGB, HSL and hex.
-
-
-  /**
-   * Convert RGB values to HSL.
-   *
-   * Algorithms:
-   *   @see http://www.w3.org/TR/css3-color/#hsl-color
-   *   @see http://130.113.54.154/~monger/hsl-rgb.html
-   *   @see http://en.wikipedia.org/wiki/HSL_color_space
-   *
-   * @param int $red
-   *   0..255
-   * @param int $green
-   *   0..255
-   * @param int $blue
-   *   0..255
-   * @return array
-   *   hue        => 0..360
-   *   saturation => 0.0..1.0
-   *   lightness  => 0.0..1.0
-   */
-  public static function rgb2hsl($red, $green, $blue)
-  {
-    // Convert the red, green and blue values to fractions:
-    $red   = self::normalizeByte($red)   / 255;
-    $green = self::normalizeByte($green) / 255;
-    $blue  = self::normalizeByte($blue)  / 255;
-
-    // Get the min and max values:
-    $min = min($red, $green, $blue);
-    $max = max($red, $green, $blue);
-
-    // Calculate lightness:
-    $lightness = ($min + $max) / 2;
-    if ($min == $max) {
-      // Grey:
-      $saturation = 0;
-      $hue = 0; // Actually undefined (without hue), but 0 is standard.
-    } else {
-      // Calculate saturation:
-      $d = $max - $min;
-      if ($lightness < 0.5) {
-        $saturation = $d / ($max + $min);
-      } else {
-        $saturation = $d / (2 - $max - $min);
-      }
-
-      // Calculate hue:
-      if ($red == $max) {
-        $hue = ($green - $blue) / $d;
-      } elseif ($green == $max) {
-        $hue = 2 + (($blue - $red) / $d);
-      } else {
-        $hue = 4 + (($red - $green) / $d);
-      }
-
-      // Convert hue to degrees:
-      $hue *= 60;
-      if ($hue < 0) {
-        $hue += 360;
-      }
+        // Convert to a float.
+        return (float)$num;
     }
 
-    return array(
-      'hue'        => $hue,
-      'saturation' => $saturation,
-      'lightness'  => $lightness
-    );
-  }
+    /**
+     * Converts the provided percentage string into a fraction in the range 0.0 to 1.0.
+     *
+     * A valid percentage string means a number in the range 0.0 to 100.0, followed by a '%'
+     * character.
+     * No leading sign character (- or +) or floating point notation (e or E) is allowed.
+     *
+     * @param string $str A string that could be a percentage string.
+     * @return ?float The equivalent fraction, or null if the string was invalid.
+     */
+    public static function percentToFrac(string $str): ?float
+    {
+        // Check the string has the right format.
+        if (!preg_match('/^\d+(\.\d+)?%$/', $str)) {
+            return null;
+        }
 
-  /**
-   * Convert HSL values to RGB.
-   *
-   * @param float $hue
-   *   0..360
-   * @param float $saturation
-   *   0.0..1.0 or 0%..100%
-   * @param float $lightness
-   *   0.0..1.0 or 0%..100%
-   * @return array
-   *   red   => 0..255
-   *   green => 0..255
-   *   blue  => 0..255
-   */
-  public static function hsl2rgb($hue, $saturation, $lightness)
-  {
-    // Convert values to fractions:
-    $hue        = self::normalizeDegree($hue) / 360;
-    $saturation = self::normalizeFraction($saturation);
-    $lightness  = self::normalizeFraction($lightness);
+        // Convert to float and check the range.
+        $value = (float)substr($str, 0, -1);
+        if ($value > 100.0) {
+            return null;
+        }
 
-    if ($saturation == 0) {
-      // Grey:
-      $red = $green = $blue = round($lightness * 255);
-    } else {
-      $m2 = ($lightness <= 0.5) ? ($lightness * ($saturation + 1)) : ($lightness + $saturation - ($lightness * $saturation));
-      $m1 = $lightness * 2 - $m2;
-      $red   = self::hue2rgb($m1, $m2, $hue + (1 / 3));
-      $green = self::hue2rgb($m1, $m2, $hue);
-      $blue  = self::hue2rgb($m1, $m2, $hue - (1 / 3));
+        // Convert to a fraction.
+        return $value / 100.0;
     }
 
-    return array(
-      'red'   => $red,
-      'green' => $green,
-      'blue'  => $blue
-    );
-  }
+    /**
+     * Convert a fraction in the range 0.0 to 1.0 into a percentage string (e.g. '50%').
+     */
+    public static function fracToPercent(float $frac): ?string
+    {
+        // Check the range is valid.
+        if ($frac < 0 || $frac > 1) {
+            return null;
+        }
 
-  /**
-   * Protected helper function for converting HSL values to RGB.
-   * Return value is color component 0..255.
-   *
-   * @param float $m1
-   * @param float $m2
-   * @param float $h
-   * @return int
-   *   0..255
-   */
-  protected static function hue2rgb($m1, $m2, $h)
-  {
-    if ($h < 0) {
-      $h += 1;
-    } elseif ($h > 1) {
-      $h -= 1;
-    }
-    if ($h * 6 < 1) {
-      $c = $m1 + (($m2 - $m1) * $h * 6);
-    } elseif ($h * 2 < 1) {
-      $c = $m2;
-    } elseif ($h * 3 < 2) {
-      $c = $m1 + (($m2 - $m1) * (2 / 3 - $h) * 6);
-    } else {
-      $c = $m1;
-    }
-    return round($c * 255);
-  }
-
-  /**
-   * Convert an RGB color value to a 2-digit hex string.
-   *
-   * @static
-   * @param int|string $byte
-   *   0..255 or 0%..100%
-   * @return string
-   */
-  public static function byte2hex($byte)
-  {
-    $byte = self::normalizeByte($byte);
-    return str_pad(strtoupper(dechex($byte)), 2, '0', STR_PAD_LEFT);
-  }
-
-  /**
-   * Convert RGB values to a 6-digit hex string.
-   *
-   * @param int|string $red
-   *   0..255 or 0%..100%
-   * @param int|string $green
-   *   0..255 or 0%..100%
-   * @param int|string $blue
-   *   0..255 or 0%..100%
-   * @return string
-   */
-  public static function rgb2hex($red, $green, $blue)
-  {
-    return self::byte2hex($red) . self::byte2hex($green) . self::byte2hex($blue);
-  }
-
-  /**
-   * Convert 3 or 6-digit hex string to RGB values.
-   *
-   * @param string
-   * @return array
-   */
-  public static function hex2rgb($hex)
-  {
-    if (!self::isHexString($hex)) {
-      return FALSE;
+        return round($frac * 100, 2) . '%';
     }
 
-    // Remove any leading # character:
-    if ($hex[0] == '#') {
-      $hex = substr($hex, 1);
+    /**
+     * Convert a byte to a fraction. If the value is out of range, return null.
+     *
+     * @param int $byte The byte value.
+     * @return float The fraction, or null.
+     */
+    public static function byteToFrac(int $byte): ?float
+    {
+        // Check the range.
+        if ($byte < 0 || $byte > 255) {
+            return null;
+        }
+
+        return round($byte / 255.0, 2);
     }
 
-    $len = strlen($hex);
-    if ($len === 8) {
-      // 8-digit hex string (RRGGBBAA).
-      $red   = hexdec(substr($hex, 0, 2));
-      $green = hexdec(substr($hex, 2, 2));
-      $blue  = hexdec(substr($hex, 4, 2));
-      $alpha = hexdec(substr($hex, 6, 2));
-    } elseif ($len === 6) {
-      // 6-digit hex string.
-      $red   = hexdec(substr($hex, 0, 2));
-      $green = hexdec(substr($hex, 2, 2));
-      $blue  = hexdec(substr($hex, 4, 2));
-    } elseif ($len === 4) {
-      // 4-digit hex string (RGBA). Double each digit.
-      $red   = hexdec(str_repeat($hex[0], 2));
-      $green = hexdec(str_repeat($hex[1], 2));
-      $blue  = hexdec(str_repeat($hex[2], 2));
-      $alpha = hexdec(str_repeat($hex[3], 2));
-    } else {
-      // 3-digit hex string. Double each hex digit:
-      $red   = hexdec(str_repeat($hex[0], 2));
-      $green = hexdec(str_repeat($hex[1], 2));
-      $blue  = hexdec(str_repeat($hex[2], 2));
+    /**
+     * Convert a fraction to a byte. If the value is out of range, return null.
+     *
+     * @param float $frac The fraction to convert.
+     * @param int The byte value, or null.
+     */
+    public static function fracToByte(float $frac): ?int
+    {
+        // Check the range.
+        if ($frac < 0 || $frac > 1) {
+            return null;
+        }
+
+        return (int)round($frac * 255.0);
     }
 
-    $result = array(
-      'red'   => $red,
-      'green' => $green,
-      'blue'  => $blue,
-    );
-    if (isset($alpha)) {
-      $result['alpha'] = $alpha / 255;
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Methods for working with hexadecimal strings
+
+    /**
+     * Returns true if the string is a valid hex color string.
+     * A leading '#' is optional, and there can be 3, 4, 6 or 8 hex digits.
+     *
+     * @param string $str A string that could be a CSS hex color.
+     * @return bool If the provided string is a valid CSS hex color string.
+     */
+    public static function isHexString(string $str): bool
+    {
+        // Check for invalid length.
+        $len = strlen($str);
+        if ($len === 0 || $len > 9) {
+            return false;
+        }
+
+        // Trim the leading '#' if present.
+        if ($str[0] === '#') {
+            $str = substr($str, 1);
+            $len--;
+        }
+
+        // Check the string is all hex digits and length is 3, 4, 6 or 8.
+        return ctype_xdigit($str) && in_array($len, [3, 4, 6, 8], true);
     }
 
-    return $result;
-  }
+    /**
+     * Convert a hexadecimal color string to RGBA component bytes.
+     * A leading '#' is optional.
+     * Each element of the resulting array is a byte (integer in the range 0 to 255), including
+     * alpha.
+     *
+     * @param string A hexadecimal color string.
+     * @return ?array An array of color component bytes, or null if the input was invalid.
+     */
+    public static function hexToRgba(string $hex): ?array
+    {
+        // Check the input string is a valid format.
+        if (!self::isHexString($hex)) {
+            return null;
+        }
 
-  /////////////////////////////////////////////////////////////////////////
-  // Named colors
+        // Remove any leading # character:
+        if ($hex[0] == '#') {
+            $hex = substr($hex, 1);
+        }
 
-  /**
-   * Array for mapping color names to hex values.
-   *
-   * @var array
-   */
-  protected static $colorNames = array(
-    'aliceblue'            => 'F0F8FF',
-    'amethyst'             => '9966CC',
-    'antiquewhite'         => 'FAEBD7',
-    'aqua'                 => '00FFFF',
-    'aquamarine'           => '7FFFD4',
-    'azure'                => 'F0FFFF',
-    'beige'                => 'F5F5DC',
-    'bisque'               => 'FFE4C4',
-    'black'                => '000000',
-    'blanchedalmond'       => 'FFEBCD',
-    'blue'                 => '0000FF',
-    'blueviolet'           => '8A2BE2',
-    'brown'                => 'A52A2A',
-    'burlywood'            => 'DEB887',
-    'cadetblue'            => '5F9EA0',
-    'chartreuse'           => '7FFF00',
-    'chocolate'            => 'D2691E',
-    'coral'                => 'FF7F50',
-    'cornflowerblue'       => '6495ED',
-    'cornsilk'             => 'FFF8DC',
-    'crimson'              => 'DC143C',
-    'cyan'                 => '00FFFF',
-    'darkblue'             => '00008B',
-    'darkcyan'             => '008B8B',
-    'darkgoldenrod'        => 'B8860B',
-    'darkgray'             => 'A9A9A9',
-    'darkgreen'            => '006400',
-    'darkgrey'             => 'A9A9A9',
-    'darkkhaki'            => 'BDB76B',
-    'darkmagenta'          => '8B008B',
-    'darkolivegreen'       => '556B2F',
-    'darkorange'           => 'FF8C00',
-    'darkorchid'           => '9932CC',
-    'darkred'              => '8B0000',
-    'darksalmon'           => 'E9967A',
-    'darkseagreen'         => '8FBC8F',
-    'darkslateblue'        => '483D8B',
-    'darkslategray'        => '2F4F4F',
-    'darkslategrey'        => '2F4F4F',
-    'darkturquoise'        => '00CED1',
-    'darkviolet'           => '9400D3',
-    'deeppink'             => 'FF1493',
-    'deepskyblue'          => '00BFFF',
-    'dimgray'              => '696969',
-    'dimgrey'              => '696969',
-    'dodgerblue'           => '1E90FF',
-    'firebrick'            => 'B22222',
-    'floralwhite'          => 'FFFAF0',
-    'forestgreen'          => '228B22',
-    'fuchsia'              => 'FF00FF',
-    'gainsboro'            => 'DCDCDC',
-    'ghostwhite'           => 'F8F8FF',
-    'gold'                 => 'FFD700',
-    'goldenrod'            => 'DAA520',
-    'gray'                 => '808080',
-    'green'                => '008000',
-    'greenyellow'          => 'ADFF2F',
-    'grey'                 => '808080',
-    'honeydew'             => 'F0FFF0',
-    'hotpink'              => 'FF69B4',
-    'indianred'            => 'CD5C5C',
-    'indigo'               => '4B0082',
-    'ivory'                => 'FFFFF0',
-    'khaki'                => 'F0E68C',
-    'lavender'             => 'E6E6FA',
-    'lavenderblush'        => 'FFF0F5',
-    'lawngreen'            => '7CFC00',
-    'lemonchiffon'         => 'FFFACD',
-    'lightblue'            => 'ADD8E6',
-    'lightcoral'           => 'F08080',
-    'lightcyan'            => 'E0FFFF',
-    'lightgoldenrodyellow' => 'FAFAD2',
-    'lightgray'            => 'D3D3D3',
-    'lightgreen'           => '90EE90',
-    'lightgrey'            => 'D3D3D3',
-    'lightpink'            => 'FFB6C1',
-    'lightsalmon'          => 'FFA07A',
-    'lightseagreen'        => '20B2AA',
-    'lightskyblue'         => '87CEFA',
-    'lightslategray'       => '778899',
-    'lightslategrey'       => '778899',
-    'lightsteelblue'       => 'B0C4DE',
-    'lightyellow'          => 'FFFFE0',
-    'lime'                 => '00FF00',
-    'limegreen'            => '32CD32',
-    'linen'                => 'FAF0E6',
-    'magenta'              => 'FF00FF',
-    'maroon'               => '800000',
-    'mediumaquamarine'     => '66CDAA',
-    'mediumblue'           => '0000CD',
-    'mediumorchid'         => 'BA55D3',
-    'mediumpurple'         => '9370DB',
-    'mediumseagreen'       => '3CB371',
-    'mediumslateblue'      => '7B68EE',
-    'mediumspringgreen'    => '00FA9A',
-    'mediumturquoise'      => '48D1CC',
-    'mediumvioletred'      => 'C71585',
-    'midnightblue'         => '191970',
-    'mintcream'            => 'F5FFFA',
-    'mistyrose'            => 'FFE4E1',
-    'moccasin'             => 'FFE4B5',
-    'navajowhite'          => 'FFDEAD',
-    'navy'                 => '000080',
-    'oldlace'              => 'FDF5E6',
-    'olive'                => '808000',
-    'olivedrab'            => '6B8E23',
-    'orange'               => 'FFA500',
-    'orangered'            => 'FF4500',
-    'orchid'               => 'DA70D6',
-    'palegoldenrod'        => 'EEE8AA',
-    'palegreen'            => '98FB98',
-    'paleturquoise'        => 'AFEEEE',
-    'palevioletred'        => 'DB7093',
-    'papayawhip'           => 'FFEFD5',
-    'peachpuff'            => 'FFDAB9',
-    'peru'                 => 'CD853F',
-    'pink'                 => 'FFC0CB',
-    'plum'                 => 'DDA0DD',
-    'powderblue'           => 'B0E0E6',
-    'purple'               => '800080',
-    'red'                  => 'FF0000',
-    'rosybrown'            => 'BC8F8F',
-    'royalblue'            => '4169E1',
-    'saddlebrown'          => '8B4513',
-    'salmon'               => 'FA8072',
-    'sandybrown'           => 'F4A460',
-    'seagreen'             => '2E8B57',
-    'seashell'             => 'FFF5EE',
-    'sienna'               => 'A0522D',
-    'silver'               => 'C0C0C0',
-    'skyblue'              => '87CEEB',
-    'slateblue'            => '6A5ACD',
-    'slategray'            => '708090',
-    'slategrey'            => '708090',
-    'snow'                 => 'FFFAFA',
-    'springgreen'          => '00FF7F',
-    'steelblue'            => '4682B4',
-    'tan'                  => 'D2B48C',
-    'teal'                 => '008080',
-    'thistle'              => 'D8BFD8',
-    'tomato'               => 'FF6347',
-    'turquoise'            => '40E0D0',
-    'violet'               => 'EE82EE',
-    'wheat'                => 'F5DEB3',
-    'white'                => 'FFFFFF',
-    'whitesmoke'           => 'F5F5F5',
-    'yellow'               => 'FFFF00',
-    'yellowgreen'          => '9ACD32',
-  );
+        $len = strlen($hex);
+        if ($len === 8) {
+            // 8-digit hex string (RRGGBBAA).
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+            $a = hexdec(substr($hex, 6, 2));
+        } elseif ($len === 6) {
+            // 6-digit hex string (RRGGBB).
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+            $a = 0xff;
+        } elseif ($len === 4) {
+            // 4-digit hex string (RGBA). Double each hex digit.
+            $r = hexdec(str_repeat($hex[0], 2));
+            $g = hexdec(str_repeat($hex[1], 2));
+            $b = hexdec(str_repeat($hex[2], 2));
+            $a = hexdec(str_repeat($hex[3], 2));
+        } else {
+            // 3-digit hex string (RGB). Double each hex digit:
+            $r = hexdec(str_repeat($hex[0], 2));
+            $g = hexdec(str_repeat($hex[1], 2));
+            $b = hexdec(str_repeat($hex[2], 2));
+            $a = 0xff;
+        }
 
-  /**
-   * Return the array of color names.
-   *
-   * @static
-   * @return array
-   */
-  public static function colorNames()
-  {
-    return self::$colorNames;
-  }
+        $result = [
+          'red' => $r,
+          'green' => $g,
+          'blue' => $b,
+          'alpha' => $a
+        ];
 
-  /**
-   * Check if a given string is a color name.
-   *
-   * @static
-   * @param string $name
-   * @return bool
-   */
-  public static function isColorName($name)
-  {
-    $name = strtolower($name);
-    return isset(self::$colorNames[$name]);
-  }
+        return $result;
+    }
 
-  /**
-   * Convert a color name to a 6-digit hex value.
-   *
-   * @static
-   * @param $name
-   * @return bool
-   */
-  private static function colorName2hex($name)
-  {
-    $name = strtolower($name);
-    return isset(self::$colorNames[$name]) ? self::$colorNames[$name] : FALSE;
-  }
+    /**
+     * Outputs the color as a 6-digit hexadecimal string, or 8-digit if alpha is included.
+     *
+     * @param bool $include_alpha If the alpha byte should be included (i.e. RGBA or RGB).
+     * @param bool $include_hash If the resulting string should have a leading '#'.
+     * @param bool $upper_case If the letter digits should be upper-case.
+     * @return string The color formated as a hexadecimal string.
+     */
+    public function toHexString(
+        bool $include_alpha = true,
+        bool $include_hash = true,
+        bool $upper_case = false
+    ): string {
+        // Ensure we only have the lower 32 bits.
+        $value = $this->value & 0xFFFFFFFF;
+
+        // Convert to hex and pad to 8 characters (full RGBA).
+        $hex = str_pad(dechex($value), 8, '0', STR_PAD_LEFT);
+
+        // Optionally drop alpha (last 2 hex digits).
+        if (!$include_alpha) {
+            $hex = substr($hex, 0, 6);
+        }
+
+        // Apply letter case.
+        $hex = $upper_case ? strtoupper($hex) : strtolower($hex);
+
+        // Add optional hash.
+        return ($include_hash ? '#' : '') . $hex;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Methods for converting a Color to a string
+
+    /**
+     * Outputs the color as an RGB CSS string.
+     *
+     * @return string
+     */
+    public function toRgbString()
+    {
+        return "rgb($this->red, $this->green, $this->blue)";
+    }
+
+    /**
+     * Outputs the color as an RGBA CSS string.
+     *
+     * @return string
+     */
+    public function toRgbaString()
+    {
+        $a = self::byteToFrac($this->alpha);
+        return "rgba($this->red, $this->green, $this->blue, $a)";
+    }
+
+    /**
+     * Outputs the color as an HSL CSS string.
+     *
+     * @return string
+     */
+    public function toHslString()
+    {
+        $hsla = $this->toHsl();
+        $h = round($hsla['hue'], 2);
+        $s = self::fracToPercent($hsla['saturation']);
+        $l = self::fracToPercent($hsla['lightness']);
+        return "hsl($h, $s, $l)";
+    }
+
+    /**
+     * Outputs the color as an HSLA CSS string.
+     *
+     * @return string
+     */
+    public function toHslaString()
+    {
+        $hsla = $this->toHsla();
+        $h = round($hsla['hue'], 2);
+        $s = self::fracToPercent($hsla['saturation']);
+        $l = self::fracToPercent($hsla['lightness']);
+        $a = self::byteToFrac($this->alpha);
+        return "hsla($h, $s, $l, $a)";
+    }
+
+    /**
+     * Stringable implementation.
+     *
+     * Default string representation of color is 8-digit RGBA hex string with leading '#'.
+     * Suitable for use in CSS.
+     *
+     * @return string The Color as a CSS hexadecimal color string (RGBA, 8 digits).
+     */
+    public function __toString()
+    {
+        return $this->toHexString();
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    // Static methods for converting between RGB, HSL and hex.
+
+    /**
+     * Convert RGB values to HSL.
+     *
+     * Algorithms:
+     *   @see http://www.w3.org/TR/css3-color/#hsl-color
+     *   @see http://130.113.54.154/~monger/hsl-rgb.html
+     *   @see http://en.wikipedia.org/wiki/HSL_color_space
+     *
+     * @param int|float|string $red The red byte value.
+     * @param int|float|string $green The green byte value.
+     * @param int|float|string $blue The blue byte value.
+     * @return array Array of floats with HSL values:
+     *   hue        => 0..360
+     *   saturation => 0.0..1.0
+     *   lightness  => 0.0..1.0
+     */
+    public static function rgbToHsl(
+        int|float|string $red,
+        int|float|string $green,
+        int|float|string $blue
+    ) {
+        // Get the red, green and blue values as fractions:
+        $r = self::checkColorComponent($red)[1];
+        $g = self::checkColorComponent($green)[1];
+        $b = self::checkColorComponent($blue)[1];
+
+        // Get the min and max values.
+        $min = min($r, $g, $b);
+        $max = max($r, $g, $b);
+
+        // Calculate lightness:
+        $l = ($min + $max) / 2;
+        if ($max === $min) {
+            $s = 0;
+            $h = 0;
+        } else {
+            $d = $max - $min;
+            $s = ($l < 0.5)
+                ? $d / ($max + $min)
+                : $d / (2 - $max - $min);
+
+            if ($r >= $g && $r >= $b) { // red is max
+                $h = ($g - $b) / $d;
+            } elseif ($g >= $r && $g >= $b) { // green is max
+                $h = 2 + ($b - $r) / $d;
+            } else { // blue is max
+                $h = 4 + ($r - $g) / $d;
+            }
+
+            $h = Angles::wrapDegrees($h * 60);
+        }
+
+        return [
+          'hue'        => $h,
+          'saturation' => $s,
+          'lightness'  => $l
+        ];
+    }
+
+    /**
+     * Convert HSL values to RGB.
+     * @see https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB_alternative
+     *
+     * @param float|string $hue The hue as an angle in degrees or an angle string.
+     * @param float|string $saturation The saturation as a fraction or a percentage string.
+     * @param float|string $lightness The lightness as a fraction or a percentage string.
+     * @return array An array of red, green, and blue bytes.
+     *
+     */
+    public static function hslToRgb(
+        float|string $hue,
+        float|string $saturation,
+        float|string $lightness
+    ): array {
+        // Convert values to floats in the desired ranges.
+        $h = self::checkAngle($hue); // [0-360)
+        $s = self::checkFrac($saturation); // [0-1]
+        $l = self::checkFrac($lightness); // [0-1]
+
+        // Conversion function.
+        $f = function ($n) use ($h, $s, $l): float {
+            $k = fmod($n + $h / 30, 12);
+            $a = $s * min($l, 1 - $l);
+            return $l - $a * max(-1, min($k - 3, 9 - $k, 1));
+        };
+
+        return [
+          'red'   => $f(0),
+          'green' => $f(8),
+          'blue'  => $f(4)
+        ];
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Named colors
+
+    /**
+     * Array for mapping color names to hex values.
+     *
+     * @var array
+     */
+    protected static $colorNames = [
+        'aliceblue'            => 'f0f8ff',
+        'amethyst'             => '9966cc',
+        'antiquewhite'         => 'faebd7',
+        'aqua'                 => '00ffff',
+        'aquamarine'           => '7fffd4',
+        'azure'                => 'f0ffff',
+        'beige'                => 'f5f5dc',
+        'bisque'               => 'ffe4c4',
+        'black'                => '000000',
+        'blanchedalmond'       => 'ffebcd',
+        'blue'                 => '0000ff',
+        'blueviolet'           => '8a2be2',
+        'brown'                => 'a52a2a',
+        'burlywood'            => 'deb887',
+        'cadetblue'            => '5f9ea0',
+        'chartreuse'           => '7fff00',
+        'chocolate'            => 'd2691e',
+        'coral'                => 'ff7f50',
+        'cornflowerblue'       => '6495ed',
+        'cornsilk'             => 'fff8dc',
+        'crimson'              => 'dc143c',
+        'cyan'                 => '00ffff',
+        'darkblue'             => '00008b',
+        'darkcyan'             => '008b8b',
+        'darkgoldenrod'        => 'b8860b',
+        'darkgray'             => 'a9a9a9',
+        'darkgreen'            => '006400',
+        'darkgrey'             => 'a9a9a9',
+        'darkkhaki'            => 'bdb76b',
+        'darkmagenta'          => '8b008b',
+        'darkolivegreen'       => '556b2f',
+        'darkorange'           => 'ff8c00',
+        'darkorchid'           => '9932cc',
+        'darkred'              => '8b0000',
+        'darksalmon'           => 'e9967a',
+        'darkseagreen'         => '8fbc8f',
+        'darkslateblue'        => '483d8b',
+        'darkslategray'        => '2f4f4f',
+        'darkslategrey'        => '2f4f4f',
+        'darkturquoise'        => '00ced1',
+        'darkviolet'           => '9400d3',
+        'deeppink'             => 'ff1493',
+        'deepskyblue'          => '00bfff',
+        'dimgray'              => '696969',
+        'dimgrey'              => '696969',
+        'dodgerblue'           => '1e90ff',
+        'firebrick'            => 'b22222',
+        'floralwhite'          => 'fffaf0',
+        'forestgreen'          => '228b22',
+        'fuchsia'              => 'ff00ff',
+        'gainsboro'            => 'dcdcdc',
+        'ghostwhite'           => 'f8f8ff',
+        'gold'                 => 'ffd700',
+        'goldenrod'            => 'daa520',
+        'gray'                 => '808080',
+        'green'                => '008000',
+        'greenyellow'          => 'adff2f',
+        'grey'                 => '808080',
+        'honeydew'             => 'f0fff0',
+        'hotpink'              => 'ff69b4',
+        'indianred'            => 'cd5c5c',
+        'indigo'               => '4b0082',
+        'ivory'                => 'fffff0',
+        'khaki'                => 'f0e68c',
+        'lavender'             => 'e6e6fa',
+        'lavenderblush'        => 'fff0f5',
+        'lawngreen'            => '7cfc00',
+        'lemonchiffon'         => 'fffacd',
+        'lightblue'            => 'add8e6',
+        'lightcoral'           => 'f08080',
+        'lightcyan'            => 'e0ffff',
+        'lightgoldenrodyellow' => 'fafad2',
+        'lightgray'            => 'd3d3d3',
+        'lightgreen'           => '90ee90',
+        'lightgrey'            => 'd3d3d3',
+        'lightpink'            => 'ffb6c1',
+        'lightsalmon'          => 'ffa07a',
+        'lightseagreen'        => '20b2aa',
+        'lightskyblue'         => '87cefa',
+        'lightslategray'       => '778899',
+        'lightslategrey'       => '778899',
+        'lightsteelblue'       => 'b0c4de',
+        'lightyellow'          => 'ffffe0',
+        'lime'                 => '00ff00',
+        'limegreen'            => '32cd32',
+        'linen'                => 'faf0e6',
+        'magenta'              => 'ff00ff',
+        'maroon'               => '800000',
+        'mediumaquamarine'     => '66cdaa',
+        'mediumblue'           => '0000cd',
+        'mediumorchid'         => 'ba55d3',
+        'mediumpurple'         => '9370db',
+        'mediumseagreen'       => '3cb371',
+        'mediumslateblue'      => '7b68ee',
+        'mediumspringgreen'    => '00fa9a',
+        'mediumturquoise'      => '48d1cc',
+        'mediumvioletred'      => 'c71585',
+        'midnightblue'         => '191970',
+        'mintcream'            => 'f5fffa',
+        'mistyrose'            => 'ffe4e1',
+        'moccasin'             => 'ffe4b5',
+        'navajowhite'          => 'ffdead',
+        'navy'                 => '000080',
+        'oldlace'              => 'fdf5e6',
+        'olive'                => '808000',
+        'olivedrab'            => '6b8e23',
+        'orange'               => 'ffa500',
+        'orangered'            => 'ff4500',
+        'orchid'               => 'da70d6',
+        'palegoldenrod'        => 'eee8aa',
+        'palegreen'            => '98fb98',
+        'paleturquoise'        => 'afeeee',
+        'palevioletred'        => 'db7093',
+        'papayawhip'           => 'ffefd5',
+        'peachpuff'            => 'ffdab9',
+        'peru'                 => 'cd853f',
+        'pink'                 => 'ffc0cb',
+        'plum'                 => 'dda0dd',
+        'powderblue'           => 'b0e0e6',
+        'purple'               => '800080',
+        'red'                  => 'ff0000',
+        'rosybrown'            => 'bc8f8f',
+        'royalblue'            => '4169e1',
+        'saddlebrown'          => '8b4513',
+        'salmon'               => 'fa8072',
+        'sandybrown'           => 'f4a460',
+        'seagreen'             => '2e8b57',
+        'seashell'             => 'fff5ee',
+        'sienna'               => 'a0522d',
+        'silver'               => 'c0c0c0',
+        'skyblue'              => '87ceeb',
+        'slateblue'            => '6a5acd',
+        'slategray'            => '708090',
+        'slategrey'            => '708090',
+        'snow'                 => 'fffafa',
+        'springgreen'          => '00ff7f',
+        'steelblue'            => '4682b4',
+        'tan'                  => 'd2b48c',
+        'teal'                 => '008080',
+        'thistle'              => 'd8bfd8',
+        'tomato'               => 'ff6347',
+        'turquoise'            => '40e0d0',
+        'violet'               => 'ee82ee',
+        'wheat'                => 'f5deb3',
+        'white'                => 'ffffff',
+        'whitesmoke'           => 'f5f5f5',
+        'yellow'               => 'ffff00',
+        'yellowgreen'          => '9acd32',
+    ];
+
+    /**
+     * Return the array of color names.
+     *
+     * @static
+     * @return array
+     */
+    public static function colorNames()
+    {
+        return self::$colorNames;
+    }
+
+    /**
+     * Check if a given string is a valid CSS color name.
+     *
+     * @static
+     * @param string $name A color name.
+     * @return bool If the name is a valid CSS color name.
+     */
+    public static function isColorName($name)
+    {
+        return isset(self::$colorNames[strtolower($name)]);
+    }
+
+    /**
+     * Convert a color name to a 6-digit hex value (no leading '#').
+     *
+     * @static
+     * @param string $name A CSS color name.
+     * @return string The hex value for this color.
+     */
+    private static function colorNameToHex(string $name): string
+    {
+        // Check the provided color name is valid.
+        if (!self::isColorName($name)) {
+            throw new InvalidArgumentException("Invalid color name '$name'.");
+        }
+
+        // Look up the hex value for the color.
+        return self::$colorNames[strtolower($name)];
+    }
 }
