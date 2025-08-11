@@ -429,8 +429,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      */
     public function slice(int $offset, ?int $length): Sequence
     {
-        // Initialize the result.
-        $slice = new Sequence($this->types);
+        // Initialize the result, preserving the original default value.
+        $slice = new Sequence($this->types, $this->defaultValue);
 
         // Check for zero-length slice.
         if ($length === 0) {
@@ -439,7 +439,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
         // Construct the result.
         $items = array_slice($this->items, $offset, $length);
-        $slice->append($items);
+        $slice->append(...$items);
         return $slice;
     }
 
