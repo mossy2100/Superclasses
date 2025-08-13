@@ -237,7 +237,7 @@ class DateTimeUtilities
             // Get the date:
             return new self($this->format('Y-m-d'));
         } else {
-            // Set the date:
+            // SetOf the date:
             return $this->setDate($year, $month, $day);
         }
     }
@@ -256,7 +256,7 @@ class DateTimeUtilities
             // Get the time:
             return new Time($this->hour(), $this->minute(), $this->second());
         } else {
-            // Set the time:
+            // SetOf the time:
             return $this->setTime($hour, $minute, $second);
         }
     }
@@ -318,7 +318,7 @@ class DateTimeUtilities
             // Get the timezone:
             return $this->getTimezone();
         } else {
-            // Set the timezone:
+            // SetOf the timezone:
             if (is_string($tz)) {
                 $tz = new DateTimeZone($tz);
             }
@@ -341,7 +341,7 @@ class DateTimeUtilities
             // Get the year:
             return (int) $this->format('Y');
         } else {
-            // Set the year:
+            // SetOf the year:
             return $this->date($year, $this->month(), $this->day());
         }
     }
@@ -358,7 +358,7 @@ class DateTimeUtilities
             // Get the month:
             return (int) $this->format('n');
         } else {
-            // Set the month:
+            // SetOf the month:
             return $this->date($this->year(), $month, $this->day());
         }
     }
@@ -375,7 +375,7 @@ class DateTimeUtilities
             // Get the day of the month:
             return (int) $this->format('j');
         } else {
-            // Set the day of the month:
+            // SetOf the day of the month:
             return $this->date($this->year(), $this->month(), $day);
         }
     }
@@ -392,7 +392,7 @@ class DateTimeUtilities
             // Get the hour:
             return (int) $this->format('G');
         } else {
-            // Set the hour:
+            // SetOf the hour:
             return $this->time($hour, $this->minute(), $this->second());
         }
     }
@@ -409,7 +409,7 @@ class DateTimeUtilities
             // Get the minute:
             return (int) $this->format('i');
         } else {
-            // Set the minute:
+            // SetOf the minute:
             return $this->time($this->hour(), $minute, $this->second());
         }
     }
@@ -426,7 +426,7 @@ class DateTimeUtilities
             // Get the second:
             return (int) $this->format('s');
         } else {
-            // Set the second:
+            // SetOf the second:
             return $this->time($this->hour(), $this->minute(), $second);
         }
     }

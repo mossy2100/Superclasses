@@ -13,8 +13,6 @@ use InvalidArgumentException;
 use BadFunctionCallException;
 use UnderflowException;
 
-require_once __DIR__ . '/TypeSet.php';
-
 /**
  * A type-safe array implementation that enforces item types at runtime.
  *
@@ -71,25 +69,25 @@ require_once __DIR__ . '/TypeSet.php';
  * All other types require an explicit default value to be provided.
  *
  * @example Basic usage
- * $strings = new Sequence('string');
+ * $strings = new ListOf('string');
  * $strings->append('hello');
  * $strings[] = 'world';
  *
  * @example Union types with custom default
- * $mixed = new Sequence('string|int', 'default');
+ * $mixed = new ListOf('string|int', 'default');
  * $mixed->append('text');
  * $mixed->append(42);
  *
  * @example Object types
- * $dates = new Sequence('DateTime', new DateTime());
+ * $dates = new ListOf('DateTime', new DateTime());
  * $dates->append(new DateTime('tomorrow'));
  *
  * @example Interface types
- * $countables = new Sequence('Countable', []);
+ * $countables = new ListOf('Countable', []);
  * $countables->append([1, 2, 3]);         // Arrays are countable
  * $countables->append(new ArrayObject()); // ArrayObject implements Countable
  */
-class Sequence implements ArrayAccess, Countable, IteratorAggregate
+class ListOf implements ArrayAccess, Countable, IteratorAggregate
 {
     /**
      * The valid types for this sequence.
@@ -113,7 +111,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     public private(set) mixed $defaultValue;
 
     /**
-     * Create a new Sequence with specified type constraints and a default value.
+     * Create a new ListOf with specified type constraints and a default value.
      *
      * @param string|iterable $types Type specification (e.g., 'string', 'int|null', ['string', 'int']).
      * @param mixed $default_value Default value for new items. Auto-generated for basic types if omitted.
@@ -151,7 +149,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
             throw new InvalidArgumentException("Default value has invalid type.");
         }
 
-        // Set the default value.
+        // SetOf the default value.
         $this->defaultValue = $default_value;
     }
 
@@ -228,7 +226,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * Set an item to a given value by index.
+     * SetOf an item to a given value by index.
      *
      * If the index is out of range, the sequence will be increased in size to accommodate it.
      * Any intermediate positions will be filled with the default value.
@@ -241,7 +239,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * @throws InvalidArgumentException If the index is negative or the item type is invalid.
      *
      * @example
-     * $sequence = new Sequence('string', 'default');
+     * $sequence = new ListOf('string', 'default');
      * $sequence->set(0, 'hello');  // Sets position 0 to 'hello'
      * $sequence->set(5);           // Sets position 5 to 'default', fills gaps with 'default'
      * $sequence->set(3, 'world');  // Sets position 3 to 'world'
@@ -264,12 +262,12 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
             $this->items[$i] = $this->defaultValue;
         }
 
-        // Set the item.
+        // SetOf the item.
         $this->items[$index] = $item;
     }
 
     /**
-     * Set an item to null.
+     * SetOf an item to null.
      * This method does not remove an item from the sequence.
      *
      * @param int $index The zero-based index position to unset.
@@ -284,7 +282,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
             throw new BadFunctionCallException("Cannot unset an item if null is not an allowed type.");
         }
 
-        // Set the item to null.
+        // SetOf the item to null.
         $this->items[$index] = null;
     }
 
@@ -425,12 +423,12 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      *
      * @param int $offset The start position of the slice.
      * @param ?int $length The length of the slice.
-     * @return Sequence The slice.
+     * @return ListOf The slice.
      */
-    public function slice(int $offset, ?int $length): Sequence
+    public function slice(int $offset, ?int $length): ListOf
     {
         // Initialize the result.
-        $slice = new Sequence($this->types);
+        $slice = new ListOf($this->types);
 
         // Check for zero-length slice.
         if ($length === 0) {
@@ -447,15 +445,15 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * Return a sequence with all items matching a certain filter.
      *
      * @param callable $fn The filter function that returns true for items to keep.
-     * @return Sequence A new sequence containing only the matching items.
+     * @return ListOf A new sequence containing only the matching items.
      */
-    public function filter(callable $fn): Sequence
+    public function filter(callable $fn): ListOf
     {
         // Get the matching values.
         $items = array_filter($this->items, fn ($item) => $fn($item));
 
         // Construct the result.
-        $result = new Sequence($this->types);
+        $result = new ListOf($this->types);
         $result->append(...$items);
         return $result;
     }
@@ -553,7 +551,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * Set a sequence item to null.
+     * SetOf a sequence item to null.
      *
      * This method does not remove an item from the sequence, as with an ordinary PHP array,
      * because with this data structure we want to maintain indices from 0 to sequence size - 1.

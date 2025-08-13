@@ -4,44 +4,39 @@ declare(strict_types=1);
 
 namespace Superclasses;
 
-use Stringable;
-use Countable;
-use IteratorAggregate;
-use Traversable;
-use ArrayIterator;
 use InvalidArgumentException;
 
-require_once __DIR__ . '/Type.php';
-
-class TypeSet implements Stringable, Countable, IteratorAggregate
+class TypeSet extends Set
 {
-    public private(set) array $types = [];
-
+    /**
+     * Constructor.
+     *
+     * @param string|iterable $types The type names to add to the set.
+     * @throws InvalidArgumentException If any type is invalid.
+     */
     public function __construct(string|iterable $types = '')
     {
-        // Convert union type syntax (e.g. 'string|int') into array of types.
+        parent::__construct($types);
+
+        // Convert union type syntax (e.g. 'string|int') into an array of type names.
         if (is_string($types)) {
             $types = explode('|', $types);
         }
 
-        // Collect types into array.
+        // Add types to the set.
         foreach ($types as $type) {
-            // Check type type.
+            // Check the type.
             if (!is_string($type)) {
-                throw new InvalidArgumentException("Allowed types must be specified as a string or an iterable collection of strings.");
+                throw new InvalidArgumentException("Types must be provided as strings.");
             }
 
             // Trim just in case they did something like 'string | int'.
             $type = trim($type);
 
             // Support the question mark nullable notation (e.g. '?string').
-            if ($type !== '' && $type[0] === '?') {
-                $nullable_type = substr($type, 1);
-                if ($nullable_type === '') {
-                    throw new InvalidArgumentException("Invalid nullable type syntax.");
-                }
-                $this->add('null');
-                $this->add($nullable_type);
+            if (strlen($type) >= 2 && $type[0] === '?') {
+                // Add null and the type being made nullable.
+                $this->add('null', substr($type, 1));
             } else {
                 $this->add($type);
             }
@@ -49,20 +44,71 @@ class TypeSet implements Stringable, Countable, IteratorAggregate
     }
 
     /**
-     * Add a type to the set, if not already present.
+     * Checks if the provided string looks like it could be a valid type. That includes core types and pseudotypes,
+     * resource types, and classes.
+     *
+     * For examples of resource names:
+     * @see https://www.php.net/manual/en/resource.php
+     *
+     * For valid class names:
+     * @see https://www.php.net/manual/en/language.oop5.basic.php
+     *
+     * @param mixed $item The item to check.
+     * @return bool True if the item is a valid type, false otherwise.
      */
-    public function add(string $type)
+    #[\Override]
+    public function isItemAllowed(mixed $item): bool
     {
-        if ($type !== '' && !in_array($type, $this->types)) {
-            $this->types[] = $type;
+        // Check the item is a string.
+        if (!is_string($item)) {
+            return false;
         }
+
+        $type = trim($item);
+
+        // Ignore blanks.
+        if ($type === '') {
+            return false;
+        }
+
+        // Check for simple types, pseudotypes, and resource types.
+        if (preg_match("/^[a-zA-Z0-9._ ]+$/", $type)) {
+            return true;
+        }
+
+        // Check for class names.
+        $class = "[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*";
+        $rx_class = "/^\\\\?(?:{$class})(?:\\\\{$class})*$/";
+        return (bool)preg_match($rx_class, $type);
+    }
+
+    /**
+     * Add one item to the set.
+     *
+     * @param mixed $item The item to add to the set.
+     * @return $this The modified set.
+     */
+    #[\Override]
+    public function addOne(mixed $item): static
+    {
+        // Call the parent method.
+        parent::addOne($item);
+
+        // Reduce the set as much as possible.
+        $this->simplify();
+
+        // Return $this for chaining.
+        return $this;
     }
 
     /**
      * Helper function to get a type name for a given value.
      * A more specific type name is preferred when possible.
+     *
+     * @param mixed $value The value to get the type name for.
+     * @return string The type name for the value.
      */
-    public static function getType(mixed $value)
+    public static function getValueType(mixed $value): string
     {
         $type = get_debug_type($value);
 
@@ -85,54 +131,52 @@ class TypeSet implements Stringable, Countable, IteratorAggregate
 
     /**
      * Get the type name from a value and add it to the set.
+     *
+     * @param mixed $value The value to get the type name from.
+     * @return void
      */
-    public function addValueType(mixed $value)
+    public function addValueType(mixed $value): void
     {
-        return $this->add(self::getType($value));
-    }
-
-    /**
-     * Remove a type from the set, if present.
-     */
-    public function remove(string $type)
-    {
-        $this->types = array_values(array_diff($this->types, [$type]));
+        $this->add(self::getValueType($value));
     }
 
     /**
      * Check if a value matches one of the types in the TypeSet.
+     *
+     * @param mixed $value The value to check.
+     * @return bool True if the value's type matches one of the types in the TypeSet, false otherwise.
      */
     public function match(mixed $value): bool
     {
-        // If the types include 'mixed' then any type is allowed.
-        if (in_array('mixed', $this->types)) {
+        // If the types include 'mixed', any type is allowed.
+        if ($this->contains('mixed')) {
             return true;
         }
 
-        // Check for simple type or class match.
-        if (in_array(get_debug_type($value), $this->types)) {
+        // Check for a simple type or class name match.
+        if ($this->contains(get_debug_type($value))) {
             return true;
         }
 
         // Check scalar.
-        if (is_scalar($value) && in_array('scalar', $this->types)) {
+        if (is_scalar($value) && $this->contains('scalar')) {
             return true;
         }
 
         // Check number.
-        if (Type::isNumber($value) && in_array('number', $this->types)) {
+        if (Type::isNumber($value) && $this->contains('number')) {
             return true;
         }
 
         // Additional checks for objects.
         if (is_object($value)) {
             // Any object type.
-            if (in_array('object', $this->types)) {
+            if ($this->contains('object')) {
                 return true;
             }
 
             // Check value against classes, interfaces, and traits.
-            foreach ($this->types as $type) {
+            foreach ($this as $type) {
                 // Check classes and interfaces.
                 if ((class_exists($type) || interface_exists($type)) && $value instanceof $type) {
                     return true;
@@ -146,32 +190,89 @@ class TypeSet implements Stringable, Countable, IteratorAggregate
         }
 
         // Check for any resource or specific resource type.
-        if (is_resource($value) && (in_array('resource', $this->types) ||
-            in_array(get_resource_type($value), $this->types))) {
+        if (is_resource($value) && (
+                $this->contains('resource') ||
+                $this->contains(get_resource_type($value))
+            )) {
             return true;
         }
 
         // Check iterable.
-        if (is_iterable($value) && in_array('iterable', $this->types)) {
+        if (is_iterable($value) && $this->contains('iterable')) {
             return true;
         }
 
         // Check callable.
-        if (is_callable($value) && in_array('callable', $this->types)) {
+        if (is_callable($value) && $this->contains('callable')) {
             return true;
         }
 
         return false;
     }
 
-    public function contains(string $type)
-    {
-        return in_array($type, $this->types);
-    }
-
+    /**
+     * Check if the set contains only null.
+     *
+     * @return bool True if the set contains only null, false otherwise.
+     */
     public function isNullOnly(): bool
     {
-        return $this->types === ['null'];
+        return $this->count() === 1 && $this->contains('null');
+    }
+
+    /**
+     * Reduce the set of types as much as possible.
+     *
+     * @return void
+     */
+    private function simplify(): void
+    {
+        // If no types were specified, or the set contains mixed, reduce to mixed only (i.e. any type is allowed).
+        if ($this->count() === 0 || $this->contains('mixed')) {
+            $this->clear()->add('mixed');
+            return;
+        }
+
+        // Expand group types to simplify the reduction.
+        if ($this->contains('scalar')) {
+            $this->add('int', 'float', 'bool', 'string');
+        }
+        if ($this->contains('number')) {
+            $this->add('int', 'float');
+        }
+
+        // Reduce to scalar if possible.
+        if ($this->contains('int') && $this->contains('float') &&
+            $this->contains('bool') && $this->contains('string')) {
+            $this->remove('int', 'float', 'number', 'bool', 'string');
+            $this->add('scalar');
+        }
+
+        // Reduce to number if possible.
+        if ($this->contains('int') && $this->contains('float')) {
+            $this->remove('int', 'float');
+            $this->add('number');
+        }
+
+        // If 'object' is in the set, eliminate any names that must be class names.
+        if ($this->contains('object')) {
+            foreach ($this->items as $item) {
+                // Check for a backslash. If there is one, it must be a class name.
+                if (str_contains($item, '\\')) {
+                    $this->remove($item);
+                }
+            }
+        }
+
+        // If 'resource' is in the set, eliminate any names that must be resource names.
+        if ($this->contains('resource')) {
+            foreach ($this->items as $item) {
+                // Check for a dot or space. If there is one, it must be a resource name.
+                if (preg_match('/[. ]/', $item)) {
+                    $this->remove($item);
+                }
+            }
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,25 +280,6 @@ class TypeSet implements Stringable, Countable, IteratorAggregate
 
     public function __toString(): string
     {
-        return implode('|', $this->types);
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Countable implementation
-
-    public function count(): int
-    {
-        return count($this->types);
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // IteratorAggregate implementation
-
-    /**
-     * Get iterator for foreach loops.
-     */
-    public function getIterator(): Traversable
-    {
-        return new ArrayIterator($this->types);
+        return implode('|', $this->items);
     }
 }

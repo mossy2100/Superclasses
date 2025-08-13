@@ -48,4 +48,4 @@ $x = new class () extends DateTime implements Countable {
     }
 };
 
-echo TypeSet::getType($x);
+echo TypeSet::getValueType($x);

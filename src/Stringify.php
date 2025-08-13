@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace Superclasses;
 
-use InvalidArgumentException;
-
-require_once __DIR__ . '/Set.php';
-
 /**
  * This class provides JSON-like encoding with a few differences:
  * 1. Integer keys for PHP arrays (non-lists) are not quoted as they would be in JSON objects.
  * 2. PHP arrays are encoded with square brackets.
- * 3. Objects are encoded using a HTML tag-like syntax (angle brackets), with UML symbols.
+ * 3. Objects are encoded using an HTML tag-like syntax (angle brackets), with UML symbols.
  * 4. Floats are encoded with a decimal point, 'E', or both, to differentiate them from ints.
  *
  * The purpose of the class is to offer a more readable alternative to var_dump(), print_r(), or
  * serialize().
+ *
+ * None of these methods throw exceptions, so they can be used by __toString() implementations.
  */
 class Stringify
 {
@@ -27,22 +25,18 @@ class Stringify
      * @param int $indent_level The level of indentation for this structure (default 0).
      * @return string The string representation of the value.
      */
-    public static function encode(mixed $value, int $indent_level = 0): string
+    public static function stringify(mixed $value, int $indent_level = 0): string
     {
         // Get the type.
         $type = get_debug_type($value);
 
-        // Resources aren't supported.
-        if (str_starts_with($type, 'resource')) {
-            throw new InvalidArgumentException("Resources cannot be encoded.");
-        }
-
         // Call the relevant encode method.
         return match ($type) {
             'null', 'bool', 'int', 'string' => json_encode($value),
-            'float' => self::encodeFloat($value),
-            'array' => self::encodeArray($value, $indent_level),
-            default => self::encodeObject($value, $type, $indent_level)
+            'float' => self::stringifyFloat($value),
+            'array' => self::stringifyArray($value, $indent_level),
+            'resource' => self::stringifyResource($value),
+            default => self::stringifyObject($value, $type, $indent_level)
         };
     }
 
@@ -52,7 +46,7 @@ class Stringify
      * @param float $value The float value to encode.
      * @return string The string representation of the float.
      */
-    public static function encodeFloat(float $value): string
+    public static function stringifyFloat(float $value): string
     {
         // Convert the float to a string using the default method.
         $s = (string)$value;
@@ -66,18 +60,18 @@ class Stringify
     }
 
     /**
-     * Encode a PHP array as as list with square brackets or an associative array with braces and
+     * Encode a PHP array as a list with square brackets or an associative array with braces and
      * key-value pairs.
      *
      * @param array $ary The array to encode.
      * @param int $indent_level The level of indentation for this structure (default 0).
      * @return string The string representation of the array.
      */
-    public static function encodeArray(array $ary, int $indent_level = 0): string
+    public static function stringifyArray(array $ary, int $indent_level = 0): string
     {
         // Encode a list like a JSON array. All elements will be on one line with no indentation.
         if (array_is_list($ary)) {
-            return '[' . implode(', ', array_map('Superclasses\Stringify::encode', $ary)) . ']';
+            return '[' . implode(', ', array_map('Superclasses\Stringify::stringify', $ary)) . ']';
         }
 
         // Encode an associative array like a JSON object.
@@ -86,8 +80,8 @@ class Stringify
         $indent = str_repeat(' ', 4 * ($indent_level + 1));
 
         foreach ($ary as $key => $value) {
-            $pairs[] = $indent . self::encode($key) . ': ' .
-                self::encode($value, $indent_level + 1);
+            $pairs[] = $indent . self::stringify($key) . ': ' .
+                self::stringify($value, $indent_level + 1);
         }
 
         return "{\n" . implode(",\n", $pairs) . "\n" . str_repeat(' ', 4 * $indent_level) . '}';
@@ -100,8 +94,13 @@ class Stringify
      * @param int $indent_level The level of indentation for this structure (default 0).
      * @return string The string representation of the object.
      */
-    public static function encodeObject(object $obj, string $class, int $indent_level = 0): string
+    public static function stringifyObject(object $obj, string $class, int $indent_level = 0): string
     {
+        // Call the instance stringify() method if available.
+        if ($obj instanceof Stringifiable) {
+            return $obj->stringify();
+        }
+
         // Convert the object to an array to get its properties.
         // This works better than reflection, as new properties can be created when converting the
         // object to an array (example: DateTime).
@@ -137,9 +136,21 @@ class Stringify
             }
 
             $pairs[] = $indent . $vis_symbol . $key . ': ' .
-                self::encode($value, $indent_level + 1);
+                self::stringify($value, $indent_level + 1);
         }
 
         return "<$class\n" . implode(",\n", $pairs) . '>';
+    }
+
+    /**
+     * Stringify a resource.
+     *
+     * @param mixed $value
+     * @return string
+     */
+    public static function stringifyResource(mixed $value): string {
+        $resource_type = get_resource_type($value);
+        $resource_id = get_resource_id($value);
+        return "resource:$resource_type:$resource_id";
     }
 }

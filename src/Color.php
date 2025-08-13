@@ -7,25 +7,23 @@ namespace Superclasses;
 use InvalidArgumentException;
 use Stringable;
 
-require_once __DIR__ . '/Angles.php';
-
 /**
  * Color class.
  *
  * @author Shaun Moss
  * @version 2012-08-11
  *
- * @idea Also provide properties for cyan, magenta, yellow and black.
+ * @idea Also provide properties for cyan, magenta, yellow, and black.
  *
- * NOTE RE COLOR COMPONENTS
+ * IMPORTANT NOTE RE COLOR COMPONENTS
  * Color components (red, green, blue, alpha) can be provided as ints or floats. These have
  * different meanings.
- * - If an int, this is taken to be the byte value and must be in the range 0-255.
- * - If a float, this is taken to be the fraction and it must be in the range 0.0-1.0.
- * Therefore, there is a risk of confusion if the value is equal to 1:
+ * - If an int, this is taken to be the byte value, and it must be in the range 0-255.
+ * - If a float, this is taken to be the fraction, and it must be in the range 0.0-1.0.
+ * There is a risk of confusion if a value equal to 1 is provided:
  *      - if it's an int the component's byte value will be 1
  *      - if it's a float (i.e. 1.0) then the component's byte value will be 255 (0xff)
- * SO: be careful you don't pass integer 1 when you really mean 1.0 or '100%'.
+ * So, be careful you don't pass integer 1 when you really mean 1.0 or '100%'.
  */
 class Color implements Stringable
 {
@@ -166,7 +164,7 @@ class Color implements Stringable
     }
 
     /**
-     * Set the red, green, blue, and alpha components all at the same time.
+     * SetOf the red, green, blue, and alpha components all at the same time.
      * This is an internal function and arguments are assumed to be valid.
      *
      * @param int $red The red component as a byte.
@@ -194,7 +192,7 @@ class Color implements Stringable
     }
 
     /**
-     * Set the red, green, blue, and alpha components all at the same time.
+     * SetOf the red, green, blue, and alpha components all at the same time.
      *
      * @param int|float|string $red The red component as a byte, fraction, or percentage string.
      * @param int|float|string $green The green component as a byte, fraction, or percentage string.
@@ -214,7 +212,7 @@ class Color implements Stringable
         $b = self::checkColorComponent($blue)[0];
         $a = self::checkColorComponent($alpha)[0];
 
-        // Set the byte values.
+        // SetOf the byte values.
         $this->_setRgbaBytes($r, $g, $b, $a);
     }
 
@@ -499,7 +497,7 @@ class Color implements Stringable
      */
     private static function checkColorComponent(int|float|string $value): array
     {
-        // Set the error message.
+        // SetOf the error message.
         $err_msg = "The value '$value' is invalid. A color component (red, green, blue, or alpha) must be provided as an integer in the range 0 to 255, a float in the range 0.0 to 1.0, or a percentage string (e.g. '50%').";
 
         // Check int.
@@ -557,11 +555,11 @@ class Color implements Stringable
     {
         // Convert angle string to degrees.
         if (is_string($value)) {
-            return Angles::parse($value);
+            return Angle::fromString($value)->toDegrees();
         }
 
         // Normalize number to desired range [0-360).
-        return Angles::wrapDegrees($value);
+        return Angle::wrapDegrees($value);
     }
 
     /**
@@ -675,7 +673,7 @@ class Color implements Stringable
 
     /**
      * Returns true if the string is a valid hex color string.
-     * A leading '#' is optional, and there can be 3, 4, 6 or 8 hex digits.
+     * A leading '#' is optional, and there can be 3, 4, 6, or 8 hex digits.
      *
      * @param string $str A string that could be a CSS hex color.
      * @return bool If the provided string is a valid CSS hex color string.
@@ -848,7 +846,7 @@ class Color implements Stringable
      *
      * @return string The Color as a CSS hexadecimal color string (RGBA, 8 digits).
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toHexString();
     }
@@ -905,7 +903,7 @@ class Color implements Stringable
                 $h = 4 + ($r - $g) / $d;
             }
 
-            $h = Angles::wrapDegrees($h * 60);
+            $h = Angle::wrapDegrees($h * 60);
         }
 
         return [

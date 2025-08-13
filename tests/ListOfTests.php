@@ -6,13 +6,11 @@ namespace Superclasses;
 
 use DateTime;
 
-require_once __DIR__ . '/../src/Sequence.php';
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 echo '<pre>';
 
-$a = new Sequence('string');
+$a = new ListOf('string');
 $a->append('orange');
 $a->append('red');
 $a->append('yellow');

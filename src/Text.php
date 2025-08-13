@@ -56,7 +56,7 @@ class Text implements Stringable
             }
         }
 
-        // Set properties.
+        // SetOf properties.
         $this->encoding = $encoding;
         $this->bytes = $bytes;
     }

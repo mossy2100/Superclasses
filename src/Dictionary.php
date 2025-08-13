@@ -27,14 +27,14 @@ require_once __DIR__ . '/KeyValuePair.php';
 class Dictionary implements ArrayAccess, Countable, IteratorAggregate
 {
     /**
-     * Set of valid types for keys.
+     * SetOf of valid types for keys.
      *
      * @var TypeSet
      */
     public private(set) TypeSet $keyTypes;
 
     /**
-     * Set of valid types for values.
+     * SetOf of valid types for values.
      *
      * @var TypeSet
      */
@@ -94,46 +94,6 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
         }
 
         return $dict;
-    }
-
-    /**
-     * Convert any PHP value into a unique string key.
-     */
-    public static function getStringKey(mixed $key)
-    {
-        $type = get_debug_type($key);
-        switch ($type) {
-            case 'null':
-                return 'n';
-
-            case 'bool':
-                return 'b:' . ($key ? 'T' : 'F');
-
-            case 'int':
-                return 'i:' . $key;
-
-            case 'float':
-                return 'f:' . $key;
-
-            case 'string':
-                return 's:' . strlen($key) . ':' . $key;
-
-            case 'array':
-                $array_item_keys = array_map('Dictionary::getStringKey', $key);
-                return 'a:' . count($key) . ':[' . implode(', ', $array_item_keys) . ']';
-        }
-
-        if (is_object($key)) {
-            return 'o:' . spl_object_id($key);
-        }
-
-        if (str_starts_with($type, 'resource')) {
-            return 'r:' . get_resource_id($key);
-        }
-
-        // Not sure if this can ever actually happen. gettype() can return 'unknown type' but
-        // get_debug_type() has no equivalent.
-        throw new InvalidArgumentException("Key has unknown type.");
     }
 
     /**
@@ -206,38 +166,38 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
     // ArrayAccess implementation
 
     /**
-     * Set an item by key.
+     * SetOf an item by key.
      *
      * If they key is in use, the corresponding key-value pair will be replaced.
      * If not, a new key-value pair will be added to the dictionary.
      *
-     * @param mixed $key
-     * @param mixed $value
+     * @param mixed $offset The key to set.
+     * @param mixed $value The value to set.
      *
      * @throws OutOfBoundsException If no key or a null key is specified.
      * @throws InvalidArgumentException If the key or value has an invalid type.
      */
-    public function offsetSet(mixed $key, mixed $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        if ($key === null) {
+        if ($offset === null) {
             throw new OutOfBoundsException("A key must be specified.");
         }
 
         // Check the types are valid.
-        $this->checkKeyType($key);
+        $this->checkKeyType($offset);
         $this->checkValueType($value);
 
         // Get the string version of this key.
-        $string_key = self::getStringKey($key);
+        $string_key = Type::getStringKey($offset);
 
         // Store the key-value pair in the items array.
-        $this->items[$string_key] = new KeyValuePair($key, $value);
+        $this->items[$string_key] = new KeyValuePair($offset, $value);
     }
 
-    public function offsetGet(mixed $key): mixed
+    public function offsetGet(mixed $offset): mixed
     {
         // Get the string version of this key.
-        $string_key = self::getStringKey($key);
+        $string_key = Type::getStringKey($offset);
 
         // Check key exists.
         if (!key_exists($string_key, $this->items)) {
@@ -248,19 +208,19 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
         return $this->items[$string_key]->value;
     }
 
-    public function offsetExists(mixed $key): bool
+    public function offsetExists(mixed $offset): bool
     {
         // Get the string version of this key.
-        $string_key = self::getStringKey($key);
+        $string_key = Type::getStringKey($offset);
 
         // Check key exists.
         return key_exists($string_key, $this->items);
     }
 
-    public function offsetUnset(mixed $key): void
+    public function offsetUnset(mixed $offset): void
     {
         // Get the string version of this key.
-        $string_key = self::getStringKey($key);
+        $string_key = Type::getStringKey($offset);
 
         // Check key exists.
         if (!key_exists($string_key, $this->items)) {

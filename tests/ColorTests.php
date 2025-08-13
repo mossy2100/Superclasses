@@ -5,7 +5,7 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use Superclasses\Color;
 
-final class ColorTest extends TestCase
+final class ColorTests extends TestCase
 {
     public function testConstructHexAndProperties(): void
     {
@@ -13,7 +13,7 @@ final class ColorTest extends TestCase
         $this->assertSame(0, $color->red);
         $this->assertSame(255, $color->green);
         $this->assertSame(136, $color->blue);
-        $this->assertEqualsWithDelta(1.0, $color->alpha, 0.0001);
+        $this->assertSame(255, $color->alpha);
     }
 
     public function testConstructColorNameCaseInsensitive(): void
@@ -30,14 +30,14 @@ final class ColorTest extends TestCase
         $this->assertSame(0x11, $color->red);
         $this->assertSame(0x22, $color->green);
         $this->assertSame(0x33, $color->blue);
-        $this->assertEqualsWithDelta(0x44/255, $color->alpha, 0.0001);
+        $this->assertSame(0x44, $color->alpha);
     }
 
     public function testFromRgbaAndVirtualProperties(): void
     {
         $color = Color::fromRgba(10, 20, 30, 0.5);
         $this->assertSame(10, $color->red);
-        $this->assertEqualsWithDelta(0.5, $color->alpha, 0.01);
+        $this->assertSame(128, $color->alpha);
         $color->blue = 40;
         $this->assertSame(40, $color->blue);
     }
@@ -48,6 +48,6 @@ final class ColorTest extends TestCase
         $this->assertSame(0, $color->red);
         $this->assertSame(255, $color->green);
         $this->assertSame(0, $color->blue);
-        $this->assertEqualsWithDelta(0.25, $color->alpha, 0.01);
+        $this->assertEqualsWithDelta(255 / 4, $color->alpha, 0.5);
     }
 }

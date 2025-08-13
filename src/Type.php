@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Superclasses;
 
+use InvalidArgumentException;
+
 class Type
 {
     /**
@@ -59,5 +61,49 @@ class Type
         } while ($class = get_parent_class($class));
 
         return array_unique($traits);
+    }
+
+
+    /**
+     * Convert any PHP value into a unique string key.
+     *
+     * @param mixed $key The value to convert.
+     * @return string The unique string key.
+     */
+    public static function getStringKey(mixed $key): string
+    {
+        $type = get_debug_type($key);
+        switch ($type) {
+            case 'null':
+                return 'n';
+
+            case 'bool':
+                return 'b:' . ($key ? 'T' : 'F');
+
+            case 'int':
+                return 'i:' . $key;
+
+            case 'float':
+                return 'f:' . $key;
+
+            case 'string':
+                return 's:' . strlen($key) . ':' . $key;
+
+            case 'array':
+                $array_item_keys = array_map('Dictionary::getStringKey', $key);
+                return 'a:' . count($key) . ':[' . implode(', ', $array_item_keys) . ']';
+        }
+
+        if (is_object($key)) {
+            return 'o:' . spl_object_id($key);
+        }
+
+        if (str_starts_with($type, 'resource')) {
+            return 'r:' . get_resource_id($key);
+        }
+
+        // Not sure if this can ever actually happen. gettype() can return 'unknown type' but
+        // get_debug_type() has no equivalent.
+        throw new InvalidArgumentException("Key has unknown type.");
     }
 }
