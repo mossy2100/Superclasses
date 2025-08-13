@@ -511,43 +511,43 @@ class ListOf implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Append or set a sequence item.
      *
-     * @param int $index The zero-based index position to set, or null for append.
-     * @param mixed $item The value to set.
+     * @param int $offset The zero-based index position to set, or null for append.
+     * @param mixed $value The value to set.
      * @throws InvalidArgumentException If the index or item type is invalid.
      */
-    public function offsetSet(mixed $index, mixed $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        if ($index === null) {
+        if ($offset === null) {
             // $sequence[] = $value
             $this->append($value);
         } else {
             // $sequence[$key] = $value
-            $this->set($index, $value);
+            $this->set($offset, $value);
         }
     }
 
     /**
      * Get a value from the sequence.
      *
-     * @param mixed $index The zero-based index position to set.
+     * @param mixed $offset The zero-based index position to set.
      * @return mixed The value at the specified index.
      * @throws InvalidArgumentException If the index is not an integer or out of range.
      */
-    public function offsetGet(mixed $index): mixed
+    public function offsetGet(mixed $offset): mixed
     {
-        $this->checkIndex($index);
-        return $this->items[$index];
+        $this->checkIndex($offset);
+        return $this->items[$offset];
     }
 
     /**
      * Check if a given index is valid.
      *
-     * @param mixed $index The zero-based index position to set.
+     * @param mixed $offset The zero-based index position to set.
      * @return bool If the given index exists in the sequence.
      */
-    public function offsetExists(mixed $index): bool
+    public function offsetExists(mixed $offset): bool
     {
-        return is_int($index) && $index >= 0 && $index < count($this->items);
+        return is_int($offset) && $offset >= 0 && $offset < count($this->items);
     }
 
     /**
@@ -557,12 +557,12 @@ class ListOf implements ArrayAccess, Countable, IteratorAggregate
      * because with this data structure we want to maintain indices from 0 to sequence size - 1.
      * To remove an item from the sequence, use one of the remove*() methods.
      *
-     * @param mixed $index The zero-based index position to set.
+     * @param mixed $offset The zero-based index position to set.
      * @throws InvalidArgumentException If the index is not an integer or out of range.
      */
-    public function offsetUnset(mixed $index): void
+    public function offsetUnset(mixed $offset): void
     {
-        $this->unset($index);
+        $this->unset($offset);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
