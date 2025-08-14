@@ -14,7 +14,7 @@ use BadFunctionCallException;
 use UnderflowException;
 
 /**
- * A type-safe array implementation that enforces item types at runtime.
+ * A type-safe list implementation that enforces item types at runtime.
  *
  * Supports union types and provides array-like access through ArrayAccess and Iterator interfaces.
  * Automatically generates sensible defaults for basic types or allows explicit default values.
@@ -33,6 +33,7 @@ use UnderflowException;
  * - 'mixed' - Any type (no restrictions)
  * - 'scalar' - Any scalar type (string|int|float|bool)
  * - 'number' - Either number type (int|float)
+ * - 'uint'   - Unsigned integer type (int where value >= 0)
  * - 'object' - Any object instance
  * - 'resource' - Any resource type
  * - 'iterable' - Arrays, iterators, generators (anything iterable)
@@ -129,9 +130,9 @@ class ListOf implements ArrayAccess, Countable, IteratorAggregate
 
         // If a default value isn't specified, use sane defaults for common types.
         if (func_num_args() === 1) {
-            if ($this->types->contains('null') || $this->types->contains('mixed')) {
+            if ($this->types->containsAny(['null', 'mixed'])) {
                 $default_value = null;
-            } elseif ($this->types->contains('int') || $this->types->contains('number') || $this->types->contains('scalar')) {
+            } elseif ($this->types->containsAny(['int', 'uint', 'number', 'scalar'])) {
                 $default_value = 0;
             } elseif ($this->types->contains('float')) {
                 $default_value = 0.0;
@@ -145,7 +146,7 @@ class ListOf implements ArrayAccess, Countable, IteratorAggregate
                 throw new InvalidArgumentException("A default value must be provided for this item type.");
             }
         } elseif (!$this->types->match($default_value)) {
-            // Check default value is valid for the specified types.
+            // Check the default value is valid for the specified types.
             throw new InvalidArgumentException("Default value has invalid type.");
         }
 

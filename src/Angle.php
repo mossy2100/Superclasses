@@ -647,11 +647,6 @@ class Angle
      * @return string The degrees, arcminutes, and arcseconds nicely formatted as a string.
      */
     private function _formatDMS(int $smallest_unit = 2, ?int $decimals = null): string {
-        // Guard.
-        if ($decimals !== null && $decimals < 0) {
-            throw new InvalidArgumentException("Decimals must be non-negative.");
-        }
-
         // Get the sign string.
         $sign = $this->_radians < 0 ? '-' : '';
 
@@ -675,7 +670,10 @@ class Angle
                 return "$sign{$d}° {$m}′ {$str_s}″";
 
             default:
-                throw new InvalidArgumentException("The smallest unit argument must be 0 for degrees, 1 for arcminutes, or 2 for arcseconds (default).");
+                // This should never happen because this is a private method only called from format(), which only
+                // uses 0, 1, or 2 for the smallest unit argument. But we'll leave the default case here for
+                // completeness and robustness.
+                throw new InvalidArgumentException("Invalid smallest unit argument. It must be 0 for degrees, 1 for arcminutes, or 2 for arcseconds (default).");
         }
     }
 

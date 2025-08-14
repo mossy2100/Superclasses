@@ -17,6 +17,36 @@ class Type
         return is_int($value) || is_float($value);
     }
 
+    /**
+     * Get the sign of a number.
+     *
+     * @param int|float $value The number to check.
+     * @return int -1 if negative, 1 if positive, 0 if zero.
+     */
+    public static function sign(int|float $value): int
+    {
+        return $value < 0 ? -1 : ($value > 0 ? 1 : 0);
+    }
+
+    /**
+     * Check if a value is an unsigned integer.
+     *
+     * @param mixed $value The value to check.
+     * @return bool True if the value is an unsigned integer, false otherwise.
+     */
+    public static function isUnsignedInt(mixed $value) {
+        return is_int($value) && $value >= 0;
+    }
+
+    /**
+     * Get the class name of an object.
+     *
+     * If it's an anonymous class, the class name will be truncated to the first null byte. This will return "class"
+     * for anonymous classes, or a parent class or interface name if known.
+     *
+     * @param object $value The object.
+     * @return string The class name.
+     */
     public static function getClassName(object $value): string
     {
         $class = get_class($value);

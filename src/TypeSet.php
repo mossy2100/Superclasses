@@ -168,6 +168,11 @@ class TypeSet extends Set
             return true;
         }
 
+        // Check uint.
+        if (Type::isUnsignedInt($value) && $this->contains('uint')) {
+            return true;
+        }
+
         // Additional checks for objects.
         if (is_object($value)) {
             // Any object type.
@@ -242,16 +247,20 @@ class TypeSet extends Set
         }
 
         // Reduce to scalar if possible.
-        if ($this->contains('int') && $this->contains('float') &&
-            $this->contains('bool') && $this->contains('string')) {
-            $this->remove('int', 'float', 'number', 'bool', 'string');
+        if ($this->containsAll(['int', 'float', 'bool', 'string'])) {
+            $this->remove('int', 'uint', 'float', 'number', 'bool', 'string');
             $this->add('scalar');
         }
 
         // Reduce to number if possible.
-        if ($this->contains('int') && $this->contains('float')) {
+        if ($this->containsAll(['int', 'float'])) {
             $this->remove('int', 'float');
             $this->add('number');
+        }
+
+        // Remove uint if possible.
+        if ($this->contains('uint') && $this->containsAny(['int', 'number', 'scalar'])) {
+            $this->remove('uint');
         }
 
         // If 'object' is in the set, eliminate any names that must be class names.
