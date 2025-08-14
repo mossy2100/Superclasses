@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Superclasses;
 
@@ -18,24 +18,52 @@ class Type
     }
 
     /**
-     * Get the sign of a number.
-     *
-     * @param int|float $value The number to check.
-     * @return int -1 if negative, 1 if positive, 0 if zero.
-     */
-    public static function sign(int|float $value): int
-    {
-        return $value < 0 ? -1 : ($value > 0 ? 1 : 0);
-    }
-
-    /**
      * Check if a value is an unsigned integer.
      *
      * @param mixed $value The value to check.
      * @return bool True if the value is an unsigned integer, false otherwise.
      */
-    public static function isUnsignedInt(mixed $value) {
+    public static function isUnsignedInt(mixed $value): bool
+    {
         return is_int($value) && $value >= 0;
+    }
+
+    /**
+     * Get the sign of a number.
+     *
+     * @param float $value The number.
+     * @return int -1 if negative or -0.0, 1 if positive or 0.0.
+     */
+    public static function sign(float $value): int
+    {
+        // Guard. This method is only valid for numbers.
+        if (is_nan($value)) {
+            throw new InvalidArgumentException("NaN is not a valid number.");
+        }
+
+        if ($value == 0) {
+            // Distinguish +0.0 and -0.0 without warnings.
+            return fdiv(1.0, $value) === -INF ? -1 : 1;
+        }
+
+        return $value < 0 ? -1 : 1;
+    }
+
+    /**
+     * Copy the sign of one number to another.
+     *
+     * @param float $num The number to copy the sign to.
+     * @param float $sign_source The number to copy the sign from.
+     * @return float The number with the sign of $sign_source.
+     */
+    public static function copySign(float $num, float $sign_source): float
+    {
+        // Guard. This method is only valid for numbers.
+        if (is_nan($num) || is_nan($sign_source)) {
+            throw new InvalidArgumentException("Both parameters must be numbers.");
+        }
+
+        return abs($num) * Type::sign($sign_source);
     }
 
     /**
@@ -49,7 +77,7 @@ class Type
      */
     public static function getClassName(object $value): string
     {
-        $class = get_class($value);
+        $class  = get_class($value);
         $nulpos = strpos($class, "\0");
         if ($nulpos !== false) {
             $class = substr($class, 0, $nulpos);
@@ -81,12 +109,12 @@ class Type
         // Get traits from current class and all parent classes.
         do {
             $class_traits = class_uses($class);
-            $traits = array_merge($traits, $class_traits);
+            $traits       = array_merge($traits, $class_traits);
 
             // Also get traits used by the traits themselves.
             foreach ($class_traits as $trait) {
                 $trait_traits = self::getTraitsRecursive($trait);
-                $traits = array_merge($traits, $trait_traits);
+                $traits       = array_merge($traits, $trait_traits);
             }
         } while ($class = get_parent_class($class));
 

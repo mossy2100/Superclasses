@@ -159,6 +159,10 @@ final class AngleTests extends TestCase
 
         // Reciprocals: check INF at singularities.
 
+        // Tan(90°) = ∞.
+        $t = Angle::fromDegrees(90);
+        $this->assertTrue(is_infinite($t->tan()));
+
         // Csc(180°) = ∞.
         $b = Angle::fromDegrees(180);
         $this->assertTrue(is_infinite($b->csc()));
@@ -381,7 +385,7 @@ final class AngleTests extends TestCase
     public function divisionByZero(): void
     {
         $a = Angle::fromDegrees(90);
-        $this->expectException(DivisionByZeroError::class);
+        $this->expectException(InvalidArgumentException::class);
         $a->div(0.0);
     }
 
@@ -465,5 +469,44 @@ final class AngleTests extends TestCase
         $this->assertFloatEquals(1 / sinh($x), $a->csch());
         $this->assertFloatEquals(1 / cosh($x), $a->sech());
         $this->assertFloatEquals(1 / tanh($x), $a->coth());
+    }
+
+    /**
+     * Test comparison methods: lt(), lte(), gt(), and gte().
+     *
+     * Ensures that:
+     * - lt() returns true only when the first angle is strictly less than the second.
+     * - lte() returns true when the first angle is less than or equal to the second.
+     * - gt() returns true only when the first angle is strictly greater than the second.
+     * - gte() returns true when the first angle is greater than or equal to the second.
+     *
+     * @return void
+     */
+    #[Test]
+    public function testComparisonMethods(): void
+    {
+        $a = Angle::fromDegrees(45);
+        $b = Angle::fromDegrees(90);
+        $c = Angle::fromDegrees(90);
+
+        // lt()
+        $this->assertTrue($a->lt($b));
+        $this->assertFalse($b->lt($a));
+        $this->assertFalse($b->lt($c)); // equal values
+
+        // lte()
+        $this->assertTrue($a->lte($b));
+        $this->assertTrue($b->lte($c)); // equal values
+        $this->assertFalse($b->lte($a));
+
+        // gt()
+        $this->assertTrue($b->gt($a));
+        $this->assertFalse($a->gt($b));
+        $this->assertFalse($b->gt($c)); // equal values
+
+        // gte()
+        $this->assertTrue($b->gte($a));
+        $this->assertTrue($b->gte($c)); // equal values
+        $this->assertFalse($a->gte($b));
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Superclasses;
 
@@ -17,23 +17,23 @@ class Angle
     public const float TAU = 2 * M_PI;
 
     // Radians.
-    public const float RADIANS_PER_TURN        = self::TAU;
-    public const float DEGREES_PER_RADIAN      = 180 / M_PI;
-    public const float ARCMINUTES_PER_RADIAN   = 10800 / M_PI;
-    public const float ARCSECONDS_PER_RADIAN   = 648000 / M_PI;
+    public const float RADIANS_PER_TURN = self::TAU;
+    public const float DEGREES_PER_RADIAN = 180 / M_PI;
+    public const float ARCMINUTES_PER_RADIAN = 10800 / M_PI;
+    public const float ARCSECONDS_PER_RADIAN = 648000 / M_PI;
 
     // Degrees, arcminutes, arcseconds.
-    public const float DEGREES_PER_TURN         = 360;
-    public const float ARCMINUTES_PER_DEGREE    = 60;
+    public const float DEGREES_PER_TURN = 360;
+    public const float ARCMINUTES_PER_DEGREE = 60;
     public const float ARCSECONDS_PER_ARCMINUTE = 60;
-    public const float ARCSECONDS_PER_DEGREE    = 3600;
+    public const float ARCSECONDS_PER_DEGREE = 3600;
 
     // Gradians.
-    public const float GRADIANS_PER_TURN       = 400;
-    public const float GRADIANS_PER_RADIAN     = 200 / M_PI;
-    public const float DEGREES_PER_GRADIAN     = 0.9;
+    public const float GRADIANS_PER_TURN = 400;
+    public const float GRADIANS_PER_RADIAN = 200 / M_PI;
+    public const float DEGREES_PER_GRADIAN = 0.9;
 
-    // Epsilons for float comparisons.
+    // Epsilons for comparisons.
     public const float RAD_EPSILON = 1e-9;
     public const float TRIG_EPSILON = 1e-12;
 
@@ -166,7 +166,7 @@ class Angle
     public function toDMS(int $smallest_unit = 2, ?int $decimals = null): array
     {
         $f_deg = $this->toDegrees();
-        $sign = $f_deg < 0 ? -1 : 1;
+        $sign  = $f_deg < 0 ? -1 : 1;
         $f_deg = abs($f_deg);
 
         switch ($smallest_unit) {
@@ -214,10 +214,10 @@ class Angle
 
             case 2:
                 // Convert the total degrees to degrees, minutes, and seconds (non-negative).
-                $d = floor($f_deg);
+                $d     = floor($f_deg);
                 $f_min = ($f_deg - $d) * self::ARCMINUTES_PER_DEGREE;
-                $m = floor($f_min);
-                $s = ($f_min - $m) * self::ARCSECONDS_PER_ARCMINUTE;
+                $m     = floor($f_min);
+                $s     = ($f_min - $m) * self::ARCSECONDS_PER_ARCMINUTE;
 
                 // Round the smallest unit if requested.
                 if ($decimals !== null) {
@@ -315,12 +315,11 @@ class Angle
      */
     public function div(float $k): self
     {
-        // Guard.
-        if ($k == 0) {
-            throw new DivisionByZeroError();
+        if ($k == 0 || is_nan($k) || is_infinite($k)) {
+            throw new InvalidArgumentException("Invalid divisor. It must be a number, and not equal to 0 or ±∞.");
         }
 
-        return new self($this->_radians / $k);
+        return new self(fdiv($this->_radians, $k));
     }
 
     /**
@@ -379,17 +378,74 @@ class Angle
         return $this->compare($other, $eps) === 0;
     }
 
+    /**
+     * Checks if this angle is strictly less than another within a tolerance.
+     *
+     * @param self $other The other angle to compare with.
+     * @param float $eps The tolerance for equality.
+     * @return bool True if this < other (beyond $eps); false otherwise.
+     */
+    public function lt(self $other, float $eps = self::RAD_EPSILON): bool
+    {
+        return $this->compare($other, $eps) === -1;
+    }
+
+    /**
+     * Checks if this angle is less than or equal to another within a tolerance.
+     *
+     * @param self $other The other angle to compare with.
+     * @param float $eps The tolerance for equality.
+     * @return bool True if this <= other (within or beyond $eps); false otherwise.
+     */
+    public function lte(self $other, float $eps = self::RAD_EPSILON): bool
+    {
+        return $this->compare($other, $eps) !== 1;
+    }
+
+    /**
+     * Checks if this angle is strictly greater than another within a tolerance.
+     *
+     * @param self $other The other angle to compare with.
+     * @param float $eps The tolerance for equality.
+     * @return bool True if this > other (beyond $eps); false otherwise.
+     */
+    public function gt(self $other, float $eps = self::RAD_EPSILON): bool
+    {
+        return $this->compare($other, $eps) === 1;
+    }
+
+    /**
+     * Checks if this angle is greater than or equal to another within a tolerance.
+     *
+     * @param self $other The other angle to compare with.
+     * @param float $eps The tolerance for equality.
+     * @return bool True if this >= other (within or beyond $eps); false otherwise.
+     */
+    public function gte(self $other, float $eps = self::RAD_EPSILON): bool
+    {
+        return $this->compare($other, $eps) !== -1;
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Trigonometric instance methods
 
-    private static function _inverse(float $value): float {
-        // Check for a value close to 0, which we'll treat like 0 and return INF or -INF.
-        if ($value != 0 && abs($value) <= self::TRIG_EPSILON) {
-            return $value < 0 ? -INF : INF;
+    /**
+     * Static helper method to get the inverse of a value.
+     * If the value is close to 0, then the result will be ±INF, which helps give more correct results for
+     * trigonometric functions.
+     *
+     * @param float $x The value to invert.
+     * @return float The inverse of $x.
+     */
+    private static function _inverse(float $x): float
+    {
+        // Treat |x| ≤ ε as zero and use signed zero, so fdiv returns ±INF.
+        if (abs($x) <= self::TRIG_EPSILON) {
+            $x = Type::copySign(0.0, $x);
         }
 
-        // For ±0.0, large values, and normal cases: safe IEEE-754 division.
-        return fdiv(1, $value);
+        // IEEE-754 division (no errors/exceptions).
+        return fdiv(1.0, $x);
     }
 
     /**
@@ -419,7 +475,17 @@ class Angle
      */
     public function tan(): float
     {
-        return tan($this->_radians);
+        $s = sin($this->_radians);
+        $c = cos($this->_radians);
+
+        // If cos is effectively zero, return ±INF (sign chosen by the side, i.e., sign of sin).
+        // tan() normally doesn't ever return ±INF, although it will return NAN for tan(INF).
+        if (abs($c) <= self::TRIG_EPSILON) {
+            return Type::copySign(INF, $s);
+        }
+
+        // Otherwise do IEEE‑754 division (no warnings/exceptions).
+        return fdiv($s, $c);
     }
 
     /**
@@ -449,7 +515,7 @@ class Angle
      */
     public function cot(): float
     {
-        return self::_inverse(tan($this->_radians));
+        return self::_inverse($this->tan());
     }
 
     /**
@@ -525,7 +591,8 @@ class Angle
      * @param bool $signed Whether to return a signed range instead of the default positive range.
      * @return self A new angle with a value in the specified range.
      */
-    public function wrap(bool $signed = false): self {
+    public function wrap(bool $signed = false): self
+    {
         return new self(self::wrapRadians($this->_radians, $signed));
     }
 
@@ -539,7 +606,8 @@ class Angle
      * @param bool $signed Whether to return a signed range instead of the default positive range.
      * @return self The calling angle object, updated.
      */
-    public function wrapThis(bool $signed = false): self {
+    public function wrapThis(bool $signed = false): self
+    {
         $this->_radians = self::wrapRadians($this->_radians, $signed);
         return $this;
     }
@@ -562,13 +630,14 @@ class Angle
 
         // Get the range bounds.
         $half = $units_per_turn / 2.0;
-        $min = $signed ? -$half : 0.0;
-        $max = $signed ? $half : $units_per_turn;
+        $min  = $signed ? -$half : 0.0;
+        $max  = $signed ? $half : $units_per_turn;
 
         // Adjust into the half-open interval [min, max).
         if ($r < $min) {
             $r += $units_per_turn;
-        } elseif ($r >= $max) {
+        }
+        elseif ($r >= $max) {
             $r -= $units_per_turn;
         }
 
@@ -646,7 +715,8 @@ class Angle
      * @param ?int $decimals Optional number of decimal places for the smallest unit.
      * @return string The degrees, arcminutes, and arcseconds nicely formatted as a string.
      */
-    private function _formatDMS(int $smallest_unit = 2, ?int $decimals = null): string {
+    private function _formatDMS(int $smallest_unit = 2, ?int $decimals = null): string
+    {
         // Get the sign string.
         $sign = $this->_radians < 0 ? '-' : '';
 
@@ -699,13 +769,13 @@ class Angle
         }
 
         return match (strtolower($format)) {
-            'rad'  => self::_formatFloat($this->_radians, $decimals) . 'rad',
-            'deg'  => self::_formatFloat($this->toDegrees(), $decimals) . 'deg',
-            'grad' => self::_formatFloat($this->toGradians(), $decimals) . 'grad',
-            'turn' => self::_formatFloat($this->toTurns(), $decimals) . 'turn',
-            'd'    => $this->_formatDMS(0, $decimals),
-            'dm'   => $this->_formatDMS(1, $decimals),
-            'dms'  => $this->_formatDMS(2, $decimals),
+            'rad'   => self::_formatFloat($this->_radians, $decimals) . 'rad',
+            'deg'   => self::_formatFloat($this->toDegrees(), $decimals) . 'deg',
+            'grad'  => self::_formatFloat($this->toGradians(), $decimals) . 'grad',
+            'turn'  => self::_formatFloat($this->toTurns(), $decimals) . 'turn',
+            'd'     => $this->_formatDMS(0, $decimals),
+            'dm'    => $this->_formatDMS(1, $decimals),
+            'dms'   => $this->_formatDMS(2, $decimals),
             default => throw new InvalidArgumentException(
                 "Invalid format string. Allowed: rad, deg, grad, turn, d, dm, dms."
             ),
@@ -743,12 +813,12 @@ class Angle
 
         // Check for the DMS pattern as returned by toDMSString().
         // That means optional minus, then optional degrees, minutes, seconds.
-        $num = '(?:\d+(?:\.\d+)?|\.\d+)';
-        $pattern = "/^(?P<sign>-?)"
-            . "(?:(?P<deg>{$num})°\s*)?"
-            . "(?:(?P<min>{$num})[′']\s*)?"
-            . "(?:(?P<sec>{$num})[″\"])?$/u";
-        if (preg_match($pattern, $value, $matches, PREG_UNMATCHED_AS_NULL )) {
+        $num     = '(?:\d+(?:\.\d+)?|\.\d+)';
+        $pattern = "/^(?:(?P<sign>[-+]?)\s*)?"
+                   . "(?:(?P<deg>{$num})°\s*)?"
+                   . "(?:(?P<min>{$num})[′']\s*)?"
+                   . "(?:(?P<sec>{$num})[″\"])?$/u";
+        if (preg_match($pattern, $value, $matches, PREG_UNMATCHED_AS_NULL)) {
             // Require at least one component (deg/min/sec).
             if (empty($matches['deg']) && empty($matches['min']) && empty($matches['sec'])) {
                 throw new InvalidArgumentException($err_msg);
