@@ -67,8 +67,7 @@ class DateTimeUtilities
      */
     public static function nowUTC()
     {
-        // This will call the parent constructor, which defaults to 'now'.
-        return new self(null, 'UTC');
+        return new DateTime(timezone: 'UTC');
     }
 
     /**

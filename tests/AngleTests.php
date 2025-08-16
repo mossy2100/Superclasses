@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Tests;
 
-use DivisionByZeroError;
 use InvalidArgumentException;
 use Superclasses\Angle;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,7 +23,7 @@ final class AngleTests extends TestCase
 
     private function assertAngleEquals(Angle $a, Angle $b): void
     {
-        $this->assertTrue($a->eq($b), "Angles differ: {$a} vs {$b}");
+        $this->assertTrue($a->equals($b), "Angles differ: {$a} vs {$b}");
     }
 
     /**
@@ -257,7 +256,7 @@ final class AngleTests extends TestCase
                 $b = Angle::fromString($s);
 
                 $this->assertTrue(
-                    $a->eq($b),
+                    $a->equals($b),
                     "Format/fromString mismatch for style '{$style}': {$s} → {$b} vs {$a}"
                 );
             }
@@ -325,14 +324,14 @@ final class AngleTests extends TestCase
     #[Test]
     public function parsingWhitespaceAndCaseAndAsciiUnicodeSymbols(): void
     {
-        $this->assertTrue(Angle::fromDegrees(12)->eq(Angle::fromString('12 DEG')));
-        $this->assertTrue(Angle::fromTurns(0.25)->eq(Angle::fromString(' 0.25   turn ')));
-        $this->assertTrue(Angle::fromRadians(M_PI)->eq(Angle::fromString(sprintf('%.12frad', M_PI))));
+        $this->assertTrue(Angle::fromDegrees(12)->equals(Angle::fromString('12 DEG')));
+        $this->assertTrue(Angle::fromTurns(0.25)->equals(Angle::fromString(' 0.25   turn ')));
+        $this->assertTrue(Angle::fromRadians(M_PI)->equals(Angle::fromString(sprintf('%.12frad', M_PI))));
 
         // Unicode DMS.
-        $this->assertTrue(Angle::fromDMS(12, 34, 56)->eq(Angle::fromString('12° 34′ 56″')));
+        $this->assertTrue(Angle::fromDMS(12, 34, 56)->equals(Angle::fromString('12° 34′ 56″')));
         // ASCII DMS.
-        $this->assertTrue(Angle::fromDMS(-12, -34, -56)->eq(Angle::fromString("-12°34'56\"")));
+        $this->assertTrue(Angle::fromDMS(-12, -34, -56)->equals(Angle::fromString("-12°34'56\"")));
 
         // Invalid DMS format.
         $this->expectException(InvalidArgumentException::class);
@@ -469,44 +468,5 @@ final class AngleTests extends TestCase
         $this->assertFloatEquals(1 / sinh($x), $a->csch());
         $this->assertFloatEquals(1 / cosh($x), $a->sech());
         $this->assertFloatEquals(1 / tanh($x), $a->coth());
-    }
-
-    /**
-     * Test comparison methods: lt(), lte(), gt(), and gte().
-     *
-     * Ensures that:
-     * - lt() returns true only when the first angle is strictly less than the second.
-     * - lte() returns true when the first angle is less than or equal to the second.
-     * - gt() returns true only when the first angle is strictly greater than the second.
-     * - gte() returns true when the first angle is greater than or equal to the second.
-     *
-     * @return void
-     */
-    #[Test]
-    public function testComparisonMethods(): void
-    {
-        $a = Angle::fromDegrees(45);
-        $b = Angle::fromDegrees(90);
-        $c = Angle::fromDegrees(90);
-
-        // lt()
-        $this->assertTrue($a->lt($b));
-        $this->assertFalse($b->lt($a));
-        $this->assertFalse($b->lt($c)); // equal values
-
-        // lte()
-        $this->assertTrue($a->lte($b));
-        $this->assertTrue($b->lte($c)); // equal values
-        $this->assertFalse($b->lte($a));
-
-        // gt()
-        $this->assertTrue($b->gt($a));
-        $this->assertFalse($a->gt($b));
-        $this->assertFalse($b->gt($c)); // equal values
-
-        // gte()
-        $this->assertTrue($b->gte($a));
-        $this->assertTrue($b->gte($c)); // equal values
-        $this->assertFalse($a->gte($b));
     }
 }

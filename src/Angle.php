@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Superclasses;
 
-use InvalidArgumentException;
+use ValueError;
 use DivisionByZeroError;
 use Throwable;
 
@@ -247,7 +247,7 @@ class Angle
                 return [$d, $m, $s];
 
             default:
-                throw new InvalidArgumentException("The smallest unit argument must be 0 for degrees, 1 for arcminutes, or 2 for arcseconds (default).");
+                throw new ValueError("The smallest unit argument must be 0 for degrees, 1 for arcminutes, or 2 for arcseconds (default).");
         }
     }
 
@@ -316,7 +316,7 @@ class Angle
     public function div(float $k): self
     {
         if ($k == 0 || is_nan($k) || is_infinite($k)) {
-            throw new InvalidArgumentException("Invalid divisor. It must be a number, and not equal to 0 or ±∞.");
+            throw new ValueError("Invalid divisor. It must be a number, and not equal to 0 or ±∞.");
         }
 
         return new self(fdiv($this->_radians, $k));
@@ -351,7 +351,7 @@ class Angle
     {
         // Ensure epsilon is non-negative.
         if ($eps < 0) {
-            throw new InvalidArgumentException("Epsilon must be non-negative.");
+            throw new ValueError("Epsilon must be non-negative.");
         }
 
         // Compute minimal signed difference in [-π, π).
@@ -373,57 +373,9 @@ class Angle
      * @param float $eps The tolerance for equality.
      * @return bool True if angles are equal within $eps; false otherwise.
      */
-    public function eq(self $other, float $eps = self::RAD_EPSILON): bool
+    public function equals(self $other, float $eps = self::RAD_EPSILON): bool
     {
         return $this->compare($other, $eps) === 0;
-    }
-
-    /**
-     * Checks if this angle is strictly less than another within a tolerance.
-     *
-     * @param self $other The other angle to compare with.
-     * @param float $eps The tolerance for equality.
-     * @return bool True if this < other (beyond $eps); false otherwise.
-     */
-    public function lt(self $other, float $eps = self::RAD_EPSILON): bool
-    {
-        return $this->compare($other, $eps) === -1;
-    }
-
-    /**
-     * Checks if this angle is less than or equal to another within a tolerance.
-     *
-     * @param self $other The other angle to compare with.
-     * @param float $eps The tolerance for equality.
-     * @return bool True if this <= other (within or beyond $eps); false otherwise.
-     */
-    public function lte(self $other, float $eps = self::RAD_EPSILON): bool
-    {
-        return $this->compare($other, $eps) !== 1;
-    }
-
-    /**
-     * Checks if this angle is strictly greater than another within a tolerance.
-     *
-     * @param self $other The other angle to compare with.
-     * @param float $eps The tolerance for equality.
-     * @return bool True if this > other (beyond $eps); false otherwise.
-     */
-    public function gt(self $other, float $eps = self::RAD_EPSILON): bool
-    {
-        return $this->compare($other, $eps) === 1;
-    }
-
-    /**
-     * Checks if this angle is greater than or equal to another within a tolerance.
-     *
-     * @param self $other The other angle to compare with.
-     * @param float $eps The tolerance for equality.
-     * @return bool True if this >= other (within or beyond $eps); false otherwise.
-     */
-    public function gte(self $other, float $eps = self::RAD_EPSILON): bool
-    {
-        return $this->compare($other, $eps) !== -1;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -743,7 +695,7 @@ class Angle
                 // This should never happen because this is a private method only called from format(), which only
                 // uses 0, 1, or 2 for the smallest unit argument. But we'll leave the default case here for
                 // completeness and robustness.
-                throw new InvalidArgumentException("Invalid smallest unit argument. It must be 0 for degrees, 1 for arcminutes, or 2 for arcseconds (default).");
+                throw new ValueError("Invalid smallest unit argument. It must be 0 for degrees, 1 for arcminutes, or 2 for arcseconds (default).");
         }
     }
 
@@ -759,13 +711,13 @@ class Angle
      * @param string $format A format string (case-insensitive).
      * @param ?int $decimals Optional number of decimal places for the value (or the smallest unit in DMS formats).
      * @return string The angle as a string.
-     * @throws InvalidArgumentException If the format is not recognized.
+     * @throws ValueError If the format is not recognized.
      */
     public function format(string $format = 'rad', ?int $decimals = null): string
     {
         // Guard.
         if ($decimals !== null && $decimals < 0) {
-            throw new InvalidArgumentException("Decimals must be non-negative.");
+            throw new ValueError("Decimals must be non-negative.");
         }
 
         return match (strtolower($format)) {
@@ -776,7 +728,7 @@ class Angle
             'd'     => $this->_formatDMS(0, $decimals),
             'dm'    => $this->_formatDMS(1, $decimals),
             'dms'   => $this->_formatDMS(2, $decimals),
-            default => throw new InvalidArgumentException(
+            default => throw new ValueError(
                 "Invalid format string. Allowed: rad, deg, grad, turn, d, dm, dms."
             ),
         };
@@ -798,7 +750,7 @@ class Angle
      *
      * @param string $value The string to parse.
      * @return self A new angle equivalent to the provided string.
-     * @throws InvalidArgumentException If the argument is invalid.
+     * @throws ValueError If the argument is invalid.
      */
     public static function fromString(string $value): self
     {
@@ -808,7 +760,7 @@ class Angle
         // Reject empty input.
         $value = trim($value);
         if ($value === '') {
-            throw new InvalidArgumentException($err_msg);
+            throw new ValueError($err_msg);
         }
 
         // Check for the DMS pattern as returned by toDMSString().
@@ -821,7 +773,7 @@ class Angle
         if (preg_match($pattern, $value, $matches, PREG_UNMATCHED_AS_NULL)) {
             // Require at least one component (deg/min/sec).
             if (empty($matches['deg']) && empty($matches['min']) && empty($matches['sec'])) {
-                throw new InvalidArgumentException($err_msg);
+                throw new ValueError($err_msg);
             }
 
             // Get the sign.
@@ -848,7 +800,7 @@ class Angle
         }
 
         // No valid units.
-        throw new InvalidArgumentException($err_msg);
+        throw new ValueError($err_msg);
     }
 
     /**

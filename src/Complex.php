@@ -189,7 +189,7 @@ class Complex implements Stringable
         $other = self::toComplex($other);
 
         // Check for divide by zero.
-        if ($other->eq(0)) {
+        if ($other->equals(0)) {
             throw new DivisionByZeroError("Cannot divide by 0.");
         }
 
@@ -224,20 +224,20 @@ class Complex implements Stringable
     public function ln(): Complex
     {
         // Check for ln(0), which is undefined.
-        if ($this->eq(0)) {
+        if ($this->equals(0)) {
             throw new ArithmeticError("The logarithm of 0 is undefined.");
         }
 
         // Use shortcuts where possible.
-        if ($this->eq(1)) {
+        if ($this->equals(1)) {
             return new Complex(0);
-        } elseif ($this->eq(2)) {
+        } elseif ($this->equals(2)) {
             return new Complex(M_LN2);
-        } elseif ($this->eq(M_E)) {
+        } elseif ($this->equals(M_E)) {
             return new Complex(1);
-        } elseif ($this->eq(M_PI)) {
+        } elseif ($this->equals(M_PI)) {
             return new Complex(M_LNPI);
-        } elseif ($this->eq(10)) {
+        } elseif ($this->equals(10)) {
             return new Complex(M_LN10);
         }
 
@@ -259,23 +259,23 @@ class Complex implements Stringable
         $base = self::toComplex($base);
 
         // Check for invalid base values.
-        if ($base->eq(0)) {
+        if ($base->equals(0)) {
             throw new ArithmeticError("Logarithm base cannot be 0.");
         }
-        if ($base->eq(1)) {
+        if ($base->equals(1)) {
             throw new ArithmeticError("Logarithm base cannot be 1.");
         }
 
         // Check for natural logarithm.
-        if ($base->eq(M_E)) {
+        if ($base->equals(M_E)) {
             return $this->ln();
         }
 
         // Use built-in constants for log_2(e) and log_10(e).
-        if ($this->eq(M_E)) {
-            if ($base->eq(2)) {
+        if ($this->equals(M_E)) {
+            if ($base->equals(2)) {
                 return new Complex(M_LOG2E);
-            } elseif ($base->eq(10)) {
+            } elseif ($base->equals(10)) {
                 return new Complex(M_LOG10E);
             }
         }
@@ -297,20 +297,20 @@ class Complex implements Stringable
     public function exp(): Complex
     {
         // Use shortcuts where possible.
-        if ($this->eq(0)) {
+        if ($this->equals(0)) {
             return new Complex(1);
-        } elseif ($this->eq(M_LN2)) {
+        } elseif ($this->equals(M_LN2)) {
             return new Complex(2);
-        } elseif ($this->eq(1)) {
+        } elseif ($this->equals(1)) {
             return new Complex(M_E);
-        } elseif ($this->eq(M_LNPI)) {
+        } elseif ($this->equals(M_LNPI)) {
             return new Complex(M_PI);
-        } elseif ($this->eq(M_LN10)) {
+        } elseif ($this->equals(M_LN10)) {
             return new Complex(10);
         }
 
         // Check for Euler's identity e^iπ = -1
-        if ($this->eq(new Complex(0, M_PI))) {
+        if ($this->equals(new Complex(0, M_PI))) {
             return new Complex(-1);
         }
 
@@ -332,19 +332,19 @@ class Complex implements Stringable
         $other = self::toComplex($other);
 
         // Handle special cases.
-        if ($this->eq(0)) {
+        if ($this->equals(0)) {
             // Check for complex exponent.
             if (!$other->isReal()) {
                 throw new InvalidArgumentException("Cannot raise 0 to a complex number.");
             }
 
             // Check for negative real exponent.
-            if ($other->isNegativeReal()) {
+            if ($other->real < 0) {
                 throw new InvalidArgumentException("Cannot raise 0 to a negative real number.");
             }
 
             // Check for 0 exponent.
-            if ($other->eq(0)) {
+            if ($other->equals(0)) {
                 // Although mathematically 0^0 is undefined, return 1 for consistency with pow(0, 0).
                 // This is a common result in many programming languages.
                 // (Principle of least astonishment.)
@@ -357,22 +357,22 @@ class Complex implements Stringable
         }
 
         // Handle exponent = 0. Any non-zero number to power 0 is 1.
-        if ($other->eq(0)) {
+        if ($other->equals(0)) {
             return new Complex(1);
         }
 
         // Handle exponent = 1. Any number to power 1 is itself.
-        if ($other->eq(1)) {
+        if ($other->equals(1)) {
             return clone $this;
         }
 
         // Handle i^2 = -1.
-        if ($this->eq(self::i()) && $other->eq(2)) {
+        if ($this->equals(self::i()) && $other->equals(2)) {
             return new Complex(-1);
         }
 
         // Handle e^w. Skip unnecessary calls to ln() and mul().
-        if ($this->eq(M_E)) {
+        if ($this->equals(M_E)) {
             return $other->exp();
         }
 
@@ -396,12 +396,12 @@ class Complex implements Stringable
         }
 
         // Handle special case of 0.
-        if ($this->eq(0)) {
+        if ($this->equals(0)) {
             return [new Complex()];
         }
 
         // Calculate the magnitude of the roots.
-        $root_mag = pow($this->mag, 1.0 / $n);
+        $root_mag = $this->mag ** (1.0 / $n);
 
         // Calculate all n roots.
         $roots = [];
@@ -427,33 +427,13 @@ class Complex implements Stringable
     }
 
     /**
-     * Check if a complex number is a negative real number.
-     * 
-     * @return bool True if the complex number is a negative real number, otherwise false. 
-     */
-    public function isNegativeReal(): bool
-    {
-        return $this->isReal() && $this->real < 0;
-    }
-
-    /**
-     * Check if a complex number is a positive real number.
-     * 
-     * @return bool True if the complex number is a positive real number, otherwise false. 
-     */
-    public function isPositiveReal(): bool
-    {
-        return $this->isReal() && $this->real > 0;
-    }
-
-    /**
      * Check if this complex number equals another.
      * 
      * @param Complex|int|float $other The real or complex number to compare with.
      * @param float $epsilon The tolerance for floating-point comparison.
      * @return bool True if the numbers are equal within the tolerance.
      */
-    public function eq(Complex|int|float $other, float $epsilon = PHP_FLOAT_EPSILON): bool
+    public function equals(Complex|int|float $other, float $epsilon = PHP_FLOAT_EPSILON): bool
     {
         // Make sure $other is Complex.
         $other = self::toComplex($other);

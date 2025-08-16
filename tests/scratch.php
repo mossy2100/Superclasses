@@ -17,3 +17,7 @@ echo $value < 0, PHP_EOL;
 echo $value === -0.0 ? 't' : 'f', PHP_EOL;
 
 echo tan(INF), PHP_EOL;
+
+echo dechex(123), PHP_EOL;
+
+echo 0 ** 0, PHP_EOL;
