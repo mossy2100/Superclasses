@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Superclasses;
 
-class KeyValuePair
+readonly class KeyValuePair
 {
-    public function __construct(public readonly  mixed $key, public readonly  mixed $value) {}
+    public function __construct(public mixed $key, public mixed $value) {}
 }

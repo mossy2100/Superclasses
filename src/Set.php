@@ -4,7 +4,13 @@ declare(strict_types = 1);
 
 namespace Superclasses;
 
-use Stringable, Countable, IteratorAggregate, ArrayIterator, InvalidArgumentException, Traversable;
+use ArrayIterator;
+use Countable;
+use InvalidArgumentException;
+use IteratorAggregate;
+use Stringable;
+use Stringify\Stringify;
+use Traversable;
 
 /**
  * Implements a set of values.

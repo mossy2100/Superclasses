@@ -668,7 +668,7 @@ class Color implements Stringable
     /**
      * Stringable implementation.
      *
-     * The default string representation of color is 8-digit RGBA lower-case hex string with leading '#'.
+     * The default string representation of a Color is an 8-digit RGBA lower-case hex string with leading '#'.
      * Suitable for use in CSS.
      *
      * @return string The Color as a CSS hexadecimal color string (RGBA, 8 digits).

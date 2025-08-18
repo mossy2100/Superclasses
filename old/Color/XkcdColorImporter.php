@@ -1,6 +1,6 @@
 <?php
 // tools/XkcdColorImporter.php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 const SRC_URL = 'https://xkcd.com/color/rgb.txt';
 const OUT_FILE = __DIR__ . '/../src/inc/ColorNames.php';

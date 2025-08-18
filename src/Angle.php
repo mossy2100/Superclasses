@@ -392,7 +392,7 @@ class Angle
     {
         // Treat |x| ≤ ε as zero and use signed zero, so fdiv returns ±INF.
         if (abs($x) <= self::TRIG_EPSILON) {
-            $x = Type::copySign(0.0, $x);
+            $x = Numbers::copySign(0.0, $x);
         }
 
         // IEEE-754 division (no errors/exceptions).
@@ -432,7 +432,7 @@ class Angle
         // If cos is effectively zero, return ±INF (sign chosen by the side, i.e., sign of sin).
         // tan() normally doesn't ever return ±INF, although it will return NAN for tan(INF).
         if (abs($c) <= self::TRIG_EPSILON) {
-            return Type::copySign(INF, $s);
+            return Numbers::copySign(INF, $s);
         }
 
         // Otherwise do IEEE‑754 division (no warnings/exceptions).
@@ -817,7 +817,7 @@ class Angle
         try {
             $result = self::fromString($value);
             return true;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             $result = null;
             return false;
         }

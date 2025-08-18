@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Superclasses;
 
@@ -72,11 +72,17 @@ class Complex implements Stringable
     }
 
     /**
-     * The magnitude (a.k.a. absolute value or modulus) of this complex number.
-     * 
-     * @var float
+     * The backing field for the magnitude property.
+     *
+     * @var ?float
      */
     private ?float $_mag = null;
+
+    /**
+     * The magnitude (a.k.a. absolute value or modulus) of this complex number.
+     *
+     * @var float
+     */
     public float $mag {
         get {
             // Compute if necessary.
@@ -90,11 +96,17 @@ class Complex implements Stringable
     }
 
     /**
-     * The phase (a.k.a. argument) of this complex number in radians.
+     * The backing field for the phase property.
      * 
-     * @var float
+     * @var ?float
      */
     private ?float $_phase = null;
+
+    /**
+     * The phase (a.k.a. argument) of this complex number in radians.
+     *
+     * @var float
+     */
     public float $phase {
         get {
             // Compute if necessary.
@@ -251,7 +263,7 @@ class Complex implements Stringable
      * 
      * @param Complex|int|float $base The base for the logarithm.
      * @return Complex A new complex number representing log_b(z).
-     * @throws ArithmeticError If base is 0, 1, or if this number is 0.
+     * @throws ArithmeticError If the base is 0, 1, or if this number is 0.
      */
     public function log(Complex|int|float $base): Complex
     {

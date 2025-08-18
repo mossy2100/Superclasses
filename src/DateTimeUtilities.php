@@ -1,10 +1,12 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Superclasses;
 
+use DateInvalidTimeZoneException;
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 
 /**
@@ -17,35 +19,35 @@ class DateTimeUtilities
     // Constants
 
     // These values are exact, based on average Gregorian calendar month and year lengths.
-    public const SECONDS_PER_MINUTE  = 60;
-    public const SECONDS_PER_HOUR    = 3600;
-    public const SECONDS_PER_DAY     = 86400;
-    public const SECONDS_PER_WEEK    = 604800;
-    public const SECONDS_PER_MONTH   = 2629746;
-    public const SECONDS_PER_YEAR    = 31556952;
+    public const int SECONDS_PER_MINUTE  = 60;
+    public const int SECONDS_PER_HOUR    = 3600;
+    public const int SECONDS_PER_DAY     = 86400;
+    public const int SECONDS_PER_WEEK    = 604800;
+    public const int SECONDS_PER_MONTH   = 2629746;
+    public const int SECONDS_PER_YEAR    = 31556952;
 
-    public const MINUTES_PER_HOUR    = 60;
-    public const MINUTES_PER_DAY     = 1440;
-    public const MINUTES_PER_WEEK    = 10080;
-    public const MINUTES_PER_MONTH   = 43829.1;
-    public const MINUTES_PER_YEAR    = 525949.2;
+    public const int MINUTES_PER_HOUR    = 60;
+    public const int MINUTES_PER_DAY     = 1440;
+    public const int MINUTES_PER_WEEK    = 10080;
+    public const float MINUTES_PER_MONTH   = 43829.1;
+    public const float MINUTES_PER_YEAR    = 525949.2;
 
-    public const HOURS_PER_DAY       = 24;
-    public const HOURS_PER_WEEK      = 168;
-    public const HOURS_PER_MONTH     = 730.485;
-    public const HOURS_PER_YEAR      = 8765.82;
+    public const int HOURS_PER_DAY       = 24;
+    public const int HOURS_PER_WEEK      = 168;
+    public const float HOURS_PER_MONTH     = 730.485;
+    public const float HOURS_PER_YEAR      = 8765.82;
 
-    public const DAYS_PER_WEEK       = 7;
-    public const DAYS_PER_MONTH      = 30.436875;
-    public const DAYS_PER_YEAR       = 365.2425;
+    public const int DAYS_PER_WEEK       = 7;
+    public const float DAYS_PER_MONTH      = 30.436875;
+    public const float DAYS_PER_YEAR       = 365.2425;
 
-    public const WEEKS_PER_MONTH     = 4.348125;
-    public const WEEKS_PER_YEAR      = 52.1775;
+    public const float WEEKS_PER_MONTH     = 4.348125;
+    public const float WEEKS_PER_YEAR      = 52.1775;
 
-    public const MONTHS_PER_YEAR     = 12;
+    public const int MONTHS_PER_YEAR     = 12;
 
     // Formats
-    public const MYSQL = 'Y-m-d H:i:s';
+    public const string MYSQL = 'Y-m-d H:i:s';
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Static methods
@@ -104,13 +106,14 @@ class DateTimeUtilities
      *    $dt = new DateTime($year, $month, $day, $hour, $minute, $second);
      *    $dt = new DateTime($year, $month, $day, $hour, $minute, $second, $timezone);
      *
-     * @param string|int                    $year, $unix_timestamp or $datetime_string
-     * @param null|DateTimeZone|string|int  $month or $timezone
-     * @param int                           $day
-     * @param null|DateTimeZone|string|int  $hour or $timezone
-     * @param int                           $minute
-     * @param int                           $second
-     * @param null|DateTimeZone|string      $timezone
+     * @param string|int $year , $unix_timestamp or $datetime_string
+     * @param null|DateTimeZone|string|int $month or $timezone
+     * @param int $day
+     * @param null|DateTimeZone|string|int $hour or $timezone
+     * @param int $minute
+     * @param int $second
+     * @param null|DateTimeZone|string $timezone
+     * @throws DateInvalidTimeZoneException
      */
     public function __construct()
     {
@@ -131,21 +134,21 @@ class DateTimeUtilities
         } elseif ($n_args <= 2) {
             // Args are assumed to be: $datetime, [$timezone], as for the DateTime constructor.
             $datetime = $args[0];
-            $timezone = isset($args[1]) ? $args[1] : null;
+            $timezone = $args[1] ?? null;
         } elseif ($n_args <= 4) {
             // Args are assumed to be: $year, $month, $day, [$timezone].
             $date = self::zeroPad($args[0], 4) . '-' . self::zeroPad($args[1]) . '-' . self::zeroPad($args[2]);
             $time = '00:00:00';
             $datetime = "$date $time";
-            $timezone = isset($args[3]) ? $args[3] : null;
+            $timezone = $args[3] ?? null;
         } elseif ($n_args >= 6 && $n_args <= 7) {
             // Args are assumed to be: $year, $month, $day, [$timezone].
             $date = self::zeroPad($args[0], 4) . '-' . self::zeroPad($args[1]) . '-' . self::zeroPad($args[2]);
             $time = self::zeroPad($args[3]) . ':' . self::zeroPad($args[4]) . ':' . self::zeroPad($args[5]);
             $datetime = "$date $time";
-            $timezone = isset($args[6]) ? $args[6] : null;
+            $timezone = $args[6] ?? null;
         } else {
-            trigger_error("DateTime::__construct() - Invalid number of paremeters.", E_USER_WARNING);
+            trigger_error("DateTime::__construct() - Invalid number of parameters.", E_USER_WARNING);
         }
 
         // Support string timezones:
@@ -195,7 +198,7 @@ class DateTimeUtilities
      */
     public function iso()
     {
-        return $this->format(self::ATOM);
+        return $this->format(DateTimeInterface::ATOM);
     }
 
     /**
@@ -266,7 +269,7 @@ class DateTimeUtilities
     /**
      * Get/set the timestamp.
      *
-     * @param null|int
+     * @param null|int $ts
      * @return int
      */
     public function timestamp($ts = null)
@@ -295,7 +298,7 @@ class DateTimeUtilities
             if ($ts !== false) {
                 return $ts;
             }
-        } elseif ($datetime instanceof \DateTime) {
+        } elseif ($datetime instanceof DateTime) {
             // Parameter is a \DateTime object:
             return $datetime->getTimestamp();
         }
@@ -310,6 +313,7 @@ class DateTimeUtilities
      *
      * @param null|string|DateTimeZone $tz
      * @return DateTimeZone
+     * @throws DateInvalidTimeZoneException
      */
     public function timezone($tz = null)
     {

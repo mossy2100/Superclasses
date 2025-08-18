@@ -1,8 +1,8 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Superclasses;
+namespace Stringify;
 
 /**
  * This class provides JSON-like encoding with a few differences:
@@ -71,7 +71,7 @@ class Stringify
     {
         // Encode a list like a JSON array. All elements will be on one line with no indentation.
         if (array_is_list($ary)) {
-            return '[' . implode(', ', array_map('Superclasses\Stringify::stringify', $ary)) . ']';
+            return '[' . implode(', ', array_map('Stringify\Stringify', $ary)) . ']';
         }
 
         // Encode an associative array like a JSON object.

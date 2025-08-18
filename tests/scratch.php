@@ -1,6 +1,6 @@
 <?php
 
-namespace Superclasses;
+namespace Superclasses\Tests;
 
 require_once __DIR__ . '/../src/Angle.php';
 

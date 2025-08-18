@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Superclasses;
 
@@ -157,7 +157,7 @@ class ListOf implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Construct a new sequence from an existing collection.
      */
-    public static function fromIterable(iterable $src)
+    public static function fromIterable(iterable $src): self
     {
         // Collect the item types.
         $types = new TypeSet();
@@ -186,7 +186,7 @@ class ListOf implements ArrayAccess, Countable, IteratorAggregate
         mixed $index,
         bool $check_lower_bound = true,
         bool $check_upper_bound = true
-    ) {
+    ): void {
         // Check the index is valid.
         if (!is_int($index)) {
             throw new InvalidArgumentException("Index must be an integer.");

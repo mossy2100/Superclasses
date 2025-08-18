@@ -1,8 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Superclasses;
+
+use Override;
 
 /**
  * SetOf class.
@@ -35,7 +37,7 @@ class SetOf extends Set
      * @param mixed $item The item to check.
      * @return bool True if the item is allowed, false otherwise.
      */
-    #[\Override]
+    #[Override]
     protected function isItemAllowed(mixed $item): bool {
         // Check the item type.
         return $this->types->match($item);
@@ -52,7 +54,7 @@ class SetOf extends Set
      * @param Set $other The other set with items to include.
      * @return static A new set with elements from $this and $other.
      */
-    #[\Override]
+    #[Override]
     public function union(Set $other): static
     {
         // Need to allow types from both sets.
@@ -76,7 +78,7 @@ class SetOf extends Set
      * @param Set $other The other set to intersect the $this set with.
      * @return static A new set with elements common to $this and $other.
      */
-    #[\Override]
+    #[Override]
     public function intersect(Set $other): static
     {
         // Assume the result set has the same type constraints as this set.
@@ -101,7 +103,7 @@ class SetOf extends Set
      * @param Set $other The set with items to remove.
      * @return static A new set with elements from $this that are not in $other.
      */
-    #[\Override]
+    #[Override]
     public function diff(Set $other): static
     {
         // Assume the result set has the same type constraints as this set.

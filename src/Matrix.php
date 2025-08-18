@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Superclasses;
 
@@ -10,8 +10,18 @@ use DomainException;
 class Matrix
 {
     private array $data;
-    private int $rows;
-    private int $cols;
+
+    private int $rows {
+        get {
+            return $this->rows;
+        }
+    }
+
+    private int $cols {
+        get {
+            return $this->cols;
+        }
+    }
 
     /**
      * Create a new matrix with the specified dimensions.
@@ -48,7 +58,7 @@ class Matrix
         $cols = null;
 
         // Validate data and ensure rectangular matrix
-        foreach ($data as $rowIndex => $row) {
+        foreach ($data as $row) {
             if (!is_array($row) || empty($row)) {
                 throw new InvalidArgumentException("Each row must be a non-empty array");
             }
@@ -59,7 +69,7 @@ class Matrix
                 throw new InvalidArgumentException("All rows must have the same number of columns");
             }
 
-            foreach ($row as $colIndex => $value) {
+            foreach ($row as $value) {
                 if (!is_int($value) && !is_float($value)) {
                     throw new InvalidArgumentException("Matrix elements must be numbers (int or float)");
                 }
@@ -74,26 +84,6 @@ class Matrix
         }
 
         return $matrix;
-    }
-
-    /**
-     * Get the number of rows.
-     *
-     * @return int
-     */
-    public function getRows(): int
-    {
-        return $this->rows;
-    }
-
-    /**
-     * Get the number of columns.
-     *
-     * @return int
-     */
-    public function getCols(): int
-    {
-        return $this->cols;
     }
 
     /**
@@ -428,13 +418,11 @@ class Matrix
             throw new InvalidArgumentException("Cross product is only defined for 3D vectors");
         }
 
-        $result = Matrix::fromArray([[
+        return Matrix::fromArray([[
             $thisVector[1] * $otherVector[2] - $thisVector[2] * $otherVector[1],
             $thisVector[2] * $otherVector[0] - $thisVector[0] * $otherVector[2],
             $thisVector[0] * $otherVector[1] - $thisVector[1] * $otherVector[0]
         ]]);
-
-        return $result;
     }
 
     /**

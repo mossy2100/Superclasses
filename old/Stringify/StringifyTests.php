@@ -1,8 +1,8 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Superclasses;
+namespace Superclasses\Tests;
 
 use stdClass;
 use DateTime;

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Superclasses;
 
@@ -75,7 +75,7 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Construct a new Dictionary from an existing collection.
      */
-    public static function fromIterable(iterable $src)
+    public static function fromIterable(iterable $src): self
     {
         // Collect the key and value types.
         $key_types = new TypeSet();
@@ -102,7 +102,7 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
      * @param mixed $key The key to check.
      * @throws InvalidArgumentException If the key type is not allowed.
      */
-    private function checkKeyType(mixed $key)
+    private function checkKeyType(mixed $key): void
     {
         if (!$this->keyTypes->match($key)) {
             throw new InvalidArgumentException("Invalid key type.");
@@ -115,7 +115,7 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
      * @param mixed $value The value to check.
      * @throws InvalidArgumentException If the value type is not allowed.
      */
-    private function checkValueType(mixed $value)
+    private function checkValueType(mixed $value): void
     {
         if (!$this->valueTypes->match($value)) {
             throw new InvalidArgumentException("Invalid value type.");

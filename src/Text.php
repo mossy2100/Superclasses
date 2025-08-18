@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Superclasses;
 
@@ -61,31 +61,31 @@ class Text implements Stringable
         $this->bytes = $bytes;
     }
 
-    public function toLower()
+    public function toLower(): self
     {
         $s = mb_strtolower($this->bytes);
         return new Text($s, $this->encoding);
     }
 
-    public function toUpper()
+    public function toUpper(): self
     {
         $s = mb_strtoupper($this->bytes);
         return new Text($s, $this->encoding);
     }
 
-    public function toTitle()
+    public function toTitle(): self
     {
         $s = mb_convert_case($this->bytes, MB_CASE_TITLE, $this->encoding);
         return new Text($s, $this->encoding);
     }
 
-    public function caseFold()
+    public function caseFold(): self
     {
         $s = mb_convert_case($this->bytes, MB_CASE_FOLD, $this->encoding);
         return new Text($s, $this->encoding);
     }
 
-    public function convertEncoding(string $new_encoding)
+    public function convertEncoding(string $new_encoding): self
     {
         // Attempt to convert encoding. 
         $s = mb_convert_encoding($this->bytes, $new_encoding, $this->encoding);
@@ -97,7 +97,7 @@ class Text implements Stringable
         return new Text($s, $new_encoding);
     }
 
-    public function equal(Text|string $t2, bool $case_sensitive = true)
+    public function equal(Text|string $t2, bool $case_sensitive = true): bool
     {
         // Convert second operand to a Text if needs be.
         if (is_string($t2)) {
@@ -128,7 +128,7 @@ class Text implements Stringable
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Static members
 
-    public static function setDefaultDetectedEncodings()
+    public static function setDefaultDetectedEncodings(): void
     {
         $default_encodings = [
             'UTF-8',        // Most common modern encoding
@@ -145,7 +145,7 @@ class Text implements Stringable
         mb_detect_order($default_encodings);
     }
 
-    public static function setDetectedEncodings(array $encodings)
+    public static function setDetectedEncodings(array $encodings): void
     {
         mb_detect_order($encodings);
     }

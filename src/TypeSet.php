@@ -1,10 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Superclasses;
 
 use InvalidArgumentException;
+use Override;
 
 class TypeSet extends Set
 {
@@ -56,7 +57,7 @@ class TypeSet extends Set
      * @param mixed $item The item to check.
      * @return bool True if the item is a valid type, false otherwise.
      */
-    #[\Override]
+    #[Override]
     public function isItemAllowed(mixed $item): bool
     {
         // Check the item is a string.
@@ -88,7 +89,7 @@ class TypeSet extends Set
      * @param mixed $item The item to add to the set.
      * @return $this The modified set.
      */
-    #[\Override]
+    #[Override]
     public function addOne(mixed $item): static
     {
         // Call the parent method.
@@ -164,12 +165,12 @@ class TypeSet extends Set
         }
 
         // Check number.
-        if (Type::isNumber($value) && $this->contains('number')) {
+        if (Numbers::isNumber($value) && $this->contains('number')) {
             return true;
         }
 
         // Check uint.
-        if (Type::isUnsignedInt($value) && $this->contains('uint')) {
+        if (Numbers::isUnsignedInt($value) && $this->contains('uint')) {
             return true;
         }
 
