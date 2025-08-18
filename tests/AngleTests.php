@@ -2,16 +2,13 @@
 
 declare(strict_types = 1);
 
-namespace Tests;
+namespace Superclasses\Tests;
 
 use InvalidArgumentException;
 use Superclasses\Angle;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use function cosh;
-use function sinh;
-use function tanh;
 
 #[CoversClass(Angle::class)]
 final class AngleTests extends TestCase

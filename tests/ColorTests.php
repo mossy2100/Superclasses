@@ -2,12 +2,18 @@
 
 declare(strict_types=1);
 
+namespace Superclasses\Tests;
+
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Superclasses\Color;
 
+#[CoversClass(Color::class)]
 final class ColorTests extends TestCase
 {
-    public function testConstructHexAndProperties(): void
+    #[Test]
+    public function constructHexAndProperties(): void
     {
         $color = new Color('#0f8');
         $this->assertSame(0, $color->red);
@@ -16,7 +22,8 @@ final class ColorTests extends TestCase
         $this->assertSame(255, $color->alpha);
     }
 
-    public function testConstructColorNameCaseInsensitive(): void
+    #[Test]
+    public function constructColorNameCaseInsensitive(): void
     {
         $color = new Color('ReD');
         $this->assertSame(255, $color->red);
@@ -24,7 +31,8 @@ final class ColorTests extends TestCase
         $this->assertSame(0, $color->blue);
     }
 
-    public function testHexWithAlpha(): void
+    #[Test]
+    public function constructHexWithAlpha(): void
     {
         $color = new Color('#1234');
         $this->assertSame(0x11, $color->red);
@@ -33,21 +41,23 @@ final class ColorTests extends TestCase
         $this->assertSame(0x44, $color->alpha);
     }
 
-    public function testFromRgbaAndVirtualProperties(): void
+    #[Test]
+    public function fromRgbaAndVirtualProperties(): void
     {
-        $color = Color::fromRgba(10, 20, 30, 0.5);
+        $color = Color::fromRgba(10, 20, 30, 127);
         $this->assertSame(10, $color->red);
-        $this->assertSame(128, $color->alpha);
+        $this->assertSame(127, $color->alpha);
         $color->blue = 40;
         $this->assertSame(40, $color->blue);
     }
 
-    public function testFromHsla(): void
+    #[Test]
+    public function fromHsla(): void
     {
-        $color = Color::fromHsla(120, 1, 0.5, 0.25);
+        $color = Color::fromHsla(120, 1, 0.5, 64);
         $this->assertSame(0, $color->red);
         $this->assertSame(255, $color->green);
         $this->assertSame(0, $color->blue);
-        $this->assertEqualsWithDelta(255 / 4, $color->alpha, 0.5);
+        $this->assertSame(64, $color->alpha);
     }
 }

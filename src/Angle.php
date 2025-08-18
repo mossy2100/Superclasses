@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Superclasses;
 
 use ValueError;
-use DivisionByZeroError;
 use Throwable;
 
 class Angle
