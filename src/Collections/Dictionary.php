@@ -97,6 +97,28 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
         return empty($this->_items);
     }
 
+    /**
+     * Check if a key exists in the dictionary.
+     *
+     * @param mixed $key The key to check.
+     * @return bool True if the key exists, false otherwise.
+     */
+    public function hasKey(mixed $key): bool
+    {
+        return key_exists(Type::getStringKey($key), $this->_items);
+    }
+
+    /**
+     * Check if a value exists in the dictionary.
+     *
+     * @param mixed $value The value to check.
+     * @return bool True if the value exists, false otherwise.
+     */
+    public function hasValue(mixed $value): bool
+    {
+        return in_array($value, $this->values(), true);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // ArrayAccess implementation
 
@@ -146,18 +168,14 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * Check if an item exists by key.
+     * Check if a given key exists in the dictionary.
      *
      * @param mixed $offset The key to check.
-     * @return bool True if the item exists, false otherwise.
+     * @return bool True if the key is in the dictionary, false otherwise.
      */
     public function offsetExists(mixed $offset): bool
     {
-        // Get the string version of this key.
-        $string_key = Type::getStringKey($offset);
-
-        // Check key exists.
-        return key_exists($string_key, $this->_items);
+        return $this->hasKey($offset);
     }
 
     /**

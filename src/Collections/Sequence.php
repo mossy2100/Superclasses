@@ -16,10 +16,10 @@ use OutOfRangeException;
 
 /**
  * A sequence implementation that is stricter than ordinary PHP arrays.
- *
- * Indices are always integers from 0 to the number of items in the sequence minus 1.
+ * Offsets are always sequential integers starting from 0. Therefore, the largest offset (a.k.a. index or key) will
+ * equal the number of items in the sequence minus 1.
  * Sequence items can be set at positions beyond the current range, but intermediate items will be filled in with a
- * default value, which is specified in the constructor.
+ * default value, specified in the constructor.
  */
 class Sequence implements ArrayAccess, Countable, IteratorAggregate
 {
@@ -40,7 +40,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Create a new sequence, optionally from an existing iterable.
      *
-     * A default value may be specified, which is used to fill gaps when increasing the sequence length.
+     * A default value may be specified, used to fill gaps when increasing the sequence length.
      * @see self::offsetSet()
      *
      * @param iterable $src The source iterable (default empty array).
@@ -245,13 +245,13 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * @see https://www.php.net/manual/en/function.array-slice.php
      *
      * @param int $offset The start position of the slice.
-     *      If the offset is non-negative, the slice will start at that offset in the sequence.
-     *      If the offset is negative, the slice will start that far from the end of the sequence.
+     *      If non-negative, the slice will start at that offset in the sequence.
+     *      If negative, the slice will start that far from the end of the sequence.
      * @param ?int $length The length of the slice.
-     *      If the length is given and is positive, then the sequence will have up to that many elements in it.
-     *      If the sequence is shorter than the length, then only the available items will be present.
-     *      If the length is given and is negative, the slice will stop that many elements from the end of the sequence.
-     *      If it is omitted or null, then the slice will have everything from offset up until the end of the sequence.
+     *      If given and is positive, then the sequence will have up to that many elements in it.
+     *      If the sequence is shorter than the length, then only available items will be present.
+     *      If given and is negative, the slice will stop that many elements from the end of the sequence.
+     *      If omitted or null, then the slice will have everything from offset up until the end of the sequence.
      * @return static The slice.
      */
     public function slice(int $offset, ?int $length = null): static
@@ -348,7 +348,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     {
         $value_count = new Dictionary();
         foreach ($this->items as $item) {
-            if ($value_count->contains($item)) {
+            if ($value_count->hasKey($item)) {
                 $value_count[$item]++;
             } else {
                 $value_count[$item] = 1;
@@ -440,7 +440,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      */
     public function sort(int $flags = SORT_REGULAR): static
     {
-        // Copy the items array so it's non-mutating.
+        // Copy the items array so the method is non-mutating.
         $items = $this->items;
         sort($items, $flags);
         return new static($items, $this->defaultValue);
@@ -457,7 +457,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      */
     public function sortReverse(int $flags = SORT_REGULAR): static
     {
-        // Copy the items array so it's non-mutating.
+        // Copy the items array so the method is non-mutating.
         $items = $this->items;
         rsort($items, $flags);
         return new static($items, $this->defaultValue);
@@ -474,7 +474,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      */
     public function sortBy(callable $fn): static
     {
-        // Copy the items array so it's non-mutating.
+        // Copy the items array so the method is non-mutating.
         $items = $this->items;
         usort($items, $fn);
         return new static($items, $this->defaultValue);
@@ -558,11 +558,15 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Set a sequence item to null.
      *
-     * This method does not remove an item from the sequence, as with an ordinary PHP array,
-     * because with this data structure we want to maintain offsets from 0 up to the sequence size minus 1.
+     * This method isn't usually called as a method, but rather as a result of calling unset($sequence[$offset]).
+     *
+     * Doing this doesn't remove an item from the sequence, as it does with ordinary PHP arrays. This is because this
+     * data structure maintains zero-indexed sequential keys. Therefore, removing an item from the sequence would
+     * require re-indexing later items. This could be unexpected behavior.
+     *
      * To remove an item from the sequence, use one of the remove*() methods.
      *
-     * @param mixed $offset The zero-based offset position to set.
+     * @param mixed $offset The zero-based offset position to unset.
      * @throws OutOfRangeException If the offset is outside the valid range for the sequence.
      */
     public function offsetUnset(mixed $offset): void
