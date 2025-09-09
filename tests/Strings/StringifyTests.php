@@ -10,7 +10,7 @@ use Stringable;
 
 require_once __DIR__ . '/../src/Stringify.php';
 require_once __DIR__ . '/../src/TypeSet.php';
-require_once __DIR__ . '/../src/Dictionary.php';
+require_once __DIR__ . '/../src/DictionaryOf.php';
 
 echo Stringify::stringify(null) . "\n";
 echo Stringify::stringify(true) . "\n";

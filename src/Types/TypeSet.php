@@ -2,10 +2,12 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses;
+namespace Superclasses\Types;
 
 use InvalidArgumentException;
 use Override;
+use Superclasses\Collections\Set;
+use Superclasses\Math\Numbers;
 
 class TypeSet extends Set
 {
@@ -42,6 +44,17 @@ class TypeSet extends Set
                 $this->add($type);
             }
         }
+    }
+
+    /**
+     * Convert a string or iterable of types into a TypeSet, if necessary.
+     *
+     * @param string|iterable $types The types to convert.
+     * @return self The converted TypeSet.
+     */
+    public static function convertToTypeSet(string|iterable $types = ''): self
+    {
+        return $types instanceof self ? $types : new self($types);
     }
 
     /**
@@ -84,50 +97,22 @@ class TypeSet extends Set
     }
 
     /**
-     * Add one item to the set.
+     * Add types to the set.
      *
-     * @param mixed $item The item to add to the set.
+     * @param mixed ...$items The types to add to the set.
      * @return $this The modified set.
      */
     #[Override]
-    public function addOne(mixed $item): static
+    public function add(mixed ...$items): static
     {
         // Call the parent method.
-        parent::addOne($item);
+        parent::add($items);
 
-        // Reduce the set as much as possible.
+        // Remove redundant types.
         $this->simplify();
 
         // Return $this for chaining.
         return $this;
-    }
-
-    /**
-     * Helper function to get a type name for a given value.
-     * A more specific type name is preferred when possible.
-     *
-     * @param mixed $value The value to get the type name for.
-     * @return string The type name for the value.
-     */
-    public static function getValueType(mixed $value): string
-    {
-        $type = get_debug_type($value);
-
-        // Resources.
-        if (str_starts_with($type, 'resource')) {
-            // Get the resource name if possible, otherwise generic 'resource'.
-            return is_resource($value) ? get_resource_type($value) : 'resource';
-        }
-
-        // Anonymous classes.
-        if (str_contains($type, '@anonymous')) {
-            // Return the base class or interface name if there is one, otherwise generic 'object'.
-            $class = substr($type, 0, -10);
-            return $class === 'class' ? 'object' : $class;
-        }
-
-        // Return null, bool, int, float, string, or array.
-        return $type;
     }
 
     /**
@@ -138,7 +123,7 @@ class TypeSet extends Set
      */
     public function addValueType(mixed $value): void
     {
-        $this->add(self::getValueType($value));
+        $this->add(Type::getType($value));
     }
 
     /**
@@ -160,17 +145,17 @@ class TypeSet extends Set
         }
 
         // Check scalar.
-        if (is_scalar($value) && $this->contains('scalar')) {
+        if ($this->contains('scalar') && is_scalar($value)) {
             return true;
         }
 
         // Check number.
-        if (Numbers::isNumber($value) && $this->contains('number')) {
+        if ($this->contains('number') && Numbers::isNumber($value)) {
             return true;
         }
 
         // Check uint.
-        if (Numbers::isUnsignedInt($value) && $this->contains('uint')) {
+        if ($this->contains('uint') && Numbers::isUnsignedInt($value)) {
             return true;
         }
 

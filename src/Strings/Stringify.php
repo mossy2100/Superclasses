@@ -2,7 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Stringify;
+namespace Superclasses\Strings;
+
+use Stringable;
 
 /**
  * This class provides JSON-like encoding with a few differences:
@@ -48,11 +50,23 @@ class Stringify
      */
     public static function stringifyFloat(float $value): string
     {
+        // Handle infinity and NaN specially.
+        if (is_nan($value)) {
+            return 'NaN';
+        }
+        if ($value === INF) {
+            return '∞';
+        }
+        if ($value === -INF) {
+            return '-∞';
+        }
+
         // Convert the float to a string using the default method.
         $s = (string)$value;
 
-        // Make sure the string has a decimal point or E.
-        if (!str_contains($s, '.') && !str_contains($s, 'E')) {
+        // If the string representation of the float value has no decimal point or exponent (i.e. nothing to distinguish
+        // it from an integer), append a decimal point.
+        if (strpbrk($s, ".eE") === false) {
             $s .= '.0';
         }
 
@@ -96,14 +110,14 @@ class Stringify
      */
     public static function stringifyObject(object $obj, string $class, int $indent_level = 0): string
     {
-        // Call the instance stringify() method if available.
-        if ($obj instanceof Stringifiable) {
-            return $obj->stringify();
+        // Call the __toString() method if implemented.
+        if ($obj instanceof Stringable) {
+            return $obj->__toString();
         }
 
         // Convert the object to an array to get its properties.
-        // This works better than reflection, as new properties can be created when converting the
-        // object to an array (example: DateTime).
+        // This works better than reflection, as new properties can be created when converting the object to an array
+        // (example: DateTime).
         $a = (array)$obj;
 
         // Early return if no properties.

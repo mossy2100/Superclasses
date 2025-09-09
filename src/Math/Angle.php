@@ -2,10 +2,12 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses;
+namespace Superclasses\Math;
 
-use ValueError;
 use Throwable;
+use RangeException;
+use DomainException;
+use UnexpectedValueException;
 
 class Angle
 {
@@ -161,9 +163,15 @@ class Angle
      * @param ?int $decimals Optional number of decimal places for rounding the smallest unit. If null (default), no
      *      rounding will be performed.
      * @return float[] Array of 1-3 floats representing the degrees, arcminutes, and arcseconds.
+     * @throws DomainException If $smallest_unit is not 0, 1, or 2, or if $decimals is negative.
      */
     public function toDMS(int $smallest_unit = 2, ?int $decimals = null): array
     {
+        // Guard.
+        if ($decimals !== null && $decimals < 0) {
+            throw new DomainException("Decimals must be non-negative.");
+        }
+
         $f_deg = $this->toDegrees();
         $sign  = $f_deg < 0 ? -1 : 1;
         $f_deg = abs($f_deg);
@@ -246,7 +254,7 @@ class Angle
                 return [$d, $m, $s];
 
             default:
-                throw new ValueError("The smallest unit argument must be 0 for degrees, 1 for arcminutes, or 2 for arcseconds (default).");
+                throw new DomainException("The smallest unit argument must be 0 for degrees, 1 for arcminutes, or 2 for arcseconds (default).");
         }
     }
 
@@ -314,8 +322,9 @@ class Angle
      */
     public function div(float $k): self
     {
-        if ($k == 0 || is_nan($k) || is_infinite($k)) {
-            throw new ValueError("Invalid divisor. It must be a number, and not equal to 0 or ±∞.");
+        // Guards.
+        if (!is_finite($k) || $k == 0) {
+            throw new RangeException("Divisor cannot be 0, NaN, or ±∞.");
         }
 
         return new self(fdiv($this->_radians, $k));
@@ -345,12 +354,13 @@ class Angle
      * @param self $other The other angle to compare with.
      * @param float $eps The tolerance for equality.
      * @return int -1, 0, or 1
+     * @throws DomainException If $eps is negative.
      */
     public function compare(self $other, float $eps = self::RAD_EPSILON): int
     {
         // Ensure epsilon is non-negative.
         if ($eps < 0) {
-            throw new ValueError("Epsilon must be non-negative.");
+            throw new DomainException("Epsilon must be non-negative.");
         }
 
         // Compute minimal signed difference in [-π, π).
@@ -430,7 +440,7 @@ class Angle
         $c = cos($this->_radians);
 
         // If cos is effectively zero, return ±INF (sign chosen by the side, i.e., sign of sin).
-        // tan() normally doesn't ever return ±INF, although it will return NAN for tan(INF).
+        // The built-in tan() function normally doesn't ever return ±INF.
         if (abs($c) <= self::TRIG_EPSILON) {
             return Numbers::copySign(INF, $s);
         }
@@ -645,9 +655,15 @@ class Angle
      * @param float $value The value to format.
      * @param ?int $decimals Number of decimal places to show, or null for the maximum (with no trailing zeros).
      * @return string The formatted string.
+     * @throws DomainException If $decimals is negative.
      */
     private static function _formatFloat(float $value, ?int $decimals = null): string
     {
+        // Guard.
+        if ($decimals !== null && $decimals < 0) {
+            throw new DomainException("Decimals must be non-negative or null.");
+        }
+
         // Canonicalize -0.0 to 0.0 to avoid surprising string output.
         if ($value == 0.0) $value = 0.0;
 
@@ -665,9 +681,15 @@ class Angle
      * @param int $smallest_unit 0 for degrees, 1 for arcminutes, 2 for arcseconds.
      * @param ?int $decimals Optional number of decimal places for the smallest unit.
      * @return string The degrees, arcminutes, and arcseconds nicely formatted as a string.
+     * @throws DomainException If $smallest_unit is not 0, 1, or 2, or if $decimals is negative.
      */
     private function _formatDMS(int $smallest_unit = 2, ?int $decimals = null): string
     {
+        // Guard.
+        if ($decimals !== null && $decimals < 0) {
+            throw new DomainException("Decimals must be non-negative or null.");
+        }
+
         // Get the sign string.
         $sign = $this->_radians < 0 ? '-' : '';
 
@@ -694,7 +716,7 @@ class Angle
                 // This should never happen because this is a private method only called from format(), which only
                 // uses 0, 1, or 2 for the smallest unit argument. But we'll leave the default case here for
                 // completeness and robustness.
-                throw new ValueError("Invalid smallest unit argument. It must be 0 for degrees, 1 for arcminutes, or 2 for arcseconds (default).");
+                throw new DomainException("Invalid smallest unit argument. It must be 0 for degrees, 1 for arcminutes, or 2 for arcseconds (default).");
         }
     }
 
@@ -710,13 +732,13 @@ class Angle
      * @param string $format A format string (case-insensitive).
      * @param ?int $decimals Optional number of decimal places for the value (or the smallest unit in DMS formats).
      * @return string The angle as a string.
-     * @throws ValueError If the format is not recognized.
+     * @throws DomainException If $format is not one of the supported formats or if $decimals is negative.
      */
     public function format(string $format = 'rad', ?int $decimals = null): string
     {
         // Guard.
         if ($decimals !== null && $decimals < 0) {
-            throw new ValueError("Decimals must be non-negative.");
+            throw new DomainException("Decimals must be non-negative or null.");
         }
 
         return match (strtolower($format)) {
@@ -727,7 +749,7 @@ class Angle
             'd'     => $this->_formatDMS(0, $decimals),
             'dm'    => $this->_formatDMS(1, $decimals),
             'dms'   => $this->_formatDMS(2, $decimals),
-            default => throw new ValueError(
+            default => throw new DomainException(
                 "Invalid format string. Allowed: rad, deg, grad, turn, d, dm, dms."
             ),
         };
@@ -749,7 +771,7 @@ class Angle
      *
      * @param string $value The string to parse.
      * @return self A new angle equivalent to the provided string.
-     * @throws ValueError If the argument is invalid.
+     * @throws UnexpectedValueException If the string does not represent a valid angle.
      */
     public static function fromString(string $value): self
     {
@@ -759,7 +781,7 @@ class Angle
         // Reject empty input.
         $value = trim($value);
         if ($value === '') {
-            throw new ValueError($err_msg);
+            throw new UnexpectedValueException($err_msg);
         }
 
         // Check for the DMS pattern as returned by toDMSString().
@@ -772,7 +794,7 @@ class Angle
         if (preg_match($pattern, $value, $matches, PREG_UNMATCHED_AS_NULL)) {
             // Require at least one component (deg/min/sec).
             if (empty($matches['deg']) && empty($matches['min']) && empty($matches['sec'])) {
-                throw new ValueError($err_msg);
+                throw new UnexpectedValueException($err_msg);
             }
 
             // Get the sign.
@@ -799,7 +821,7 @@ class Angle
         }
 
         // No valid units.
-        throw new ValueError($err_msg);
+        throw new UnexpectedValueException($err_msg);
     }
 
     /**

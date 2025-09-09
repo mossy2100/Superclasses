@@ -2,12 +2,39 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses;
+namespace Superclasses\Types;
 
 use InvalidArgumentException;
 
 class Type
 {
+    /**
+     * Helper function to get a type name for a given value.
+     * A more specific type name (for example, a class name or resource type) is preferred when possible.
+     *
+     * @param mixed $value The value to get the type name for.
+     * @return string The type name for the value.
+     */
+    public static function getType(mixed $value): string
+    {
+        $type = get_debug_type($value);
+
+        // Resources.
+        if (str_starts_with($type, 'resource')) {
+            // Get the resource name if possible, otherwise generic 'resource'.
+            return is_resource($value) ? get_resource_type($value) : 'resource';
+        }
+
+        // Anonymous classes.
+        if (str_contains($type, '@anonymous')) {
+            // Return the base class or interface name if there is one, otherwise generic 'object'.
+            $class = substr($type, 0, -10);
+            return $class === 'class' ? 'object' : $class;
+        }
+
+        // Return null, bool, int, float, string, or array.
+        return $type;
+    }
 
     /**
      * Get the class name of an object.
@@ -29,7 +56,7 @@ class Type
     }
 
     /**
-     * Check if object or class uses a given trait.
+     * Check if an object or class uses a given trait.
      * Handle both class names and objects, including trait inheritance.
      */
     public static function usesTrait(object|string $obj_or_class, string $trait): bool
@@ -91,7 +118,7 @@ class Type
                 return 's:' . strlen($key) . ':' . $key;
 
             case 'array':
-                $array_item_keys = array_map('Dictionary::getStringKey', $key);
+                $array_item_keys = array_map('DictionaryOf::getStringKey', $key);
                 return 'a:' . count($key) . ':[' . implode(', ', $array_item_keys) . ']';
         }
 

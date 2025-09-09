@@ -6,7 +6,7 @@ namespace Superclasses\Tests;
 
 use DateTime;
 
-require_once __DIR__ . '/../src/Dictionary.php';
+require_once __DIR__ . '/../src/DictionaryOf.php';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -26,10 +26,10 @@ $d[new DateTime('2025-09-01')] = 314;
 // var_dump($d->entries());
 
 // $a = ["test", "cat"];
-// echo Dictionary::getStringKey($a) . PHP_EOL;
+// echo DictionaryOf::getStringKey($a) . PHP_EOL;
 
 // $a = ["test, s:3:cat"];
-// echo Dictionary::getStringKey($a) . PHP_EOL;
+// echo DictionaryOf::getStringKey($a) . PHP_EOL;
 
 
 // function floatToStr(float $f) {
@@ -71,12 +71,12 @@ echo 'resource id = ' . get_resource_id($fp) . PHP_EOL;
 //     3 => 'Ado',
 //     'test' => new DateTime('2025-07-01')
 // ];
-// $d2 = Dictionary::fromIterable($names);
+// $d2 = DictionaryOf::fromIterable($names);
 // // var_dump($d2);
 
 // // Mixed type inference
 // $mixed = ['string', 42, 3.14, true, new DateTime()];
-// $dict = Dictionary::fromIterable($mixed);
+// $dict = DictionaryOf::fromIterable($mixed);
 // echo $dict->valueTypes;  // "string|int|float|bool|DateTime"
 
 echo Dictionary::getStringKey(null) . PHP_EOL;

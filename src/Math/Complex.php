@@ -2,10 +2,12 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses;
+namespace Superclasses\Math;
 
+use ArithmeticError;
+use DivisionByZeroError;
+use InvalidArgumentException;
 use Stringable;
-use DivisionByZeroError, InvalidArgumentException, ArithmeticError;
 
 /**
  * TODO

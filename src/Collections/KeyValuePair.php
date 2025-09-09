@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses;
+namespace Superclasses\Collections;
 
 readonly class KeyValuePair
 {

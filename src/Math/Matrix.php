@@ -2,10 +2,10 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses;
+namespace Superclasses\Math;
 
-use InvalidArgumentException;
 use DomainException;
+use InvalidArgumentException;
 
 class Matrix
 {

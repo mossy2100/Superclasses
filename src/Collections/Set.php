@@ -2,14 +2,14 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses;
+namespace Superclasses\Collections;
 
 use ArrayIterator;
 use Countable;
 use InvalidArgumentException;
 use IteratorAggregate;
 use Stringable;
-use Stringify\Stringify;
+use Superclasses\Types\Type;
 use Traversable;
 
 /**
@@ -404,16 +404,21 @@ class Set implements Stringable, Countable, IteratorAggregate
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Stringable implementation
 
+    /**
+     * Generate a string representation of the set.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
-        return Stringify::stringify($this);
+        return '{' . implode(', ', array_map('Stringify\stringify', $this->_items)) . '}';
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Countable implementation
 
     /**
-     * Return the number of items in the set.
+     * Get the number of items in the set.
      *
      * @return int
      */
@@ -427,6 +432,8 @@ class Set implements Stringable, Countable, IteratorAggregate
 
     /**
      * Get iterator for foreach loops.
+     *
+     * @return Traversable The iterator.
      */
     public function getIterator(): Traversable
     {

@@ -2,12 +2,6 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses;
-
-use DateInvalidTimeZoneException;
-use DateTime;
-use DateTimeInterface;
-use DateTimeZone;
 
 /**
  * This class is part of the Superclasses library, and provides some useful methods for working with
@@ -250,13 +244,13 @@ class DateTimeUtilities
      * @param int $hour
      * @param int $minute
      * @param int $second
-     * @return Time|DateTime
+     * @return \Superclasses\Time|DateTime
      */
     public function time($hour = 0, $minute = 0, $second = 0)
     {
         if (func_num_args() == 0) {
             // Get the time:
-            return new Time($this->hour(), $this->minute(), $this->second());
+            return new \Superclasses\Time($this->hour(), $this->minute(), $this->second());
         } else {
             // SetOf the time:
             return $this->setTime($hour, $minute, $second);

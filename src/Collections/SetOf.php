@@ -2,9 +2,10 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses;
+namespace Superclasses\Collections;
 
 use Override;
+use Superclasses\Types\TypeSet;
 
 /**
  * SetOf class.

@@ -4,8 +4,12 @@ declare(strict_types = 1);
 
 namespace Superclasses;
 
-use ValueError;
 use Stringable;
+use Superclasses\Math\Angle;
+use RangeException;
+use DomainException;
+use BadMethodCallException;
+use UnexpectedValueException;
 
 /**
  * Color class.
@@ -219,7 +223,7 @@ class Color implements Stringable
      * Defaults to black.
      *
      * @param string $color The color as a CSS hexadecimal color string or named color.
-     * @throws ValueError if the provided string is not a valid CSS color.
+     * @throws UnexpectedValueException If the provided string is not a valid CSS color.
      */
     public function __construct(string $color = 'black')
     {
@@ -236,7 +240,7 @@ class Color implements Stringable
      * @param int $blue The blue component byte value.
      * @param int $alpha Optional alpha value as a byte. Defaults to 0xff, which is equivalent to 100% opacity.
      * @return self
-     * @throws ValueError If any inputs are invalid.
+     * @throws RangeException If any inputs are invalid.
      */
     public static function fromRgba(int $red, int $green, int $blue, int $alpha = 0xff): self
     {
@@ -329,7 +333,7 @@ class Color implements Stringable
                 'relativeLuminance'  => $this->relativeLuminance,
                 'perceivedLightness' => $this->perceivedLightness,
                 'hex'                => $this->toHexString(),
-                'bestTextColor'      => $this->bestTextColor()->toHexString(),
+                'bestTextColor'      => $this->bestTextColor(),
             ]
         );
     }
@@ -358,10 +362,11 @@ class Color implements Stringable
      *
      * @see https://en.wikipedia.org/wiki/SRGB#Transfer_function_(%22gamma%22)
      *
+     * @static
      * @param int $byte The RGB byte value.
      * @return float The transfer function value.
      */
-    public function gamma(int $byte): float {
+    public static function gamma(int $byte): float {
         // Convert RGB byte to a float in the range [0.0, 1.0].
         $c = $byte / 255.0;
 
@@ -385,13 +390,18 @@ class Color implements Stringable
     /**
      * Pick black or white text for the best contrast on this background color.
      *
-     * @return Color The best text color.
+     * This function returns a string, either "black" or "white", which is useful in some contexts.
+     * If a Color is desired, this string can be passed to new Color().
+     * @example
+     * new Color($color->bestTextColor())
+     *
+     * @return string The best text color as a string (either "black" or "white").
      */
-    public function bestTextColor(): Color
+    public function bestTextColor(): string
     {
         $black = new self('black');
         $white = new self('white');
-        return ($black->contrastRatio($this) >= $white->contrastRatio($this)) ? $black : $white;
+        return ($black->contrastRatio($this) >= $white->contrastRatio($this)) ? 'black' : 'white';
     }
 
     /**
@@ -445,15 +455,16 @@ class Color implements Stringable
      * Find the average of several colors.
      *
      * @static
-     * @param Color ...$colors
-     * @return self
+     * @param Color ...$colors The colors to average.
+     * @return self The average color.
+     * @throws BadMethodCallException If no colors are provided.
      */
     public static function average(self ...$colors): self
     {
         // Get the number of colors and make sure we have at least one.
         $n = count($colors);
         if ($n === 0) {
-            throw new ValueError('At least one color must be provided.');
+            throw new BadMethodCallException('At least one color must be provided.');
         }
 
         // If there's only one, return it.
@@ -519,7 +530,7 @@ class Color implements Stringable
     }
 
     /**
-     * Get a byte value from the internal color string.
+     * Get a byte value from the internal RGBA string.
      *
      * NB: This is an internal function, and the offset is assumed to be in range [0, 3].
      *
@@ -539,7 +550,7 @@ class Color implements Stringable
      * @param int $offset The offset, which will be 0 for red, 1 for green, 2 for blue, and 3 for alpha.
      * @param int $byte The color component value.
      * @return void
-     * @throws ValueError If the provided valid isn't valid.
+     * @throws RangeException If the provided value isn't valid.
      */
     private function _setByte(int $offset, int $byte): void
     {
@@ -789,27 +800,6 @@ class Color implements Stringable
     // region Static members for working with hex strings and named colors
 
     /**
-     * Convert a color name to an 8-digit hex value (no leading '#').
-     *
-     * @static
-     * @param string $name A CSS color name.
-     * @return string The hex value for this color.
-     * @throws ValueError if the provided string is not a valid color name.
-     */
-    public static function colorNameToHex(string $name): string
-    {
-        $name = trim(strtolower($name));
-
-        // Check the provided color name is valid.
-        if (!self::isValidColorName($name)) {
-            throw new ValueError("Invalid color name '$name'.");
-        }
-
-        // Look up the hex value for the color.
-        return self::CSS_COLOR_NAMES[$name];
-    }
-
-    /**
      * Returns true if the string is a valid hex color string.
      * A leading '#' is optional, and there can be 3, 4, 6, or 8 hex digits.
      *
@@ -870,14 +860,15 @@ class Color implements Stringable
      * Convert a CSS color hex string, being 3, 4, 6, or 8 hexadecimal digits, lower- or upper-case, with or without
      * leading '#', into a canonical form, which is defined as 8 lower-case hexadecimal digits with no leading '#'.
      *
-     * @param string $hex
-     * @return string
+     * @param string $hex A CSS hex color string.
+     * @return string The canonical hex string.
+     * @throws UnexpectedValueException if the provided string is not a valid CSS hex color string.
      */
     public static function normalizeHex(string $hex): string
     {
         // Check the input string is a valid format.
         if (!self::isValidHexString($hex)) {
-            throw new ValueError("The provided string '$hex' is not a valid CSS hexadecimal color string.");
+            throw new UnexpectedValueException("The provided string '$hex' is not a valid CSS hexadecimal color string.");
         }
 
         // Remove a leading # character if present and lower-case letter digits.
@@ -903,13 +894,13 @@ class Color implements Stringable
      *
      * @param string $hex A CSS hex color string.
      * @return array{red:int, green:int, blue:int, alpha:int} Array of color components as bytes.
-     * @throws ValueError if the provided string is not a valid CSS hex color string.
+     * @throws UnexpectedValueException If the provided string is not a valid CSS hex color string.
      */
     public static function hexStringToBytes(string $hex): array
     {
         // Check the input string is a valid format.
         if (!self::isValidHexString($hex)) {
-            throw new ValueError("The provided string '$hex' is not a valid CSS hexadecimal color string.");
+            throw new UnexpectedValueException("The provided string '$hex' is not a valid CSS hexadecimal color string.");
         }
 
         // Normalize to 8 hex digits.
@@ -934,22 +925,33 @@ class Color implements Stringable
      *
      * @static
      * @param string $name A CSS color name.
-     * @return array{red:int, green:int, blue:int, alpha:int} Array of color components as bytes.
-     * @throws ValueError if the provided string is not a valid color name.
+     * @return string The hex value for this color.
+     * @throws DomainException If the provided string is not a valid color name.
      */
-    public static function colorNameToBytes(string $name): array
+    public static function colorNameToHex(string $name): string
     {
         $name = trim(strtolower($name));
 
         // Check the provided color name is valid.
         if (!self::isValidColorName($name)) {
-            throw new ValueError("Invalid color name '$name'.");
+            throw new DomainException("Invalid color name '$name'.");
         }
 
         // Look up the hex value for the color.
-        $hex = self::CSS_COLOR_NAMES[$name];
+        return self::CSS_COLOR_NAMES[$name];
+    }
 
-        // Convert the hex string to RGBA bytes.
+    /**
+     * Convert a color name to an 8-digit hex value (no leading '#').
+     *
+     * @static
+     * @param string $name A CSS color name.
+     * @return array{red:int, green:int, blue:int, alpha:int} Array of color components as bytes.
+     * @throws DomainException if the provided string is not a valid color name.
+     */
+    public static function colorNameToBytes(string $name): array
+    {
+        $hex = self::colorNameToHex($name);
         return self::hexStringToBytes($hex);
     }
 
@@ -959,18 +961,18 @@ class Color implements Stringable
      * @static
      * @param string $str The color string.
      * @return array{red:int, green:int, blue:int, alpha:int} Array of color components as bytes.
-     * @throws ValueError if the provided string is not a valid CSS color name or hex color string.
+     * @throws UnexpectedValueException If the provided string is not a valid CSS color name or hex color string.
      */
     public static function colorStringToBytes(string $str): array
     {
         $str = trim($str);
 
-        // Convert a color name to a hex string.
+        // Convert a color name to bytes.
         if (self::isValidColorName($str)) {
-            $str = self::colorNameToHex($str);
+            return self::colorNameToBytes($str);
         }
 
-        // Convert a hex string to RGBA bytes.
+        // Convert a hex string to bytes.
         return self::hexStringToBytes($str);
     }
 
@@ -995,12 +997,12 @@ class Color implements Stringable
      *
      * @param int $byte The value to check.
      * @return void
-     * @throws ValueError If the byte is out of range.
+     * @throws RangeException If the byte is out of range.
      */
     private static function _validateByte(int $byte): void
     {
         if ($byte < 0 || $byte > 255) {
-            throw new ValueError("Invalid byte value. Byte values must be in the range [0, 255].");
+            throw new RangeException("Invalid byte value. Byte values must be in the range [0, 255].");
         }
     }
 
@@ -1009,12 +1011,12 @@ class Color implements Stringable
      *
      * @param float $frac The fraction to check.
      * @return void
-     * @throws ValueError If the byte is out of range.
+     * @throws RangeException If the fraction is out of range.
      */
     private static function _validateFrac(float $frac): void
     {
         if ($frac < 0 || $frac > 1) {
-            throw new ValueError("Invalid fraction value. Fractions must be in the range [0.0, 1.0].");
+            throw new RangeException("Invalid fraction value. Fractions must be in the range [0.0, 1.0].");
         }
     }
 
