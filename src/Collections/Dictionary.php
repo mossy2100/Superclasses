@@ -9,6 +9,7 @@ use Countable;
 use Traversable;
 use IteratorAggregate;
 use OutOfBoundsException;
+use Override;
 use Superclasses\Types\Type;
 
 /**
@@ -133,6 +134,7 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
      *
      * @throws OutOfBoundsException If no key or a null key is specified.
      */
+    #[Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
         // Check if a key was specified.
@@ -153,6 +155,7 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
      * @param mixed $offset The key to get.
      * @return mixed The value of the item.
      */
+    #[Override]
     public function offsetGet(mixed $offset): mixed
     {
         // Get the string version of this key.
@@ -173,6 +176,7 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
      * @param mixed $offset The key to check.
      * @return bool True if the key is in the dictionary, false otherwise.
      */
+    #[Override]
     public function offsetExists(mixed $offset): bool
     {
         return $this->hasKey($offset);
@@ -184,6 +188,7 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
      * @param mixed $offset The key to unset.
      * @return void
      */
+    #[Override]
     public function offsetUnset(mixed $offset): void
     {
         // Get the string version of this key.
@@ -206,6 +211,7 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return int
      */
+    #[Override]
     public function count(): int
     {
         return count($this->_items);
@@ -219,6 +225,7 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return Traversable
      */
+    #[Override]
     public function getIterator(): Traversable
     {
         foreach ($this->_items as $item) {

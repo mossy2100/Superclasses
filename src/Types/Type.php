@@ -91,7 +91,6 @@ class Type
         return array_unique($traits);
     }
 
-
     /**
      * Convert any PHP value into a unique string key.
      *
@@ -101,6 +100,7 @@ class Type
     public static function getStringKey(mixed $key): string
     {
         $type = get_debug_type($key);
+
         switch ($type) {
             case 'null':
                 return 'n';
@@ -118,16 +118,17 @@ class Type
                 return 's:' . strlen($key) . ':' . $key;
 
             case 'array':
-                $array_item_keys = array_map('DictionaryOf::getStringKey', $key);
+                // @todo Check for circular references here to prevent infinite recursion.
+                $array_item_keys = array_map('Type::getStringKey', $key);
                 return 'a:' . count($key) . ':[' . implode(', ', $array_item_keys) . ']';
-        }
-
-        if (is_object($key)) {
-            return 'o:' . spl_object_id($key);
         }
 
         if (str_starts_with($type, 'resource')) {
             return 'r:' . get_resource_id($key);
+        }
+
+        if (is_object($key)) {
+            return 'o:' . spl_object_id($key);
         }
 
         // Not sure if this can ever actually happen. gettype() can return 'unknown type' but

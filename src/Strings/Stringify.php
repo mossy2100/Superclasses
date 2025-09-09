@@ -10,11 +10,10 @@ use Stringable;
  * This class provides JSON-like encoding with a few differences:
  * 1. Integer keys for PHP arrays (non-lists) are not quoted as they would be in JSON objects.
  * 2. PHP arrays are encoded with square brackets.
- * 3. Objects are encoded using an HTML tag-like syntax (angle brackets), with UML symbols.
+ * 3. Objects are encoded using an HTML tag-like syntax (angle brackets), with UML symbols to indicate visibility.
  * 4. Floats are encoded with a decimal point, 'E', or both, to differentiate them from ints.
  *
- * The purpose of the class is to offer a more readable alternative to var_dump(), print_r(), or
- * serialize().
+ * The purpose of the class is to offer a more readable alternative to var_dump(), print_r(), or serialize().
  *
  * None of these methods throw exceptions, so they can be used by __toString() implementations.
  */
@@ -33,13 +32,27 @@ class Stringify
         $type = get_debug_type($value);
 
         // Call the relevant encode method.
-        return match ($type) {
-            'null', 'bool', 'int', 'string' => json_encode($value),
-            'float' => self::stringifyFloat($value),
-            'array' => self::stringifyArray($value, $indent_level),
-            'resource' => self::stringifyResource($value),
-            default => self::stringifyObject($value, $type, $indent_level)
-        };
+        switch ($type) {
+            case 'null':
+            case 'bool':
+            case 'int':
+            case 'string':
+                return json_encode($value);
+
+            case 'float':
+                return self::stringifyFloat($value);
+
+            case 'array':
+                return self::stringifyArray($value, $indent_level);
+        }
+
+        // If it's a resource then $type will be "resource (type)" or "resource (closed)".
+        if (str_starts_with($type, 'resource')) {
+            return self::stringifyResource($value);
+        }
+
+        // Must be a class name.
+        return self::stringifyObject($value, $type, $indent_level);
     }
 
     /**
@@ -66,7 +79,7 @@ class Stringify
 
         // If the string representation of the float value has no decimal point or exponent (i.e. nothing to distinguish
         // it from an integer), append a decimal point.
-        if (strpbrk($s, ".eE") === false) {
+        if (!preg_match('/[.eE]/', $s)) {
             $s .= '.0';
         }
 
@@ -88,8 +101,7 @@ class Stringify
             return '[' . implode(', ', array_map('Stringify\Stringify', $ary)) . ']';
         }
 
-        // Encode an associative array like a JSON object.
-        // Each key-value pair will be on its own line.
+        // Encode an associative array like a JSON object. Each key-value pair will be on its own line.
         $pairs = [];
         $indent = str_repeat(' ', 4 * ($indent_level + 1));
 
@@ -99,6 +111,16 @@ class Stringify
         }
 
         return "{\n" . implode(",\n", $pairs) . "\n" . str_repeat(' ', 4 * $indent_level) . '}';
+    }
+
+    /**
+     * Stringify a resource.
+     *
+     * @param mixed $value The resource to stringify.
+     * @return string The string representation of the resource.
+     */
+    public static function stringifyResource(mixed $value): string {
+        return 'resource:' . get_resource_type($value) . ':' . get_resource_id($value);
     }
 
     /**
@@ -149,22 +171,9 @@ class Stringify
                     continue 2;
             }
 
-            $pairs[] = $indent . $vis_symbol . $key . ': ' .
-                self::stringify($value, $indent_level + 1);
+            $pairs[] = $indent . $vis_symbol . $key . ': ' . self::stringify($value, $indent_level + 1);
         }
 
         return "<$class\n" . implode(",\n", $pairs) . '>';
-    }
-
-    /**
-     * Stringify a resource.
-     *
-     * @param mixed $value
-     * @return string
-     */
-    public static function stringifyResource(mixed $value): string {
-        $resource_type = get_resource_type($value);
-        $resource_id = get_resource_id($value);
-        return "resource:$resource_type:$resource_id";
     }
 }

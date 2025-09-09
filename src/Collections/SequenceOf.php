@@ -96,17 +96,29 @@ class SequenceOf extends Sequence
     /**
      * Create a new SequenceOf with specified type constraints and a default value.
      *
-     * @param string|iterable $types Type specification (e.g., 'string', 'int|null', ['string', 'int']).
+     * @param string|iterable|null $types Type specification (e.g., 'string', 'int|null', ['string', 'int']).
+     *      The default is null, which means figure it out from the source iterable.
+     * @param iterable $src The source iterable (default empty array).
      * @param mixed $default_value Default value for new items. Auto-generated for basic types if omitted.
      * @throws InvalidArgumentException If no default can be generated or provided default is invalid.
      */
-    public function __construct(string|iterable $types = 'mixed', mixed $default_value = null)
+    public function __construct(string|iterable|null $types = 'mixed', iterable $src = [], mixed $default_value = null)
     {
         // Call the parent constructor.
-        parent::__construct($default_value);
+        parent::__construct($src, $default_value);
 
-        // Convert the types into a TypeSet.
-        $this->types = $types instanceof TypeSet ? $types : new TypeSet($types);
+        // If no types were specified, infer them from the source items and default value.
+        if ($types === null) {
+            $this->types = new TypeSet();
+            foreach ($this->items as $item) {
+                $this->types->addValueType($item);
+            }
+            $this->types->addValueType($this->defaultValue);
+        }
+        else {
+            // Convert the types into a TypeSet.
+            $this->types = $types instanceof TypeSet ? $types : new TypeSet($types);
+        }
 
         // If no types were specified, assume any are allowed.
         if (count($this->types) === 0) {
@@ -114,7 +126,7 @@ class SequenceOf extends Sequence
         }
 
         // If a default value isn't specified, use sane defaults for common types.
-        if (func_num_args() === 1) {
+        if (func_num_args() === 2) {
             if ($this->types->containsAny(['null', 'mixed'])) {
                 $default_value = null;
             } elseif ($this->types->containsAny(['int', 'uint', 'number', 'scalar'])) {
@@ -131,37 +143,10 @@ class SequenceOf extends Sequence
                 throw new InvalidArgumentException("A default value must be provided for this item type.");
             }
             $this->defaultValue = $default_value;
-        } elseif (!$this->types->match($default_value)) {
+        } elseif ($types !== null && !$this->types->match($default_value)) {
             // Check the default value is valid for the specified types.
             throw new InvalidArgumentException("Default value has invalid type.");
         }
-    }
-
-    /**
-     * Construct a new sequence from an existing collection.
-     *
-     * @param iterable $src The source collection.
-     * @param mixed $default_value Default value for new items.
-     * @return static A new sequence containing items from the provided iterable.
-     */
-    #[Override]
-    public static function fromIterable(iterable $src, mixed $default_value = null ): static
-    {
-        // Collect the item types.
-        $types = new TypeSet();
-        foreach ($src as $value) {
-            $types->addValueType($value);
-        }
-
-        // Instantiate the sequence.
-        $sequence = new self($types, $default_value);
-
-        // Copy the values into the new sequence.
-        foreach ($src as $item) {
-            $sequence->append($item);
-        }
-
-        return $sequence;
     }
 
     /**
@@ -230,24 +215,24 @@ class SequenceOf extends Sequence
     /**
      * Get a slice of the sequence.
      *
-     * The offset and length parameters can be negative. They work the same as for array_slice().
+     * The index and length parameters can be negative. They work the same as for array_slice().
      * @see https://www.php.net/manual/en/function.array-slice.php
      *
-     * @param int $offset The start position of the slice.
-     *      If offset is non-negative, the slice will start at that offset in the sequence.
-     *      If offset is negative, the slice will start that far from the end of the sequence.
+     * @param int $index The start position of the slice.
+     *      If non-negative, the slice will start at that index in the sequence.
+     *      If negative, the slice will start that far from the end of the sequence.
      * @param ?int $length The length of the slice.
-     *      If length is given and is positive, then the sequence will have up to that many elements in it.
-     *      If the sequence is shorter than the length, then only the available items will be present.
-     *      If length is given and is negative, the slice will stop that many elements from the end of the sequence.
-     *      If it is omitted or null, then the slice will have everything from offset up until the end of the sequence.
+     *      If given and is positive, the sequence will have up to that many elements in it.
+     *      If the sequence is shorter than the length, only the available items will be present.
+     *      If given and is negative, the slice will stop that many elements from the end of the sequence.
+     *      If omitted or null, the slice will have everything from index up until the end of the sequence.
      * @return static The slice.
      */
     #[Override]
-    public function slice(int $offset, ?int $length = null): static
+    public function slice(int $index, ?int $length = null): static
     {
         // Call the parent method.
-        $seq = parent::slice($offset, $length);
+        $seq = parent::slice($index, $length);
 
         // Clone the type set.
         $seq->types = clone $this->types;
@@ -287,8 +272,8 @@ class SequenceOf extends Sequence
      *
      * @param int $offset The zero-based index position to set, or null to append.
      * @param mixed $value The value to set.
-     * @throws InvalidArgumentException If the offset is not null or an integer, or if the item type is not allowed.
-     * @throws OutOfRangeException If the offset is out of range.
+     * @throws InvalidArgumentException If the index is not null or an integer, or if the item type is not allowed.
+     * @throws OutOfRangeException If the index is out of range.
      */
     #[Override]
     public function offsetSet(mixed $offset, mixed $value): void
@@ -314,7 +299,7 @@ class SequenceOf extends Sequence
     #[Override]
     public function offsetUnset(mixed $offset): void
     {
-        // Check the offset is valid.
+        // Check the index is valid.
         $this->checkIndex($offset);
 
         // Make sure nulls are allowed.

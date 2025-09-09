@@ -9,14 +9,14 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use Traversable;
-use Throwable;
-use InvalidArgumentException;
 use UnderflowException;
 use OutOfRangeException;
+use Override;
+use Superclasses\Exceptions\ArgumentTypeException;
 
 /**
  * A sequence implementation that is stricter than ordinary PHP arrays.
- * Offsets are always sequential integers starting from 0. Therefore, the largest offset (a.k.a. index or key) will
+ * Indices are always sequential integers starting from 0. Therefore, the largest index (a.k.a. index or key) will
  * equal the number of items in the sequence minus 1.
  * Sequence items can be set at positions beyond the current range, but intermediate items will be filled in with a
  * default value, specified in the constructor.
@@ -58,28 +58,28 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * Validate offset parameters and optionally check bounds.
+     * Validate index parameters and optionally check bounds.
      *
-     * @param mixed $offset The offset to validate.
-     * @param bool $check_lower_bound Whether to check if an offset is non-negative.
-     * @param bool $check_upper_bound Whether to check if an offset is within array bounds.
-     * @throws InvalidArgumentException If the offset is not an integer.
-     * @throws OutOfRangeException If the offset is outside the valid range for the sequence.
+     * @param mixed $index The index to validate.
+     * @param bool $check_lower_bound Whether to check if an index is non-negative.
+     * @param bool $check_upper_bound Whether to check if an index is within array bounds.
+     * @throws ArgumentTypeException If the index is not an integer.
+     * @throws OutOfRangeException If the index is outside the valid range for the sequence.
      */
-    public function checkOffset(mixed $offset, bool $check_lower_bound = true, bool $check_upper_bound = true): void {
-        // Check the offset is an integer.
-        if (!is_int($offset)) {
-            throw new InvalidArgumentException("Offset must be an integer.");
+    public function checkIndex(mixed $index, bool $check_lower_bound = true, bool $check_upper_bound = true): void {
+        // Check the index is an integer.
+        if (!is_int($index)) {
+            throw new ArgumentTypeException('index', 'int', $index);
         }
 
-        // Check the offset isn't negative.
-        if ($check_lower_bound && $offset < 0) {
-            throw new OutOfRangeException("Offset cannot be negative.");
+        // Check the index isn't negative.
+        if ($check_lower_bound && $index < 0) {
+            throw new OutOfRangeException("Index cannot be negative.");
         }
 
-        // Check the offset isn't too large.
-        if ($check_upper_bound && $offset >= count($this->items)) {
-            throw new OutOfRangeException("Offset is out of range.");
+        // Check the index isn't too large.
+        if ($check_upper_bound && $index >= count($this->items)) {
+            throw new OutOfRangeException("Index is out of range.");
         }
     }
 
@@ -139,26 +139,26 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * Remove the item at the given offset from the sequence.
+     * Remove the item at the given index from the sequence.
      *
-     * The offsets of items at higher offsets than the one specified by $offset will be reduced by 1, i.e. shifted down,
+     * The indices of items at higher indices than the one specified by $index will be reduced by 1, i.e. shifted down,
      * and the sequence length will be reduced by 1.
      *
-     * @param int $offset The zero-based offset position of the item to remove.
+     * @param int $index The zero-based index position of the item to remove.
      * @return mixed The removed value.
-     * @throws InvalidArgumentException If the offset is not an integer.
-     * @throws OutOfRangeException If the offset is outside the valid range for the sequence.
+     * @throws ArgumentTypeException If the index is not an integer.
+     * @throws OutOfRangeException If the index is outside the valid range for the sequence.
      */
-    public function remove(int $offset): mixed
+    public function remove(int $index): mixed
     {
-        // Ensure the offset is valid.
-        $this->checkOffset($offset);
+        // Ensure the index is valid.
+        $this->checkIndex($index);
 
         // Get the item.
-        $item = $this->items[$offset];
+        $item = $this->items[$index];
 
         // Remove it from the sequence.
-        array_splice($this->items, $offset, 1);
+        array_splice($this->items, $index, 1);
 
         // Return the item.
         return $item;
@@ -241,23 +241,23 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Get a slice of the sequence.
      *
-     * Both the offset and the length can be negative. They work the same as for array_slice().
+     * Both the index and the length can be negative. They work the same as for array_slice().
      * @see https://www.php.net/manual/en/function.array-slice.php
      *
-     * @param int $offset The start position of the slice.
-     *      If non-negative, the slice will start at that offset in the sequence.
+     * @param int $index The start position of the slice.
+     *      If non-negative, the slice will start at that index in the sequence.
      *      If negative, the slice will start that far from the end of the sequence.
      * @param ?int $length The length of the slice.
      *      If given and is positive, then the sequence will have up to that many elements in it.
      *      If the sequence is shorter than the length, then only available items will be present.
      *      If given and is negative, the slice will stop that many elements from the end of the sequence.
-     *      If omitted or null, then the slice will have everything from offset up until the end of the sequence.
+     *      If omitted or null, then the slice will have everything from index up until the end of the sequence.
      * @return static The slice.
      */
-    public function slice(int $offset, ?int $length = null): static
+    public function slice(int $index, ?int $length = null): static
     {
         // Get the items.
-        $items = array_slice($this->items, $offset, $length);
+        $items = array_slice($this->items, $index, $length);
 
         // Construct the result.
         return new static($items, $this->defaultValue);
@@ -270,11 +270,22 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * @see https://www.php.net/manual/en/function.array-search.php
      *
      * @param mixed $value The value to search for.
-     * @return int|null The offset of the first matching value, or null if the value is not found.
+     * @return int|null The index of the first matching value, or null if the value is not found.
      */
     public function search(mixed $value): ?int
     {
         return array_search($value, $this->items, true);
+    }
+
+    /**
+     * Check if the sequence contains a specific index.
+     *
+     * @param int $index The index to search for.
+     * @return bool True if the index exists in the sequence, false otherwise.
+     */
+    public function hasIndex(int $index): bool
+    {
+        return key_exists($index, $this->items);
     }
 
     /**
@@ -284,7 +295,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * @param mixed $value The value to search for.
      * @return bool True if the value exists in the sequence, false otherwise.
      */
-    public function contains(mixed $value): bool
+    public function hasValue(mixed $value): bool
     {
         return in_array($value, $this->items, true);
     }
@@ -363,13 +374,13 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * This method is analogous to array_fill().
      * @see https://www.php.net/manual/en/function.array-fill.php
      *
-     * @param int $start_offset The zero-based offset position to start filling.
+     * @param int $start_index The zero-based index position to start filling.
      * @param int $count The number of items to fill.
      * @param mixed $value The value to fill with.
      */
-    public function fill(int $start_offset, int $count, mixed $value): void {
+    public function fill(int $start_index, int $count, mixed $value): void {
         for ($i = 0; $i < $count; $i++) {
-            $this[$start_offset + $i] = $value;
+            $this[$start_index + $i] = $value;
         }
     }
 
@@ -486,16 +497,17 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Append or set a sequence item.
      *
-     * If the offset is out of range, the sequence will be increased in size to accommodate it.
+     * If the index is out of range, the sequence will be increased in size to accommodate it.
      * Any intermediate positions will be filled with the default value.
      * NB: If the default is an object, all items set to the default will reference the same object.
      * If you don't want this behaviour, set each sequence item individually.
      *
-     * @param mixed $offset The zero-based offset position to set, or null to append.
+     * @param mixed $offset The zero-based index position to set, or null to append.
      * @param mixed $value The value to set.
-     * @throws InvalidArgumentException If the offset is not null or an integer.
-     * @throws OutOfRangeException If the offset is out of range.
+     * @throws ArgumentTypeException If the index is neither null nor an integer.
+     * @throws OutOfRangeException If the index is out of range.
      */
+    #[Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
         if ($offset === null) {
@@ -506,8 +518,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
             // Update an item.
             // $sequence[$key] = $value
 
-            // Check the offset is valid.
-            $this->checkOffset($offset, check_upper_bound: false);
+            // Check the index is valid.
+            $this->checkIndex($offset, check_upper_bound: false);
 
             // Fill in any missing items with defaults.
             $start = count($this->items);
@@ -523,36 +535,37 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Get a value from the sequence.
      *
-     * @param mixed $offset The zero-based offset position to set.
-     * @return mixed The value at the specified offset.
-     * @throws InvalidArgumentException If the offset is not an integer.
-     * @throws OutOfRangeException If the offset is outside the valid range for the sequence.
+     * @param mixed $offset The zero-based index position to get.
+     * @return mixed The value at the specified index.
+     * @throws ArgumentTypeException If the index is not an integer.
+     * @throws OutOfRangeException If the index is outside the valid range for the sequence.
      */
+    #[Override]
     public function offsetGet(mixed $offset): mixed
     {
-        // Check the offset is valid.
-        $this->checkOffset($offset);
+        // Check the index is valid.
+        $this->checkIndex($offset);
 
-        // Get the item at the specified offset.
+        // Get the item at the specified index.
         return $this->items[$offset];
     }
 
     /**
-     * Check if a given offset is valid.
+     * Check if a given index is valid.
      *
-     * @param mixed $offset The sequence offset position.
-     * @return bool If the given offset is an integer and within the current valid range for the sequence.
+     * @param mixed $offset The sequence index position.
+     * @return bool If the given index is an integer and within the current valid range for the sequence.
+     * @throws ArgumentTypeException If the index is not an integer.
      */
+    #[Override]
     public function offsetExists(mixed $offset): bool
     {
-        try {
-            // Leverage existing method.
-            $this->checkOffset($offset);
-            return true;
+        // Check the index is an integer.
+        if (!is_int($offset)) {
+            throw new ArgumentTypeException('offset', 'int', $offset);
         }
-        catch (Throwable) {
-            return false;
-        }
+
+        return $this->hasIndex($offset);
     }
 
     /**
@@ -566,13 +579,14 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      *
      * To remove an item from the sequence, use one of the remove*() methods.
      *
-     * @param mixed $offset The zero-based offset position to unset.
-     * @throws OutOfRangeException If the offset is outside the valid range for the sequence.
+     * @param mixed $offset The zero-based index position to unset.
+     * @throws OutOfRangeException If the index is outside the valid range for the sequence.
      */
+    #[Override]
     public function offsetUnset(mixed $offset): void
     {
-        // Check the offset is valid.
-        $this->checkOffset($offset);
+        // Check the index is valid.
+        $this->checkIndex($offset);
 
         // Set the item to null.
         $this->items[$offset] = null;
@@ -586,6 +600,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return int The number of items in the sequence.
      */
+    #[Override]
     public function count(): int
     {
         return count($this->items);
@@ -599,6 +614,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return Traversable The iterator.
      */
+    #[Override]
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->items);
