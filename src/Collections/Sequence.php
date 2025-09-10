@@ -347,7 +347,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     {
         return in_array($value, $this->items, true);
     }
-x
+
     /**
      * Check if all items in the sequence pass a test.
      *
