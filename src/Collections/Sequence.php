@@ -23,6 +23,9 @@ use Superclasses\Exceptions\ArgumentTypeException;
  */
 class Sequence implements ArrayAccess, Countable, IteratorAggregate
 {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Properties
+
     /**
      * The items in the sequence.
      *
@@ -36,6 +39,11 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * @var mixed
      */
     public mixed $defaultValue;
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Constructor
 
     /**
      * Create a new sequence, optionally from an existing iterable.
@@ -57,6 +65,11 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
         $this->defaultValue = $default_value;
     }
 
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Helper methods
+
     /**
      * Validate index parameters and optionally check bounds.
      *
@@ -66,7 +79,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * @throws ArgumentTypeException If the index is not an integer.
      * @throws OutOfRangeException If the index is outside the valid range for the sequence.
      */
-    public function checkIndex(mixed $index, bool $check_lower_bound = true, bool $check_upper_bound = true): void {
+    protected function checkIndex(mixed $index, bool $check_lower_bound = true, bool $check_upper_bound = true): void {
         // Check the index is an integer.
         if (!is_int($index)) {
             throw new ArgumentTypeException('index', 'int', $index);
@@ -82,6 +95,11 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
             throw new OutOfRangeException("Index is out of range.");
         }
     }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Get items from the sequence
 
     /**
      * Get the first item from the sequence.
@@ -102,6 +120,65 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     public function last(): mixed {
         return $this[array_key_last($this->items)];
     }
+
+    /**
+     * Get a slice of the sequence.
+     *
+     * Both the index and the length can be negative. They work the same as for array_slice().
+     * @see https://www.php.net/manual/en/function.array-slice.php
+     *
+     * @param int $index The start position of the slice.
+     *      If non-negative, the slice will start at that index in the sequence.
+     *      If negative, the slice will start that far from the end of the sequence.
+     * @param ?int $length The length of the slice.
+     *      If given and is positive, then the sequence will have up to that many elements in it.
+     *      If the sequence is shorter than the length, then only available items will be present.
+     *      If given and is negative, the slice will stop that many elements from the end of the sequence.
+     *      If omitted or null, then the slice will include everything from index up until the end of the sequence.
+     * @return static The slice.
+     */
+    public function slice(int $index, ?int $length = null): static
+    {
+        // Get the items.
+        $items = array_slice($this->items, $index, $length);
+
+        // Construct the result.
+        return new static($items, $this->defaultValue);
+    }
+
+    /**
+     * Searches the array for a given value and returns the first corresponding key if successful.
+     *
+     * This method is analogous to array_search().
+     * @see https://www.php.net/manual/en/function.array-search.php
+     *
+     * @param mixed $value The value to search for.
+     * @return int|null The index of the first matching value, or null if the value is not found.
+     */
+    public function search(mixed $value): ?int
+    {
+        return array_search($value, $this->items, true);
+    }
+
+    /**
+     * Returns the first element satisfying a callback function.
+     *
+     * This method is analogous to array_find().
+     * @see https://www.php.net/manual/en/function.array-find.php
+     *
+     * @param callable $fn The filter function that will return true for a matching item.
+     * @return mixed The value of the first element for which the callback returns true. If no matching element is found
+     *      the function returns null.
+     */
+    public function find(callable $fn): mixed
+    {
+        return array_find($this->items, $fn);
+    }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Add items to the sequence
 
     /**
      * Add one or more items to the end of the sequence.
@@ -137,6 +214,11 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     {
         array_unshift($this->items, ...$items);
     }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Remove items from the sequence
 
     /**
      * Remove the item at the given index from the sequence.
@@ -228,6 +310,11 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
         $this->items = [];
     }
 
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Boolean methods
+
     /**
      * Check if the sequence is empty.
      *
@@ -236,45 +323,6 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     public function isEmpty(): bool
     {
         return $this->items === [];
-    }
-
-    /**
-     * Get a slice of the sequence.
-     *
-     * Both the index and the length can be negative. They work the same as for array_slice().
-     * @see https://www.php.net/manual/en/function.array-slice.php
-     *
-     * @param int $index The start position of the slice.
-     *      If non-negative, the slice will start at that index in the sequence.
-     *      If negative, the slice will start that far from the end of the sequence.
-     * @param ?int $length The length of the slice.
-     *      If given and is positive, then the sequence will have up to that many elements in it.
-     *      If the sequence is shorter than the length, then only available items will be present.
-     *      If given and is negative, the slice will stop that many elements from the end of the sequence.
-     *      If omitted or null, then the slice will have everything from index up until the end of the sequence.
-     * @return static The slice.
-     */
-    public function slice(int $index, ?int $length = null): static
-    {
-        // Get the items.
-        $items = array_slice($this->items, $index, $length);
-
-        // Construct the result.
-        return new static($items, $this->defaultValue);
-    }
-
-    /**
-     * Searches the array for a given value and returns the first corresponding key if successful.
-     *
-     * This method is analogous to array_search().
-     * @see https://www.php.net/manual/en/function.array-search.php
-     *
-     * @param mixed $value The value to search for.
-     * @return int|null The index of the first matching value, or null if the value is not found.
-     */
-    public function search(mixed $value): ?int
-    {
-        return array_search($value, $this->items, true);
     }
 
     /**
@@ -299,7 +347,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     {
         return in_array($value, $this->items, true);
     }
-
+x
     /**
      * Check if all items in the sequence pass a test.
      *
@@ -328,117 +376,10 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
         return array_any($this->items, $fn);
     }
 
-    /**
-     * Split the sequence into chunks of a given size.
-     * The last chunk may be smaller than the specified size.
-     *
-     * This method is analogous to array_chunk().
-     * @see https://www.php.net/manual/en/function.array-chunk.php
-     *
-     * @param int $size The size of each chunk.
-     * @return static[] An array of chunks.
-     */
-    public function chunk(int $size): array {
-        $chunks = array_chunk($this->items, $size);
-        $result = [];
-        foreach ($chunks as $chunk) {
-            $result[] = new static($chunk, $this->defaultValue);
-        }
-        return $result;
-    }
+    // endregion
 
-    /**
-     * Counts the occurrences of each distinct value in a sequence.
-     *
-     * This method is analogous to array_count_values().
-     * @see https://www.php.net/manual/en/function.array-count-values.php
-     *
-     * @return Dictionary A dictionary mapping values to the number of occurrences.
-     */
-    public function countValues(): Dictionary
-    {
-        $value_count = new Dictionary();
-        foreach ($this->items as $item) {
-            if ($value_count->hasKey($item)) {
-                $value_count[$item]++;
-            } else {
-                $value_count[$item] = 1;
-            }
-         }
-         return $value_count;
-    }
-
-    /**
-     * Fill the sequence with a given value.
-     *
-     * This method is analogous to array_fill().
-     * @see https://www.php.net/manual/en/function.array-fill.php
-     *
-     * @param int $start_index The zero-based index position to start filling.
-     * @param int $count The number of items to fill.
-     * @param mixed $value The value to fill with.
-     */
-    public function fill(int $start_index, int $count, mixed $value): void {
-        for ($i = 0; $i < $count; $i++) {
-            $this[$start_index + $i] = $value;
-        }
-    }
-
-    /**
-     * Return a sequence with all items matching a certain filter.
-     *
-     * This method is analogous to array_filter().
-     * @see https://www.php.net/manual/en/function.array-filter.php
-     *
-     * @param callable $fn The filter function that returns true for items to keep.
-     * @return static A new sequence containing only the matching items.
-     */
-    public function filter(callable $fn): static
-    {
-        // Get the matching values.
-        $items = array_filter($this->items, fn($item) => $fn($item));
-
-        // Construct the result.
-        return new static($items, $this->defaultValue);
-    }
-
-    /**
-     * Returns the first element satisfying a callback function.
-     *
-     * This method is analogous to array_find().
-     * @see https://www.php.net/manual/en/function.array-find.php
-     *
-     * @param callable $fn The filter function that will return true for a matching item.
-     * @return mixed The value of the first element for which the callback returns true. If no matching element is found
-     *      the function returns null.
-     */
-    public function find(callable $fn): mixed
-    {
-        return array_find($this->items, $fn);
-    }
-
-    /**
-     * Applies the callback to the items in the sequence.
-     *
-     * @param callable $fn The callback function to apply to each item.
-     * @return static A new sequence containing the results of the callback function.
-     */
-    public function map(callable $fn): static
-    {
-        $items = array_map($fn, $this->items);
-        return new static($items, $this->defaultValue);
-    }
-
-    /**
-     * Return a new sequence with the same items as the $this sequence but in reverse order.
-     *
-     * @return static A new sequence with the same items as the $this sequence but in reverse order.
-     */
-    public function reverse(): static
-    {
-        $items = array_reverse($this->items);
-        return new static($items, $this->defaultValue);
-    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Sort methods
 
     /**
      * Return a new sequence with the items sorted in ascending order.
@@ -491,6 +432,116 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
         return new static($items, $this->defaultValue);
     }
 
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Miscellaneous methods
+
+    /**
+     * Split the sequence into chunks of a given size.
+     * The last chunk may be smaller than the specified size.
+     *
+     * This method is analogous to array_chunk().
+     * @see https://www.php.net/manual/en/function.array-chunk.php
+     *
+     * @param int $size The size of each chunk.
+     * @return static[] An array of chunks.
+     */
+    public function chunk(int $size): array {
+        $chunks = array_chunk($this->items, $size);
+        $result = [];
+        foreach ($chunks as $chunk) {
+            $result[] = new static($chunk, $this->defaultValue);
+        }
+        return $result;
+    }
+
+    /**
+     * Counts the occurrences of each distinct value in a sequence.
+     *
+     * This method is analogous to array_count_values().
+     * @see https://www.php.net/manual/en/function.array-count-values.php
+     *
+     * @return Dictionary A dictionary mapping values to the number of occurrences.
+     */
+    public function countValues(): Dictionary
+    {
+        $value_count = new Dictionary();
+        foreach ($this->items as $item) {
+            if ($value_count->hasKey($item)) {
+                $value_count[$item]++;
+            } else {
+                $value_count[$item] = 1;
+            }
+         }
+         return $value_count;
+    }
+
+    /**
+     * Fill the sequence with a given value.
+     *
+     * This method is analogous to array_fill().
+     * @see https://www.php.net/manual/en/function.array-fill.php
+     *
+     * @param int $start_index The zero-based index position to start filling.
+     * @param int $count The number of items to fill.
+     * @param mixed $value The value to fill with.
+     */
+    public function fill(int $start_index, int $count, mixed $value = null): void {
+        // If no value is specified, use the default value.
+        // Use func_num_args() here to check if the value was specified, instead of comparing it with null, because they
+        // might actually want to fill with nulls.
+        if (func_num_args() === 2) {
+            $value = $this->defaultValue;
+        }
+
+        // Set the specified sequence items.
+        for ($i = 0; $i < $count; $i++) {
+            $this[$start_index + $i] = $value;
+        }
+    }
+
+    /**
+     * Return a sequence with all items matching a certain filter.
+     *
+     * This method is analogous to array_filter().
+     * @see https://www.php.net/manual/en/function.array-filter.php
+     *
+     * @param callable $fn The filter function that returns true for items to keep.
+     * @return static A new sequence containing only the matching items.
+     */
+    public function filter(callable $fn): static
+    {
+        // Get the matching values.
+        $items = array_filter($this->items, fn($item) => $fn($item));
+
+        // Construct the result.
+        return new static($items, $this->defaultValue);
+    }
+
+    /**
+     * Applies the callback to the items in the sequence.
+     *
+     * @param callable $fn The callback function to apply to each item.
+     * @return static A new sequence containing the results of the callback function.
+     */
+    public function map(callable $fn): static
+    {
+        $items = array_map($fn, $this->items);
+        return new static($items, $this->defaultValue);
+    }
+
+    /**
+     * Return a new sequence with the same items as the $this sequence but in reverse order.
+     *
+     * @return static A new sequence with the same items as the $this sequence but in reverse order.
+     */
+    public function reverse(): static
+    {
+        $items = array_reverse($this->items);
+        return new static($items, $this->defaultValue);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // ArrayAccess implementation
 
@@ -531,6 +582,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
             $this->items[$offset] = $value;
         }
     }
+
+    // endregion
 
     /**
      * Get a value from the sequence.
@@ -593,7 +646,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Countable implementation
+    // region Countable implementation
 
     /**
      * Get the number of items in the sequence.
@@ -606,8 +659,10 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
         return count($this->items);
     }
 
+    // endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // IteratorAggregate implementation
+    // region IteratorAggregate implementation
 
     /**
      * Get iterator for foreach loops.
@@ -619,4 +674,6 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     {
         return new ArrayIterator($this->items);
     }
+
+    // endregion
 }
