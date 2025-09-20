@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Math;
+namespace Superclasses\Tests\Math;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;

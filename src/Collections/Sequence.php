@@ -8,11 +8,14 @@ use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use Superclasses\ErrorType;
+use Throwable;
 use Traversable;
 use UnderflowException;
 use OutOfRangeException;
 use Override;
-use Superclasses\Exceptions\ArgumentTypeException;
+use LogicException;
+use Superclasses\Exceptions\TypeException;
 
 /**
  * A sequence implementation that is stricter than ordinary PHP arrays.
@@ -49,10 +52,10 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * Create a new sequence, optionally from an existing iterable.
      *
      * A default value may be specified, used to fill gaps when increasing the sequence length.
-     * @see self::offsetSet()
-     *
      * @param iterable $src The source iterable (default empty array).
      * @param mixed $default_value Default value for new items (default null).
+     * @see self::offsetSet()
+     *
      */
     public function __construct(iterable $src = [], mixed $default_value = null)
     {
@@ -76,13 +79,14 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * @param mixed $index The index to validate.
      * @param bool $check_lower_bound Whether to check if an index is non-negative.
      * @param bool $check_upper_bound Whether to check if an index is within array bounds.
-     * @throws ArgumentTypeException If the index is not an integer.
+     * @throws TypeException If the index is not an integer.
      * @throws OutOfRangeException If the index is outside the valid range for the sequence.
      */
-    protected function checkIndex(mixed $index, bool $check_lower_bound = true, bool $check_upper_bound = true): void {
+    protected function checkIndex(mixed $index, bool $check_lower_bound = true, bool $check_upper_bound = true): void
+    {
         // Check the index is an integer.
         if (!is_int($index)) {
-            throw new ArgumentTypeException('index', 'int', $index);
+            throw TypeException::create('index', 'int', $index);
         }
 
         // Check the index isn't negative.
@@ -107,7 +111,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * @return mixed The first item.
      * @throws OutOfRangeException If the sequence is empty.
      */
-    public function first(): mixed {
+    public function first(): mixed
+    {
         return $this[0];
     }
 
@@ -117,7 +122,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * @return mixed The last item.
      * @throws OutOfRangeException If the sequence is empty.
      */
-    public function last(): mixed {
+    public function last(): mixed
+    {
         return $this[array_key_last($this->items)];
     }
 
@@ -228,7 +234,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      *
      * @param int $index The zero-based index position of the item to remove.
      * @return mixed The removed value.
-     * @throws ArgumentTypeException If the index is not an integer.
+     * @throws TypeException If the index is not an integer.
      * @throws OutOfRangeException If the index is outside the valid range for the sequence.
      */
     public function remove(int $index): mixed
@@ -261,7 +267,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
         // Filter the sequence to remove the matching values.
         $this->items = array_values(array_filter(
             $this->items,
-            fn ($item) => $item !== $value
+            fn($item) => $item !== $value
         ));
 
         // Return the number of items removed.
@@ -447,7 +453,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * @param int $size The size of each chunk.
      * @return static[] An array of chunks.
      */
-    public function chunk(int $size): array {
+    public function chunk(int $size): array
+    {
         $chunks = array_chunk($this->items, $size);
         $result = [];
         foreach ($chunks as $chunk) {
@@ -470,11 +477,12 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
         foreach ($this->items as $item) {
             if ($value_count->hasKey($item)) {
                 $value_count[$item]++;
-            } else {
+            }
+            else {
                 $value_count[$item] = 1;
             }
-         }
-         return $value_count;
+        }
+        return $value_count;
     }
 
     /**
@@ -487,7 +495,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * @param int $count The number of items to fill.
      * @param mixed $value The value to fill with.
      */
-    public function fill(int $start_index, int $count, mixed $value = null): void {
+    public function fill(int $start_index, int $count, mixed $value = null): void
+    {
         // If no value is specified, use the default value.
         // Use func_num_args() here to check if the value was specified, instead of comparing it with null, because they
         // might actually want to fill with nulls.
@@ -532,6 +541,18 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
+     * Merge two sequences.
+     *
+     * @param Sequence $other The sequence to merge with.
+     * @return static A new sequence containing the merged items.
+     */
+    public function merge(self $other): static
+    {
+        $items = array_merge($this->items, $other->items);
+        return new static($items, $this->defaultValue);
+    }
+
+    /**
      * Return a new sequence with the same items as the $this sequence but in reverse order.
      *
      * @return static A new sequence with the same items as the $this sequence but in reverse order.
@@ -542,8 +563,133 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
         return new static($items, $this->defaultValue);
     }
 
+    // endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ArrayAccess implementation
+    // region Aggregation methods
+
+    /**
+     * Reduce the sequence to a single value using a callback function.
+     *
+     * @param callable $fn Callback function (accumulator, item) => new_accumulator.
+     * @param mixed $init Initial value for the aggregation.
+     * @return mixed The final result.
+     */
+    public function reduce(callable $fn, mixed $init): mixed
+    {
+        return array_reduce($this->items, $fn, $init);
+    }
+
+    /**
+     * Find the product of the values in the sequence.
+     *
+     * @return float|int The product of the values in the sequence.
+     */
+    public function product(): float|int
+    {
+        return array_product($this->items);
+    }
+
+    /**
+     * Find the sum of the values in the sequence.
+     *
+     * @return float|int The sum of the values in the sequence.
+     */
+    public function sum(): float|int
+    {
+        return array_sum($this->items);
+    }
+
+    /**
+     * Find the concatenation of the values in the sequence, optionally separated by a given string (the "glue").
+     *
+     * @param string $glue The string to separate the values with.
+     * @return string The concatenation of the values in the sequence.
+     */
+    public function join(string $glue = ''): string
+    {
+        return implode($glue, $this->items);
+    }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Choose random methods
+
+    /**
+     * Randomly choose one or more items from the sequence.
+     * NB: This method is non-mutating.
+     *
+     * @param int $count The number of items to choose (default: 1).
+     * @return array An array containing the chosen items (keys and values) in random order.
+     * @throws UnderflowException If the sequence is empty.
+     * @throws OutOfRangeException If the count is out of range.
+     * @throws OutOfRangeException If the sequence doesn't have enough items to choose the specified count.'
+     */
+    public function chooseRand(int $count = 1): array
+    {
+        // Guards.
+        if ($this->count() === 0) {
+            throw new UnderflowException("No items in the sequence to choose from.");
+        }
+        if ($count <= 0) {
+            throw new OutOfRangeException("Count must be greater than 0.");
+        }
+        if ($count > $this->count()) {
+            throw new OutOfRangeException("Not enough items in the sequence to choose $count items.");
+        }
+
+        // Get the keys of the randomly chosen items.
+        $keys = array_rand($this->items, $count);
+
+        // Make sure it's an array, as array_rand() will return a single key value when count is 1.
+        if (!is_array($keys)) {
+            $keys = [$keys];
+        }
+
+        // Convert the keys into key-value pairs.
+        $result = [];
+        foreach ($keys as $key) {
+            $result[$key] = $this->items[$key];
+        }
+        return $result;
+    }
+
+    /**
+     * Randomly remove one or more items from the sequence.
+     * NB: This method is mutating.
+     *
+     * @param int $count The number of items to remove (default: 1).
+     * @return array An array containing the removed values in random order.
+     * @throws UnderflowException If the sequence is empty.
+     * @throws OutOfRangeException If the count is out of range.
+     * @throws OutOfRangeException If the sequence doesn't have enough items to choose the specified count.'
+     */
+    public function removeRand(int $count = 1): array
+    {
+        // Randomly choose one or more items.
+        $items = $this->chooseRand($count);
+
+        // Sort the items by key in descending order.
+        // We want to remove the items with the highest keys first,
+        // because each call to remove() will re-index the sequence.
+        // Clone the array of selected items to preserve randomness.
+        $sorted_items = $items;
+        krsort($sorted_items);
+
+        // Remove the items from the sequence.
+        foreach ($sorted_items as $key => $value) {
+            $this->remove($key);
+        }
+
+        // Return the chosen values.
+        return array_values($items);
+    }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region ArrayAccess implementation
 
     /**
      * Append or set a sequence item.
@@ -555,7 +701,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      *
      * @param mixed $offset The zero-based index position to set, or null to append.
      * @param mixed $value The value to set.
-     * @throws ArgumentTypeException If the index is neither null nor an integer.
+     * @throws TypeException If the index is neither null nor an integer.
      * @throws OutOfRangeException If the index is out of range.
      */
     #[Override]
@@ -565,7 +711,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
             // Append a new item to the sequence.
             // $sequence[] = $value
             $this->append($value);
-        } else {
+        }
+        else {
             // Update an item.
             // $sequence[$key] = $value
 
@@ -583,14 +730,12 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
         }
     }
 
-    // endregion
-
     /**
      * Get a value from the sequence.
      *
      * @param mixed $offset The zero-based index position to get.
      * @return mixed The value at the specified index.
-     * @throws ArgumentTypeException If the index is not an integer.
+     * @throws TypeException If the index is not an integer.
      * @throws OutOfRangeException If the index is outside the valid range for the sequence.
      */
     #[Override]
@@ -608,14 +753,14 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      *
      * @param mixed $offset The sequence index position.
      * @return bool If the given index is an integer and within the current valid range for the sequence.
-     * @throws ArgumentTypeException If the index is not an integer.
+     * @throws TypeException If the index is not an integer.
      */
     #[Override]
     public function offsetExists(mixed $offset): bool
     {
         // Check the index is an integer.
         if (!is_int($offset)) {
-            throw new ArgumentTypeException('offset', 'int', $offset);
+            throw TypeException::create('offset', 'int', $offset);
         }
 
         return $this->hasIndex($offset);
@@ -644,6 +789,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
         // Set the item to null.
         $this->items[$offset] = null;
     }
+
+    // endregion
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // region Countable implementation

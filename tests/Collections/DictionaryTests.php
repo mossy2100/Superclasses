@@ -2,11 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses\Tests;
+namespace Superclasses\Tests\Collections;
 
 use DateTime;
-
-require_once __DIR__ . '/../src/DictionaryOf.php';
+use Superclasses\Collections\Dictionary;
+use Superclasses\Types\Type;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -79,12 +79,12 @@ echo 'resource id = ' . get_resource_id($fp) . PHP_EOL;
 // $dict = DictionaryOf::fromIterable($mixed);
 // echo $dict->valueTypes;  // "string|int|float|bool|DateTime"
 
-echo Dictionary::getStringKey(null) . PHP_EOL;
-echo Dictionary::getStringKey(true) . PHP_EOL;
-echo Dictionary::getStringKey(false) . PHP_EOL;
-echo Dictionary::getStringKey(123) . PHP_EOL;
-echo Dictionary::getStringKey(123.45e67) . PHP_EOL;
-echo Dictionary::getStringKey("cats are nice") . PHP_EOL;
-echo Dictionary::getStringKey([1, 2, false, "dogs are nice too"]) . PHP_EOL;
-echo Dictionary::getStringKey(new DateTime()) . PHP_EOL;
-echo Dictionary::getStringKey($fp) . PHP_EOL;
+echo Type::getStringKey(null) . PHP_EOL;
+echo Type::getStringKey(true) . PHP_EOL;
+echo Type::getStringKey(false) . PHP_EOL;
+echo Type::getStringKey(123) . PHP_EOL;
+echo Type::getStringKey(123.45e67) . PHP_EOL;
+echo Type::getStringKey("cats are nice") . PHP_EOL;
+echo Type::getStringKey([1, 2, false, "dogs are nice too"]) . PHP_EOL;
+echo Type::getStringKey(new DateTime()) . PHP_EOL;
+echo Type::getStringKey($fp) . PHP_EOL;

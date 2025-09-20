@@ -2,15 +2,16 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses\Tests;
+namespace Superclasses\Tests\Collections;
 
 use DateTime;
+use Superclasses\Collections\SequenceOf;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 echo '<pre>';
 
-$a = new ListOf('string');
+$a = new SequenceOf('string');
 $a->append('orange');
 $a->append('red');
 $a->append('yellow');

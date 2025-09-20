@@ -2,15 +2,13 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses\Tests;
+namespace Superclasses\Tests\Strings;
 
 use stdClass;
 use DateTime;
-use Stringable;
-
-require_once __DIR__ . '/../src/Stringify.php';
-require_once __DIR__ . '/../src/TypeSet.php';
-require_once __DIR__ . '/../src/DictionaryOf.php';
+use Superclasses\Strings\Stringify;
+use Superclasses\Collections\Dictionary;
+use Superclasses\Collections\Set;
 
 echo Stringify::stringify(null) . "\n";
 echo Stringify::stringify(true) . "\n";

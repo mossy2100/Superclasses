@@ -53,11 +53,8 @@ use OutOfRangeException;
  *
  * ## Automatic Defaults
  * When no explicit default is provided, the following defaults are used:
- * - null → null
- * - mixed → null
- * - int → 0
- * - number → 0
- * - scalar → 0
+ * - null or mixed → null
+ * - int, number, or scalar → 0
  * - float → 0.0
  * - string → '' (empty string)
  * - bool → false
@@ -96,23 +93,27 @@ class SequenceOf extends Sequence
     /**
      * Create a new SequenceOf with specified type constraints and a default value.
      *
-     * @param string|iterable|null $types Type specification (e.g., 'string', 'int|null', ['string', 'int']).
-     *      The default is null, which means figure it out from the source iterable.
+     * @param string|iterable $types Type specification (e.g., 'string', 'int|null', ['string', 'int']).
+     *      The default is 'auto', which means determine the types from the source iterable and default value.
      * @param iterable $src The source iterable (default empty array).
      * @param mixed $default_value Default value for new items. Auto-generated for basic types if omitted.
      * @throws InvalidArgumentException If no default can be generated or provided default is invalid.
      */
-    public function __construct(string|iterable|null $types = 'mixed', iterable $src = [], mixed $default_value = null)
+    public function __construct(string|iterable $types = 'auto', iterable $src = [], mixed $default_value = null)
     {
         // Call the parent constructor.
         parent::__construct($src, $default_value);
 
-        // If no types were specified, infer them from the source items and default value.
-        if ($types === null) {
+        // If 'auto' types were specified, infer them from the source items and default value.
+        if ($types === 'auto') {
             $this->types = new TypeSet();
-            foreach ($this->items as $item) {
+
+            // Add types from the source iterable.
+            foreach ($src as $item) {
                 $this->types->addValueType($item);
             }
+
+            // Add the default value type.
             $this->types->addValueType($this->defaultValue);
         }
         else {
@@ -143,8 +144,8 @@ class SequenceOf extends Sequence
                 throw new InvalidArgumentException("A default value must be provided for this item type.");
             }
             $this->defaultValue = $default_value;
-        } elseif ($types !== null && !$this->types->match($default_value)) {
-            // Check the default value is valid for the specified types.
+        } elseif (!$this->types->match($default_value)) {
+            // Default value is invalid for the specified type set.
             throw new InvalidArgumentException("Default value has invalid type.");
         }
     }
@@ -208,7 +209,7 @@ class SequenceOf extends Sequence
             $this->checkItemType($item);
         }
 
-        /// Call the parent method.
+        // Call the parent method.
         parent::prepend(...$items);
     }
 
@@ -259,7 +260,7 @@ class SequenceOf extends Sequence
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ArrayAccess implementation
+    // region ArrayAccess implementation
 
     /**
      * Append or set a sequence item.
@@ -310,4 +311,6 @@ class SequenceOf extends Sequence
         // Set the item to null.
         $this->items[$offset] = null;
     }
+
+    // endregion
 }

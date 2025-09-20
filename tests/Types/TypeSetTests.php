@@ -2,13 +2,13 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses\Tests;
+namespace Superclasses\Tests\Types;
 
 use ArrayObject;
 use DateTime;
 use Countable;
-
-require_once __DIR__ . '/../src/TypeSet.php';
+use Superclasses\Types\TypeSet;
+use Superclasses\Types\Type;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -48,4 +48,4 @@ $x = new class () extends DateTime implements Countable {
     }
 };
 
-echo TypeSet::getValueType($x);
+echo Type::getType($x);

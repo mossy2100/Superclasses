@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses\Tests;
+namespace Superclasses\Tests\Math;
 
-require '../src/Complex.php';
+use Superclasses\Math\Complex;
 
 // Example usage:
 $z1 = new Complex(3, 4);     // 3 + 4i
