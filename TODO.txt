@@ -1,10 +1,12 @@
 TODO
 ====
 
+Collections
 1. Update Set to accept a set of types in the constructor.
-2. Get rid of TypeSet and update Sequence and Dictionary to use sets of string for the allowed types.
-3. Update Type to support the special functions currently in TypeSet.
-4. Rename Stringify as Stringify. If a class has a __toString() method, use that. No decode
-   method required. This is just for display/debugging. Put key-value pairs and properties on their own
-   line. For associative arrays, use square brackets for a more PHP-like syntax. It's not JSON.
-   Sets use {} and Dictionaries can use <> with key-value pairs.
+2. Make TypeSet as simple as possible and remove dependency on Set class.
+3. Remove the "Of" classes and make Set, Sequence, and Dictionary all accept types.
+4. Remove src iterable from the constructors and instead use append().
+5. Complete tests for collection classes.
+
+Math
+1. Make Complex class into an extension.

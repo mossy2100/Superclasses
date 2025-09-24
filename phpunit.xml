@@ -3,7 +3,12 @@
          colors="true"
          cacheResult="false"
          beStrictAboutOutputDuringTests="true"
-         beStrictAboutChangesToGlobalState="true">
+         beStrictAboutChangesToGlobalState="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerErrors="true"
+         displayDetailsOnTestsThatTriggerNotices="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnPhpunitDeprecations="true">
 
     <testsuites>
         <testsuite name="unit">

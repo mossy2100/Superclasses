@@ -4,77 +4,97 @@ declare(strict_types = 1);
 
 namespace Superclasses\Math;
 
+use Stringable;
 use ArithmeticError;
 use DivisionByZeroError;
 use InvalidArgumentException;
-use Stringable;
 
 /**
- * TODO
- * 4. Write tests.
+ * TODO Complete tests.
  */
-
 class Complex implements Stringable
 {
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Properties
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Properties
 
     /**
-     * The real part of the complex number.
-     * 
+     * The backing field for the real property.
+     *
      * @var float
      */
     private float $_real = 0;
+
+    /**
+     * The real part of the complex number.
+     *
+     * @var float
+     */
     public float $real {
         get {
             return $this->_real;
         }
 
         set(float|int $value) {
-            // Make sure value is a finite float.
+            // Make sure value is a float.
             $value = (float)$value;
+
+            // Make sure value is finite.
             if (!is_finite($value)) {
                 throw new InvalidArgumentException("Complex numbers must have finite components.");
             }
 
-            // Update backing field.
-            $this->_real = $value;
+            // Don't update unless necessary.
+            if ($value !== $this->_real) {
+                // Update backing field.
+                $this->_real = $value;
 
-            // Clear computed properties.
-            $this->_mag = null;
-            $this->_phase = null;
+                // Clear computed properties.
+                $this->_mag = null;
+                $this->_phase = null;
+            }
         }
     }
 
     /**
-     * The imaginary part of the complex number.
-     * 
+     * The backing field for the imag property.
+     *
      * @var float
      */
     private float $_imag = 0;
+
+    /**
+     * The imaginary part of the complex number.
+     *
+     * @var float
+     */
     public float $imag {
         get {
             return $this->_imag;
         }
 
         set(float|int $value) {
-            // Make sure value is a finite float.
+            // Make sure value is a float.
             $value = (float)$value;
+
+            // Make sure value is finite.
             if (!is_finite($value)) {
                 throw new InvalidArgumentException("Complex numbers must have finite components.");
             }
 
-            // Update backing field.
-            $this->_imag = $value;
+            // Don't update unless necessary.
+            if ($value !== $this->_imag) {
+                // Update backing field.
+                $this->_imag = $value;
 
-            // Clear computed properties.
-            $this->_mag = null;
-            $this->_phase = null;
+                // Clear computed properties.
+                $this->_mag = null;
+                $this->_phase = null;
+            }
         }
     }
 
     /**
-     * The backing field for the magnitude property.
+     * The backing field for the mag property.
      *
      * @var ?float
      */
@@ -89,17 +109,16 @@ class Complex implements Stringable
         get {
             // Compute if necessary.
             if ($this->_mag === null) {
-                $this->_mag = $this->isReal() ?
-                    abs($this->real) :
-                    sqrt(($this->real * $this->real) + ($this->imag * $this->imag));
+                $this->_mag = $this->isReal() ? abs($this->real) : hypot($this->real, $this->imag);
             }
+
             return $this->_mag;
         }
     }
 
     /**
      * The backing field for the phase property.
-     * 
+     *
      * @var ?float
      */
     private ?float $_phase = null;
@@ -113,20 +132,21 @@ class Complex implements Stringable
         get {
             // Compute if necessary.
             if ($this->_phase === null) {
-                $this->_phase = $this->isReal() ?
-                    ($this->real < 0 ? M_PI : 0) :
-                    atan2($this->imag, $this->real);
+                $this->_phase = $this->isReal() ? ($this->real < 0 ? M_PI : 0) : atan2($this->imag, $this->real);
             }
+
             return $this->_phase;
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Constructor
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Constructor
 
     /**
      * Create a new complex number.
-     * 
+     *
      * @param int|float $real The real part of the complex number.
      * @param int|float $imag The imaginary part of the complex number.
      */
@@ -136,12 +156,14 @@ class Complex implements Stringable
         $this->imag = $imag;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Arithmetic operations
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Arithmetic operations
 
     /**
      * Add another complex number to this one.
-     * 
+     *
      * @param Complex|int|float $other The real or complex number to add.
      * @return Complex A new complex number representing the sum.
      */
@@ -156,7 +178,7 @@ class Complex implements Stringable
 
     /**
      * Subtract another complex number from this one.
-     * 
+     *
      * @param Complex|int|float $other The real or complex number to subtract.
      * @return Complex A new complex number representing the difference.
      */
@@ -172,7 +194,7 @@ class Complex implements Stringable
     /**
      * Multiply this complex number by another.
      * Uses the formula: (a + bi)(c + di) = (ac - bd) + (ad + bc)i
-     * 
+     *
      * @param Complex|int|float $other The real or complex number to multiply by.
      * @return Complex A new complex number representing the product.
      */
@@ -192,7 +214,7 @@ class Complex implements Stringable
     /**
      * Divide this complex number by another.
      * Uses the formula: (a + bi)/(c + di) = [(ac + bd) + (bc - ad)i]/(c² + d²)
-     * 
+     *
      * @param Complex|int|float $other The real or complex number to divide by.
      * @return Complex A new complex number representing the quotient.
      * @throws DivisionByZeroError If the divisor is zero.
@@ -226,12 +248,14 @@ class Complex implements Stringable
         return new Complex($this->real, -$this->imag);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Transcendental operations
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Transcendental operations
 
     /**
      * Calculate the natural logarithm of a complex number.
-     * 
+     *
      * @return Complex A new complex number representing ln(z).
      * @throws ArithmeticError If the complex number is 0.
      */
@@ -245,13 +269,17 @@ class Complex implements Stringable
         // Use shortcuts where possible.
         if ($this->equals(1)) {
             return new Complex(0);
-        } elseif ($this->equals(2)) {
+        }
+        elseif ($this->equals(2)) {
             return new Complex(M_LN2);
-        } elseif ($this->equals(M_E)) {
+        }
+        elseif ($this->equals(M_E)) {
             return new Complex(1);
-        } elseif ($this->equals(M_PI)) {
+        }
+        elseif ($this->equals(M_PI)) {
             return new Complex(M_LNPI);
-        } elseif ($this->equals(10)) {
+        }
+        elseif ($this->equals(10)) {
             return new Complex(M_LN10);
         }
 
@@ -262,7 +290,7 @@ class Complex implements Stringable
     /**
      * Calculate the logarithm of a complex number with the given base.
      * Uses the change of base formula: log_b(z) = ln(z) / ln(b)
-     * 
+     *
      * @param Complex|int|float $base The base for the logarithm.
      * @return Complex A new complex number representing log_b(z).
      * @throws ArithmeticError If the base is 0, 1, or if this number is 0.
@@ -289,7 +317,8 @@ class Complex implements Stringable
         if ($this->equals(M_E)) {
             if ($base->equals(2)) {
                 return new Complex(M_LOG2E);
-            } elseif ($base->equals(10)) {
+            }
+            elseif ($base->equals(10)) {
                 return new Complex(M_LOG10E);
             }
         }
@@ -305,7 +334,7 @@ class Complex implements Stringable
 
     /**
      * Calculate e^z where z is this complex number.
-     * 
+     *
      * @return Complex A new complex number representing e^z.
      */
     public function exp(): Complex
@@ -313,13 +342,17 @@ class Complex implements Stringable
         // Use shortcuts where possible.
         if ($this->equals(0)) {
             return new Complex(1);
-        } elseif ($this->equals(M_LN2)) {
+        }
+        elseif ($this->equals(M_LN2)) {
             return new Complex(2);
-        } elseif ($this->equals(1)) {
+        }
+        elseif ($this->equals(1)) {
             return new Complex(M_E);
-        } elseif ($this->equals(M_LNPI)) {
+        }
+        elseif ($this->equals(M_LNPI)) {
             return new Complex(M_PI);
-        } elseif ($this->equals(M_LN10)) {
+        }
+        elseif ($this->equals(M_LN10)) {
             return new Complex(10);
         }
 
@@ -334,8 +367,18 @@ class Complex implements Stringable
 
     /**
      * Raise this complex number to a power.
-     * This is a multi-valued function but for simplicity only the principal value is returned. 
-     * 
+     * This function can be multi-valued for certain base/exponent combinations.
+     * For simplicity, only the principal value is returned.
+     *
+     * Single-valued cases:
+     * - Any base raised to an integer exponent.
+     * - Real positive base with real exponent.
+     *
+     * Multi-valued cases:
+     * - Complex base with fractional exponent: z^(1/n)
+     * - Negative real base with fractional exponent: (-2)^(1/3)
+     * - Any base with complex exponent: z^(a+bi) where b ≠ 0
+     *
      * @param Complex|int|float $other The real or complex number to raise this complex number to.
      * @return Complex A new complex number representing the result.
      * @throws InvalidArgumentException If attempting 0 raised to a negative or complex power.
@@ -366,7 +409,7 @@ class Complex implements Stringable
                 return new Complex(1);
             }
 
-            // The exponent is a positive real number, and 0 raised to any positive real number is 0.
+            // The exponent is a positive real number. 0 raised to any positive real number is 0.
             return new Complex();
         }
 
@@ -397,7 +440,7 @@ class Complex implements Stringable
     /**
      * Calculate the nth roots of this complex number.
      * Returns all n complex roots using De Moivre's theorem.
-     * 
+     *
      * @param int $n The root to calculate (e.g., 2 for square root, 3 for cube root).
      * @return Complex[] An array of Complex numbers representing all nth roots.
      * @throws InvalidArgumentException If n is not a positive integer.
@@ -427,13 +470,57 @@ class Complex implements Stringable
         return $roots;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Comparison methods
+    /**
+     * Calculate the square of this complex number.
+     *
+     * @return $this
+     */
+    public function sqr(): self
+    {
+        return $this->pow(2);
+    }
+
+    /**
+     * Calculate the square root of this complex number.
+     * Only the principal value is returned. For both square roots, call roots(2).
+     *
+     * @return $this
+     */
+    public function sqrt(): self
+    {
+        return $this->pow(0.5);
+    }
+
+    /**
+     * Calculate the cube of this complex number.
+     *
+     * @return $this
+     */
+    public function cube(): self
+    {
+        return $this->pow(3);
+    }
+
+    /**
+     * Calculate the cube root of this complex number.
+     * Only the principal value is returned. For all cube roots, call roots(3).
+     *
+     * @return $this
+     */
+    public function cbrt(): self
+    {
+        return $this->pow(1 / 3);
+    }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Comparison methods
 
     /**
      * Check if a complex number is real.
-     * 
-     * @return bool True if the Complex is a real number, otherwise false. 
+     *
+     * @return bool True if the Complex is a real number, otherwise false.
      */
     public function isReal(): bool
     {
@@ -442,7 +529,7 @@ class Complex implements Stringable
 
     /**
      * Check if this complex number equals another.
-     * 
+     *
      * @param Complex|int|float $other The real or complex number to compare with.
      * @param float $epsilon The tolerance for floating-point comparison.
      * @return bool True if the numbers are equal within the tolerance.
@@ -454,15 +541,17 @@ class Complex implements Stringable
 
         // Compare real and imaginary parts.
         return abs($this->real - $other->real) < $epsilon &&
-            abs($this->imag - $other->imag) < $epsilon;
+               abs($this->imag - $other->imag) < $epsilon;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Factory methods
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Factory methods
 
     /**
      * Get an imaginary unit.
-     * 
+     *
      * @return Complex A new complex number equal to the imaginary unit.
      */
     public static function i(): Complex
@@ -472,7 +561,7 @@ class Complex implements Stringable
 
     /**
      * Convert the input value to a complex number, if not already.
-     * 
+     *
      * @param Complex|int|float $z The real or complex value.
      * @return Complex The equivalent complex value.
      */
@@ -483,7 +572,7 @@ class Complex implements Stringable
 
     /**
      * Create a complex number from polar coordinates.
-     * 
+     *
      * @param int|float $mag The magnitude (distance from origin).
      * @param int|float $phase The phase angle in radians.
      * @return Complex A new complex number.
@@ -500,12 +589,96 @@ class Complex implements Stringable
         return $z;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Stringable implementation
+    /**
+     * Parse a string representation of a complex number.
+     *
+     * Supports various formats:
+     * - Real numbers: "5", "-3.14", "0"
+     * - Pure imaginary: "i", "-i", "3i", "-2.5j", "I", "J"
+     * - Complex: "3+4i", "5-2j", "-1+i", "2.5-3.7I"
+     * - Spaces allowed: "3 + 4i", "5 - 2j"
+     * - Either order: "4i+3", "-2j+5"
+     *
+     * @param string $str The string to parse
+     * @return Complex The parsed complex number
+     * @throws InvalidArgumentException If the string cannot be parsed
+     */
+    public static function parse(string $str): Complex
+    {
+        // Remove all whitespace
+        $str = preg_replace('/\s+/', '', $str);
+
+        // Handle empty string
+        if ($str === '') {
+            throw new InvalidArgumentException("Cannot parse empty string as complex number.");
+        }
+
+        // Handle pure real numbers (no imaginary unit)
+        if (is_numeric($str)) {
+            return new Complex((float)$str, 0);
+        }
+
+        // Handle pure imaginary with or without coefficient: i, 3i, -2.5j, etc.
+        $rx_num = '(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?';
+        if (preg_match("/^([+-]?)((?:$rx_num)?)[ijIJ]$/", $str, $matches)) {
+            // Handle cases where coefficient is omitted (like i or -i).
+            $imag = $matches[2] === '' ? 1 : (float)$matches[2];
+
+            // Apply signs to get final value.
+            if ($matches[1] === '-') {
+                $imag = -$imag;
+            }
+
+            return new Complex(0, $imag);
+        }
+
+        // Handle complex numbers with both real and imaginary parts.
+        // Pattern real±imag.
+        $pattern_real_first = "/^([+-]?)($rx_num)([+-])((?:$rx_num)?)[ijIJ]\$/";
+        // Pattern imag±real.
+        $pattern_imag_first = "/^([+-]?)((?:$rx_num)?)[ijIJ]([+-])($rx_num)\$/";
+
+        if (preg_match($pattern_real_first, $str, $matches)) {
+            $real_sign = $matches[1];
+            $real_val = $matches[2];
+            $imag_sign = $matches[3];
+            $imag_val = $matches[4];
+        }
+        elseif (preg_match($pattern_imag_first, $str, $matches)) {
+            $imag_sign = $matches[1];
+            $imag_val = $matches[2];
+            $real_sign = $matches[3];
+            $real_val = $matches[4];
+        }
+        else {
+            throw new InvalidArgumentException("Cannot parse '$str' as complex number.");
+        }
+
+        // Get the imaginary part. Handle cases where imaginary coefficient is omitted (like +i or -i).
+        $imag = $imag_val === '' ? 1 :  (float)$imag_val;
+
+        // Get the real part.
+        $real = (float)$real_val;
+
+        // Apply signs to get final values.
+        if ($imag_sign === '-') {
+            $imag = -$imag;
+        }
+        if ($real_sign === '-') {
+            $real = -$real;
+        }
+
+        return new Complex($real, $imag);
+    }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Stringable implementation
 
     /**
      * Convert the complex number to a string representation.
-     * 
+     *
      * @return string String representation in the form "a", "bi", "a + bi", or "a - bi".
      */
     public function __toString(): string
@@ -519,9 +692,11 @@ class Complex implements Stringable
         if ($this->real == 0) {
             if ($this->imag == 1) {
                 return 'i';
-            } elseif ($this->imag == -1) {
+            }
+            elseif ($this->imag == -1) {
                 return '-i';
-            } else {
+            }
+            else {
                 return $this->imag . 'i';
             }
         }
@@ -532,4 +707,21 @@ class Complex implements Stringable
         $imag = $abs == 1 ? '' : $abs;
         return $this->real . $op . $imag . 'i';
     }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Conversion methods
+
+    /**
+     * Convert the complex number to an array.
+     *
+     * @return array An array containing the real and imaginary parts of the complex number.
+     */
+    public function toArray(): array
+    {
+        return [$this->real, $this->imag];
+    }
+
+    // endregion
 }
