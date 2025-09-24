@@ -4,13 +4,27 @@ declare(strict_types = 1);
 
 namespace Superclasses\Types;
 
+use Countable;
 use InvalidArgumentException;
-use Override;
-use Superclasses\Collections\Set;
 use Superclasses\Math\Numbers;
 
-class TypeSet extends Set
+class TypeSet implements Countable
 {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Properties
+
+    /**
+     * Items in the set.
+     *
+     * @var array<string>
+     */
+    private(set) array $types = [];
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Constructor
+
     /**
      * Constructor.
      *
@@ -19,8 +33,6 @@ class TypeSet extends Set
      */
     public function __construct(string|iterable $types = '')
     {
-        parent::__construct($types);
-
         // Convert union type syntax (e.g. 'string|int') into an array of type names.
         if (is_string($types)) {
             $types = explode('|', $types);
@@ -37,14 +49,21 @@ class TypeSet extends Set
             $type = trim($type);
 
             // Support the question mark nullable notation (e.g. '?string').
-            if (strlen($type) >= 2 && $type[0] === '?') {
+            if (strlen($type) > 1 && $type[0] === '?') {
                 // Add null and the type being made nullable.
                 $this->add('null', substr($type, 1));
-            } else {
+            }
+            else {
+                // This will throw if the type is blank or '?' or otherwise invalid.
                 $this->add($type);
             }
         }
     }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Helper methods
 
     /**
      * Convert a string or iterable of types into a TypeSet, if necessary.
@@ -58,8 +77,8 @@ class TypeSet extends Set
     }
 
     /**
-     * Checks if the provided string looks like it could be a valid type. That includes core types and pseudotypes,
-     * resource types, and classes.
+     * Checks if the provided string looks like a valid type. That includes core types, pseudotypes, resource types,
+     * and classes.
      *
      * For examples of resource names:
      * @see https://www.php.net/manual/en/resource.php
@@ -67,18 +86,17 @@ class TypeSet extends Set
      * For valid class names:
      * @see https://www.php.net/manual/en/language.oop5.basic.php
      *
-     * @param mixed $item The item to check.
-     * @return bool True if the item is a valid type, false otherwise.
+     * @param mixed $type The type to check.
+     * @return bool True if the type is a valid type, false otherwise.
      */
-    #[Override]
-    public function isItemAllowed(mixed $item): bool
+    public function isValid(mixed $type): bool
     {
-        // Check the item is a string.
-        if (!is_string($item)) {
+        // Check the type is a string.
+        if (!is_string($type)) {
             return false;
         }
 
-        $type = trim($item);
+        $type = trim($type);
 
         // Ignore blanks.
         if ($type === '') {
@@ -92,38 +110,8 @@ class TypeSet extends Set
 
         // Check for class names.
         $class = "[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*";
-        $rx_class = "/^\\\\?(?:{$class})(?:\\\\{$class})*$/";
+        $rx_class = "/^\\\\?({$class})(?:\\\\{$class})*$/";
         return (bool)preg_match($rx_class, $type);
-    }
-
-    /**
-     * Add types to the set.
-     *
-     * @param mixed ...$items The types to add to the set.
-     * @return $this The modified set.
-     */
-    #[Override]
-    public function add(mixed ...$items): static
-    {
-        // Call the parent method.
-        parent::add($items);
-
-        // Remove redundant types.
-        $this->simplify();
-
-        // Return $this for chaining.
-        return $this;
-    }
-
-    /**
-     * Get the type name from a value and add it to the set.
-     *
-     * @param mixed $value The value to get the type name from.
-     * @return void
-     */
-    public function addValueType(mixed $value): void
-    {
-        $this->add(Type::getType($value));
     }
 
     /**
@@ -167,7 +155,7 @@ class TypeSet extends Set
             }
 
             // Check value against classes, interfaces, and traits.
-            foreach ($this as $type) {
+            foreach ($this->types as $type) {
                 // Check classes and interfaces.
                 if ((class_exists($type) || interface_exists($type)) && $value instanceof $type) {
                     return true;
@@ -201,80 +189,160 @@ class TypeSet extends Set
         return false;
     }
 
-    /**
-     * Check if the set contains only null.
-     *
-     * @return bool True if the set contains only null, false otherwise.
-     */
-    public function isNullOnly(): bool
-    {
-        return $this->count() === 1 && $this->contains('null');
-    }
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Add/remove methods
 
     /**
-     * Reduce the set of types as much as possible.
+     * Add types to the set.
      *
-     * @return void
+     * @param mixed ...$types The types to add to the set.
+     * @return $this The modified set.
      */
-    private function simplify(): void
+    public function add(mixed ...$types): self
     {
-        // If no types were specified, or the set contains mixed, reduce to mixed only (i.e. any type is allowed).
-        if ($this->count() === 0 || $this->contains('mixed')) {
-            $this->clear()->add('mixed');
-            return;
-        }
+        foreach ($types as $type) {
+            // Check if the type is allowed in the set.
+            if (!$this->isValid($type)) {
+                throw new InvalidArgumentException("Invalid type: $type.");
+            }
 
-        // Expand group types to simplify the reduction.
-        if ($this->contains('scalar')) {
-            $this->add('int', 'float', 'bool', 'string');
-        }
-        if ($this->contains('number')) {
-            $this->add('int', 'float');
-        }
-
-        // Reduce to scalar if possible.
-        if ($this->containsAll(['int', 'float', 'bool', 'string'])) {
-            $this->remove('int', 'uint', 'float', 'number', 'bool', 'string');
-            $this->add('scalar');
-        }
-
-        // Reduce to number if possible.
-        if ($this->containsAll(['int', 'float'])) {
-            $this->remove('int', 'float');
-            $this->add('number');
-        }
-
-        // Remove uint if possible.
-        if ($this->contains('uint') && $this->containsAny(['int', 'number', 'scalar'])) {
-            $this->remove('uint');
-        }
-
-        // If 'object' is in the set, eliminate any names that must be class names.
-        if ($this->contains('object')) {
-            foreach ($this->items as $item) {
-                // Check for a backslash. If there is one, it must be a class name.
-                if (str_contains($item, '\\')) {
-                    $this->remove($item);
-                }
+            // Add the type if new.
+            if (!in_array($type, $this->types, true)) {
+                $this->types[] = $type;
             }
         }
 
-        // If 'resource' is in the set, eliminate any names that must be resource names.
-        if ($this->contains('resource')) {
-            foreach ($this->items as $item) {
-                // Check for a dot or space. If there is one, it must be a resource name.
-                if (preg_match('/[. ]/', $item)) {
-                    $this->remove($item);
-                }
+        // Return $this for chaining.
+        return $this;
+    }
+
+    /**
+     * Get the type name from a value and add it to the set.
+     *
+     * @param mixed $value The value to get the type name from.
+     * @return $this The modified set.
+     */
+    public function addValueType(mixed $value): self
+    {
+        return $this->add(Type::getType($value));
+    }
+
+    /**
+     * Remove one or more types from the set.
+     *
+     * @param mixed ...$types The types to remove from the set, if present.
+     * @return $this The modified set.
+     */
+    public function remove(mixed ...$types): self
+    {
+        // No type check needed; if it's in the set, remove it.
+        foreach ($types as $type) {
+            $key = array_search($type, $this->types);
+            if ($key === false) {
+                continue;
+            }
+            unset($this->types[$key]);
+        }
+
+        // Reindex.
+        $this->types = array_values($this->types);
+
+        // Return $this for chaining.
+        return $this;
+    }
+
+    /**
+     * Remove all types from the set.
+     *
+     * @return $this
+     */
+    public function clear(): self
+    {
+        // Remove all the types.
+        $this->types = [];
+
+        // Return $this for chaining.
+        return $this;
+    }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Contains methods
+
+    /**
+     * Check if the set contains a given type.
+     *
+     * Strict checking is used, i.e. the type must match on value as well as type.
+     *
+     * @param mixed $type The type to check for.
+     * @return bool
+     */
+    public function contains(mixed $type): bool
+    {
+        return in_array($type, $this->types, true);
+    }
+
+    /**
+     * Check if the set contains one or more given types provided as an iterable.
+     *
+     * @param iterable $types The types to check for.
+     * @return bool
+     */
+    public function containsAll(iterable $types): bool
+    {
+        foreach ($types as $type) {
+            if (!$this->contains($type)) {
+                return false;
             }
         }
+
+        // If we got here, all types were found.
+        return true;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Stringable implementation
-
-    public function __toString(): string
+    /**
+     * Check if the set contains any of the given types provided as an iterable.
+     *
+     * @param iterable $types The types to check for.
+     * @return bool If the set contains any of the types.
+     */
+    public function containsAny(iterable $types): bool
     {
-        return implode('|', $this->items);
+        foreach ($types as $it) {
+            if ($this->contains($it)) {
+                return true;
+            }
+        }
+        return false;
     }
+
+    /**
+     * Check if the set is empty.
+     *
+     * @return bool True if the set is empty, false otherwise.
+     */
+    public function isEmpty(): bool
+    {
+        return empty($this->types);
+    }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Countable implementation
+
+    /**
+     * Get the number of types in the set.
+     *
+     * @return int
+     */
+    public function count(): int
+    {
+        return count($this->types);
+    }
+
+    // endregion
 }

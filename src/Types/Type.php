@@ -101,6 +101,7 @@ class Type
     {
         $type = get_debug_type($key);
 
+        // Core types.
         switch ($type) {
             case 'null':
                 return 'n';
@@ -123,10 +124,12 @@ class Type
                 return 'a:' . count($key) . ':[' . implode(', ', $array_item_keys) . ']';
         }
 
+        // Resources.
         if (str_starts_with($type, 'resource')) {
             return 'r:' . get_resource_id($key);
         }
 
+        // Objects.
         if (is_object($key)) {
             return 'o:' . spl_object_id($key);
         }

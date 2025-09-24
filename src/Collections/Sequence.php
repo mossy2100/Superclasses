@@ -8,13 +8,10 @@ use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
-use Superclasses\ErrorType;
-use Throwable;
 use Traversable;
 use UnderflowException;
 use OutOfRangeException;
 use Override;
-use LogicException;
 use Superclasses\Exceptions\TypeException;
 
 /**

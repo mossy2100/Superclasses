@@ -9,4 +9,5 @@ Collections
 5. Complete tests for collection classes.
 
 Math
-1. Make Complex class into an extension.
+1. Make Complex class into an extension. (maybe later)
+2. Complete tests for Complex class.
