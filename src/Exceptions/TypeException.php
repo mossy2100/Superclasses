@@ -11,7 +11,6 @@ use LogicException;
  */
 class TypeException extends LogicException
 {
-
     /**
      * Constructor.
      *
