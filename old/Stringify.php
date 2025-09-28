@@ -2,9 +2,6 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses\Strings;
-
-use Stringable;
 
 /**
  * This class provides JSON-like encoding with a few differences:

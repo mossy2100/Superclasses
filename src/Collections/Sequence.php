@@ -189,33 +189,70 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      * NB: This is a mutating method.
      *
      * @param mixed ...$items The items to add to the sequence.
+     * @return $this The sequence instance.
      *
      * @example
      * $sequence->append($item);
      * $sequence->append($item1, $item2, $item3);
      * $sequence->append(...$items);
      */
-    public function append(mixed ...$items): void
+    public function append(mixed ...$items): static
     {
         // Loop instead of using array_push() to avoid array copy.
         foreach ($items as $item) {
             $this->items[] = $item;
         }
+
+        // Return this for chaining.
+        return $this;
     }
 
     /**
      * Add one or more items to the start of the sequence.
      *
+     * NB: This is a mutating method.
+     *
      * @param mixed ...$items The items to add to the sequence.
+     * @return $this The sequence instance.
      *
      * @example
      * $sequence->prepend($item);
      * $sequence->prepend($item1, $item2, $item3);
      * $sequence->prepend(...$items);
      */
-    public function prepend(mixed ...$items): void
+    public function prepend(mixed ...$items): static
     {
+        // Insert an element at the start of the sequence.
         array_unshift($this->items, ...$items);
+
+        // Return this for chaining.
+        return $this;
+    }
+
+    /**
+     * Insert an item at the specified position. Later items will be shifted right.
+     *
+     * NB: This is a mutating method.
+     *
+     * @param int $index The zero-based index position to insert the item at.
+     * @param mixed $item The item to insert.
+     * @return $this The sequence instance.
+     */
+    public function insert(int $index, mixed $item): static {
+        // Ensure the index is valid.
+        $this->checkIndex($index);
+
+        // Shift elements after $index right by 1.
+        $max = count($this->items);
+        for ($i = $max; $i > $index; $i--) {
+            $this->items[$i] = $this->items[$i - 1];
+        }
+
+        // Set the new value of the item at position $index.
+        $this->items[$index] = $item;
+
+        // Return this for chaining.
+        return $this;
     }
 
     // endregion
@@ -228,6 +265,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      *
      * The indices of items at higher indices than the one specified by $index will be reduced by 1, i.e. shifted down,
      * and the sequence length will be reduced by 1.
+     *
+     * NB: This is a mutating method.
      *
      * @param int $index The zero-based index position of the item to remove.
      * @return mixed The removed value.
@@ -250,8 +289,9 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * Remove all items matching a given value.
-     * Strict equality is used to find matching values.
+     * Remove all items matching a given value. Strict equality is used to find matching values.
+     *
+     * NB: This is a mutating method.
      *
      * @param mixed $value The value to remove.
      * @return int The number of items removed.
@@ -274,6 +314,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
     /**
      * Remove the first item from the sequence.
      *
+     * NB: This is a mutating method.
+     *
      * @return mixed The removed item.
      * @throws UnderflowException If the sequence is empty.
      */
@@ -290,6 +332,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Remove the last item from the sequence.
+     *
+     * NB: This is a mutating method.
      *
      * @return mixed The removed item.
      * @throws UnderflowException If the sequence is empty.
@@ -615,6 +659,8 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Randomly choose one or more items from the sequence.
+     * Both keys and values are returned, as an array.
+     *
      * NB: This method is non-mutating.
      *
      * @param int $count The number of items to choose (default: 1).
@@ -654,6 +700,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * Randomly remove one or more items from the sequence.
+     *
      * NB: This method is mutating.
      *
      * @param int $count The number of items to remove (default: 1).

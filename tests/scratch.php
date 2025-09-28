@@ -2,8 +2,6 @@
 
 namespace Superclasses\Tests;
 
-use Superclasses\Strings\Stringify;
-
 require_once __DIR__ . '/../src/Strings/Stringify.php';
 
 //echo fdiv(1, -0.0);

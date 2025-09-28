@@ -150,7 +150,7 @@ class Matrix
      * @return Matrix New matrix representing the difference
      * @throws InvalidArgumentException If matrices have different dimensions
      */
-    public function subtract(Matrix $other): Matrix
+    public function sub(Matrix $other): Matrix
     {
         if ($this->rows !== $other->rows || $this->cols !== $other->cols) {
             throw new InvalidArgumentException("Matrices must have the same dimensions for subtraction");
@@ -172,7 +172,7 @@ class Matrix
      * @return Matrix New matrix representing the product
      * @throws InvalidArgumentException If matrices cannot be multiplied
      */
-    public function multiply(Matrix $other): Matrix
+    public function mul(Matrix $other): Matrix
     {
         if ($this->cols !== $other->rows) {
             throw new InvalidArgumentException("Matrix A columns must equal Matrix B rows for multiplication");
@@ -198,9 +198,9 @@ class Matrix
      * @return Matrix New matrix representing the quotient
      * @throws InvalidArgumentException If division is not possible
      */
-    public function divide(Matrix $other): Matrix
+    public function div(Matrix $other): Matrix
     {
-        return $this->multiply($other->inverse());
+        return $this->mul($other->inv());
     }
 
     /**
@@ -225,13 +225,13 @@ class Matrix
      * @return float The determinant
      * @throws DomainException If matrix is not square
      */
-    public function determinant(): float
+    public function det(): float
     {
         if ($this->rows !== $this->cols) {
             throw new DomainException("Determinant can only be calculated for square matrices");
         }
 
-        return $this->calculateDeterminant($this->data);
+        return $this->calcDet($this->data);
     }
 
     /**
@@ -240,7 +240,7 @@ class Matrix
      * @param array $matrix Matrix data
      * @return float
      */
-    private function calculateDeterminant(array $matrix): float
+    private function calcDet(array $matrix): float
     {
         $n = count($matrix);
 
@@ -265,7 +265,7 @@ class Matrix
                 $submatrix[] = $row;
             }
 
-            $cofactor = ($j % 2 === 0 ? 1 : -1) * $matrix[0][$j] * $this->calculateDeterminant($submatrix);
+            $cofactor = ($j % 2 === 0 ? 1 : -1) * $matrix[0][$j] * $this->calcDet($submatrix);
             $det += $cofactor;
         }
 
@@ -278,13 +278,13 @@ class Matrix
      * @return Matrix New matrix representing the inverse
      * @throws DomainException If matrix is not square or not invertible
      */
-    public function inverse(): Matrix
+    public function inv(): Matrix
     {
         if ($this->rows !== $this->cols) {
             throw new DomainException("Inverse can only be calculated for square matrices");
         }
 
-        $det = $this->determinant();
+        $det = $this->det();
         if (abs($det) < 1e-10) {
             throw new DomainException("Matrix is not invertible (determinant is zero)");
         }
@@ -295,7 +295,7 @@ class Matrix
         for ($i = 0; $i < $n; $i++) {
             for ($j = 0; $j < $n; $j++) {
                 $minor = $this->getMinor($i, $j);
-                $cofactor = (($i + $j) % 2 === 0 ? 1 : -1) * $this->calculateDeterminant($minor);
+                $cofactor = (($i + $j) % 2 === 0 ? 1 : -1) * $this->calcDet($minor);
                 $adjugate->data[$j][$i] = $cofactor / $det; // Note: transposed
             }
         }
@@ -346,7 +346,7 @@ class Matrix
         }
 
         if ($power < 0) {
-            return $this->inverse()->pow(-$power);
+            return $this->inv()->pow(-$power);
         }
 
         $result = $this->identity($this->rows);
@@ -354,9 +354,9 @@ class Matrix
 
         while ($power > 0) {
             if ($power % 2 === 1) {
-                $result = $result->multiply($base);
+                $result = $result->mul($base);
             }
-            $base = $base->multiply($base);
+            $base = $base->mul($base);
             $power = intval($power / 2);
         }
 

@@ -12,7 +12,7 @@ use UnexpectedValueException;
 class Angle
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Constants
+    // region Constants
 
     // Define τ = 2π.
     public const float TAU = 2 * M_PI;
@@ -38,8 +38,10 @@ class Angle
     public const float RAD_EPSILON = 1e-9;
     public const float TRIG_EPSILON = 1e-12;
 
+    // endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // State
+    // region Properties
 
     /**
      * Internal storage in radians.
@@ -47,6 +49,11 @@ class Angle
      * @var float
      */
     private float $_radians;
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Constructor
 
     /**
      * Private constructor to enforce factory usage.
@@ -58,8 +65,10 @@ class Angle
         $this->_radians = $radians;
     }
 
+    // endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Factory methods
+    // region Factory methods
 
     /**
      * Create an angle from radians.
@@ -127,8 +136,10 @@ class Angle
         return new self($turns * self::RADIANS_PER_TURN);
     }
 
+    // endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Methods for getting the angle in different units
+    // region Methods for getting the angle in different units
 
     /**
      * Get the angle in radians.
@@ -278,8 +289,10 @@ class Angle
         return $this->_radians / self::RADIANS_PER_TURN;
     }
 
+    // endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Arithmetic instance methods
+    // region Arithmetic methods
 
     /**
      * Add another angle to this angle.
@@ -340,8 +353,10 @@ class Angle
         return new self(abs($this->_radians));
     }
 
+    // endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Comparison methods
+    // region Comparison methods
 
     /**
      * Compare this angle to another within a tolerance.
@@ -387,8 +402,10 @@ class Angle
         return $this->compare($other, $eps) === 0;
     }
 
+    // endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Trigonometric instance methods
+    // region Trigonometry methods
 
     /**
      * Static helper method to get the inverse of a value.
@@ -539,8 +556,10 @@ class Angle
         return self::_inverse(tanh($this->_radians));
     }
 
+    // endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Wrap methods
+    // region Wrap methods
 
     /**
      * Normalize an angle to a specified range.
@@ -646,8 +665,10 @@ class Angle
         return self::_wrapScalar($gradians, self::GRADIANS_PER_TURN, $signed);
     }
 
+    // endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // String-related methods
+    // region String-related methods
 
     /**
      * Format a float with an optional number of decimal places.
@@ -845,8 +866,10 @@ class Angle
         }
     }
 
+    // endregion
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Stringable implementation
+    // region Stringable implementation
 
     /**
      * Return the angle as a string, showing the units in radians using CSS notation.
@@ -857,4 +880,6 @@ class Angle
     {
         return $this->format();
     }
+
+    // endregion
 }

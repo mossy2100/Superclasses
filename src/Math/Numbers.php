@@ -97,25 +97,6 @@ class Numbers
     }
 
     /**
-     * Get the sign of a number.
-     *
-     * NB: This method does not return 0 for 0 (which is neither negative nor positive), which might be a surprise.
-     * Its main use case is for multiplying with a result so the result has the right sign.
-     *
-     * @param float $value The number.
-     * @return int -1 if negative or -0.0, 1 if positive or 0.0.
-     */
-    public static function sign(float $value): int
-    {
-        // Guard. This method is only valid for numbers.
-        if (is_nan($value)) {
-            throw new UnexpectedValueException("NaN is not allowed.");
-        }
-
-        return self::isNegative($value) ? -1 : 1;
-    }
-
-    /**
      * Copy the sign of one number to another.
      *
      * @param float $num The number to copy the sign to.
@@ -129,6 +110,7 @@ class Numbers
             throw new UnexpectedValueException("NaN is not allowed for either parameter.");
         }
 
-        return abs($num) * self::sign($sign_source);
+        $sign = self::isNegative($sign_source) ? -1 : 1;
+        return abs($num) * $sign;
     }
 }

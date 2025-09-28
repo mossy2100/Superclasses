@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Superclasses\Math;
 
 use Stringable;
+use ArrayAccess;
 use ArithmeticError;
 use DivisionByZeroError;
 use InvalidArgumentException;
@@ -12,7 +13,7 @@ use InvalidArgumentException;
 /**
  * TODO Complete tests.
  */
-class Complex implements Stringable
+class Complex implements Stringable, ArrayAccess
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // region Properties
@@ -544,6 +545,16 @@ class Complex implements Stringable
                abs($this->imag - $other->imag) < $epsilon;
     }
 
+    /**
+     * Check if this complex number is the same as another.
+     *
+     * @param Complex $other The complex number to compare with.
+     * @return bool True if the numbers are equal, otherwise false.
+     */
+    public function same(Complex $other): bool {
+        return $this === $other;
+    }
+
     // endregion
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -724,4 +735,84 @@ class Complex implements Stringable
     }
 
     // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region ArrayAccess implementation
+
+    /**
+     * Check if the complex number has a given offset. Only 0 and 1 are valid offsets.
+     *
+     * @param mixed $offset The offset to check.
+     * @return bool True if the offset exists, false otherwise.
+     */
+    public function offsetExists(mixed $offset): bool
+    {
+        return $offset === 0 || $offset === 1;
+    }
+
+    /**
+     * Get the value of the complex number at the given offset. Only 0 and 1 are valid offsets.
+     *
+     * @param mixed $offset The offset to retrieve.
+     * @return int|float The value at the given offset.
+     * @throws InvalidArgumentException If the offset is invalid.
+     */
+    public function offsetGet(mixed $offset): int|float
+    {
+        // Guard.
+        if (!$this->offsetExists($offset)) {
+            throw new InvalidArgumentException("Invalid offset: $offset");
+        }
+
+        // Return the appropriate value.
+        return $offset === 0 ? $this->real : $this->imag;
+    }
+
+    /**
+     * Set the value of the complex number at the given offset. Only 0 and 1 are valid offsets.
+     *
+     * @param mixed $offset The offset to set.
+     * @param mixed $value The value to set.
+     * @throws InvalidArgumentException If the offset is invalid.
+     * @return void
+     */
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        // Guard.
+        if (!$this->offsetExists($offset)) {
+            throw new InvalidArgumentException("Invalid offset: $offset");
+        }
+
+        // Set the value.
+        if ($offset === 0) {
+            $this->real = $value;
+        }
+        else {
+            $this->imag = $value;
+        }
+    }
+
+    /**
+     * Unset the value of the complex number at the given offset. Only 0 and 1 are valid offsets.
+     * In this context, unsetting means setting the value to 0, not null, and not removing the offset.
+     *
+     * @param mixed $offset The offset to unset.
+     * @throws InvalidArgumentException If the offset is invalid.
+     * @return void
+     */
+    public function offsetUnset(mixed $offset): void
+    {
+        // Guard.
+        if (!$this->offsetExists($offset)) {
+            throw new InvalidArgumentException("Invalid offset: $offset");
+        }
+
+        // Unset the value.
+        if ($offset === 0) {
+            $this->real = 0;
+        }
+        else {
+            $this->imag = 0;
+        }
+    }
 }

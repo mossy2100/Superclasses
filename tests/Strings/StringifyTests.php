@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace Superclasses\Tests\Strings;
 
-use stdClass;
 use DateTime;
-use Superclasses\Strings\Stringify;
+use stdClass;
+use Stringify;
 use Superclasses\Collections\Dictionary;
 use Superclasses\Collections\Set;
 
