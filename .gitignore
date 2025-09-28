@@ -1,4 +1,5 @@
 /build/
 /vendor/
+/old/
 .phpunit.result.cache
 .idea/

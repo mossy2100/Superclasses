@@ -2,11 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses\Tests\Strings;
 
-use DateTime;
-use stdClass;
-use Stringify;
 use Superclasses\Collections\Dictionary;
 use Superclasses\Collections\Set;
 
