@@ -28,7 +28,7 @@ class TypeException extends LogicException
      *
      * @param string $param_name The name of the parameter that failed validation, e.g. 'index'.
      * @param string $expected_type The expected type (e.g., 'int', 'string', 'callable').
-     * @param mixed $param_value The actual value that was provided (optional, for debugging).
+     * @param mixed $param_value The actual value that was provided (optional).
      */
     public static function create(string $param_name, string $expected_type, mixed $param_value = null): self
     {

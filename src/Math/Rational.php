@@ -60,7 +60,10 @@ class Rational implements Stringable
 
     /**
      * Create a rational number from a float using continued fractions.
-     * This finds the rational with the smallest denominator that equals the float.
+     * This finds the rational with the smallest denominator that equals the provided float.
+     * If an exact match is not found, the method will return the closest approximation with a denominator less than
+     * or equal to $max_den. This is likely to be a more useful result than an exception, and limits the time spent
+     * in the method.
      *
      * @param float $value The float value.
      * @param int $max_den Maximum allowed denominator (default: 1000000).
@@ -84,7 +87,7 @@ class Rational implements Stringable
         }
 
         // Handle negative numbers.
-        $sign = $value < 0 ? -1 : 1;
+        $sign = Numbers::sign($value, false);
         $value = abs($value);
 
         // Initialize convergents.
@@ -110,15 +113,14 @@ class Rational implements Stringable
             $h_new = $a * $h0 + $h1;
             $k_new = $a * $k0 + $k1;
 
-            // Check if denominator exceeds limit.
+            // If denominator exceeds limit, return the best approximation found so far.
             if ($k_new > $max_den) {
-                // Return the best approximation found so far.
                 return new self($sign * $h_best, $k_best);
             }
 
-            // Check if we've found an exact representation (or close enough).
+            // Check if we've found an exact representation.
             $error = abs($h_new / $k_new - $value);
-            if ($error < PHP_FLOAT_EPSILON) {
+            if ($error == 0) {
                 return new self($sign * $h_new, $k_new);
             }
 
@@ -135,17 +137,17 @@ class Rational implements Stringable
             $k1 = $k0;
             $k0 = $k_new;
 
-            // Calculate remainder and continue.
+            // Calculate remainder.
             $rem = $x - $a;
-            if ($rem < PHP_FLOAT_EPSILON) {
-                break;
+
+            // If the remainder is 0, we're done.
+            if ($rem == 0) {
+                return new self($sign * $h0, $k0);
             }
 
             // Calculate next approximation.
             $x = 1.0 / $rem;
         }
-
-        return new self($sign * $h0, $k0);
     }
 
     /**
@@ -167,8 +169,8 @@ class Rational implements Stringable
         if (count($parts) === 2) {
             $num_str = trim($parts[0]);
             $den_str = trim($parts[1]);
-            $num_is_int = self::tryParseInt($num_str, $num);
-            $den_is_int = self::tryParseInt($den_str, $den);
+            $num_is_int = Numbers::tryParseInt($num_str, $num);
+            $den_is_int = Numbers::tryParseInt($den_str, $den);
             if ($num_is_int && $den_is_int) {
                 return new self($num, $den);
             }
@@ -227,11 +229,10 @@ class Rational implements Stringable
         $other = self::toRational($other);
 
         // (a/b) + (c/d) = (ad + bc) / (bd)
-
-        $f = self::mulInts($this->num, $other->den);
-        $g = self::mulInts($this->den, $other->num);
-        $h = self::addInts($f, $g);
-        $k = self::mulInts($this->den, $other->den);
+        $f = Numbers::multiplyIntegers($this->num, $other->den);
+        $g = Numbers::multiplyIntegers($this->den, $other->num);
+        $h = Numbers::addIntegers($f, $g);
+        $k = Numbers::multiplyIntegers($this->den, $other->den);
 
         return new self($h, $k);
     }
@@ -275,8 +276,8 @@ class Rational implements Stringable
         // Cross-cancel before multiplying: (a/b) * (c/d)
         // Cancel gcd(a,d) from a and d
         // Cancel gcd(b,c) from b and c
-        $gcd1 = self::gcd(abs($this->num), abs($other->den));
-        $gcd2 = self::gcd(abs($this->den), abs($other->num));
+        $gcd1 = Numbers::gcd(abs($this->num), abs($other->den));
+        $gcd2 = Numbers::gcd(abs($this->den), abs($other->num));
 
         $a = intdiv($this->num, $gcd1);
         $b = intdiv($this->den, $gcd2);
@@ -284,8 +285,8 @@ class Rational implements Stringable
         $d = intdiv($other->den, $gcd1);
 
         // Now multiply the reduced terms: (a/b) * (c/d) = ac/bd
-        $h = self::mulInts($a, $c);
-        $k = self::mulInts($b, $d);
+        $h = Numbers::multiplyIntegers($a, $c);
+        $k = Numbers::multiplyIntegers($b, $d);
 
         return new self($h, $k);
     }
@@ -360,8 +361,8 @@ class Rational implements Stringable
 
         try {
             // Cross multiply: compare a*d with b*c for a/b vs c/d.
-            $left = self::mulInts($this->num, $other->den);
-            $right = self::mulInts($this->den, $other->num);
+            $left = Numbers::multiplyIntegers($this->num, $other->den);
+            $right = Numbers::multiplyIntegers($this->den, $other->num);
         }
         catch (OverflowException) {
             // In case of overflow, compare equivalent floating point values.
@@ -434,39 +435,6 @@ class Rational implements Stringable
     // region Helper methods (private static)
 
     /**
-     * Try to convert a string to an equivalent integer.
-     *
-     * This method is stricter than PHP's built-in intval() function or (int) cast. The string must look exactly like
-     * an integer, meaning digits only, and the string represent a valid integer for the machine where the code is
-     * running (32-bit or 64-bit).
-     *
-     * @param string $s The string to convert.
-     * @param int|null $i The converted integer, if successful, or null otherwise.
-     * @return bool True if the conversion was successful, false otherwise.
-     */
-    private static function tryParseInt(string $s, ?int &$i): bool
-    {
-        $i = (int)$s;
-        $ok = $s === (string)$i;
-        if (!$ok) {
-            $i = null;
-        }
-        return $ok;
-    }
-
-    /**
-     * Calculate the greatest common divisor of two numbers.
-     *
-     * @param int $a The first number.
-     * @param int $b The second number.
-     * @return int The greatest common divisor.
-     */
-    private static function gcd(int $a, int $b): int
-    {
-        return $b === 0 ? $a : self::gcd($b, $a % $b);
-    }
-
-    /**
      * Reduce a fraction and ensure the denominator is positive.
      *
      * @param int $num The numerator.
@@ -481,7 +449,7 @@ class Rational implements Stringable
         }
 
         // Calculate the GCD.
-        $gcd = self::gcd(abs($num), abs($den));
+        $gcd = Numbers::gcd(abs($num), abs($den));
 
         // Reduce the fraction if necessary.
         if ($gcd > 1) {
@@ -519,71 +487,6 @@ class Rational implements Stringable
 
         // Convert float to Rational.
         return self::fromFloat($value);
-    }
-
-    /**
-     * Add two integers with overflow check.
-     *
-     * @param int $x The first integer.
-     * @param int $y The second integer.
-     * @return int The added integers.
-     */
-    private static function addInts(int $x, int $y): int {
-        $ex = new OverflowException("Overflow in addition.");
-
-        // Check for positive overflow.
-        if ($y > 0 && $x > PHP_INT_MAX - $y) {
-            throw $ex;
-        }
-
-        // Check for negative overflow.
-        if ($y < 0 && $x < PHP_INT_MIN - $y) {
-            throw $ex;
-        }
-
-        // No overflow.
-        return $x + $y;
-    }
-
-    /**
-     * Multiply two integers with overflow check.
-     *
-     * @param int $x The first integer.
-     * @param int $y The second integer.
-     * @return int The multiplied integers.
-     */
-    private static function mulInts(int $x, int $y): int {
-        // Quick exits for safe cases.
-        if ($x === 0 || $y === 0 || abs($x) === 1 || abs($y) === 1) {
-            return $x * $y;
-        }
-
-        $max = PHP_INT_MAX;
-        $min = PHP_INT_MIN;
-        $ex = new OverflowException("Overflow in multiplication.");
-
-        // Check for positive overflow (positive * positive).
-        if ($x > 0 && $y > 0 && $x > $max / $y) {
-            throw $ex;
-        }
-
-        // Check for positive overflow (negative * negative).
-        if ($x < 0 && $y < 0 && $x < $max / $y) {
-            throw $ex;
-        }
-
-        // Check for negative overflow (positive * negative).
-        if ($x > 0 && $y < 0 && $y < $min / $x) {
-            throw $ex;
-        }
-
-        // Check for negative overflow (negative * positive).
-        if ($x < 0 && $y > 0 && $x < $min / $y) {
-            throw $ex;
-        }
-
-        // No overflow.
-        return $x * $y;
     }
 
     /**

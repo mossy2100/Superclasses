@@ -5,13 +5,16 @@ declare(strict_types = 1);
 namespace Superclasses\Math;
 
 use UnexpectedValueException;
+use OverflowException;
 
 class Numbers
 {
     /**
      * Private constructor to prevent instantiation.
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
      * Check if a value is a number, i.e. an integer or a float.
@@ -49,7 +52,8 @@ class Numbers
      * @param float $x The floating-point number to check.
      * @return bool True if the value is negative zero (-0.0), false otherwise.
      */
-    public static function isNegativeZero(float $x): bool {
+    public static function isNegativeZero(float $x): bool
+    {
         // Using fdiv() to avoid a division by zero error.
         return $x == 0.0 && fdiv(1.0, $x) === -INF;
     }
@@ -67,7 +71,8 @@ class Numbers
      * @param float $x The floating-point number to check.
      * @return bool True if the value is positive zero (+0.0), false otherwise.
      */
-    public static function isPositiveZero(float $x): bool {
+    public static function isPositiveZero(float $x): bool
+    {
         // Using fdiv() to avoid a division by zero error.
         return $x == 0.0 && fdiv(1.0, $x) === INF;
     }
@@ -80,7 +85,8 @@ class Numbers
      * @param float $value The value to check.
      * @return bool True if the value is negative, false otherwise.
      */
-    public static function isNegative(float $value): bool {
+    public static function isNegative(float $value): bool
+    {
         return !is_nan($value) && ($value < 0 || self::isNegativeZero($value));
     }
 
@@ -92,8 +98,32 @@ class Numbers
      * @param float $value The value to check.
      * @return bool True if the value is positive, false otherwise.
      */
-    public static function isPositive(float $value): bool {
+    public static function isPositive(float $value): bool
+    {
         return !is_nan($value) && ($value > 0 || self::isPositiveZero($value));
+    }
+
+    /**
+     * Sign function.
+     *
+     * @param int|float $value The number whose sign to check.
+     * @param bool $zeroForZero If true (default), returns 0 for zero; otherwise, return the sign of the zero.
+     * @return int 1 if the number is positive, -1 if negative, and 0, 1, or -1 (depending on second argument) if 0.
+     */
+    public static function sign(int|float $value, bool $zeroForZero = true): int
+    {
+        // Check for positive.
+        if ($value > 0) {
+            return 1;
+        }
+
+        // Check for negative.
+        if ($value < 0) {
+            return -1;
+        }
+
+        // Return result for 0.
+        return $zeroForZero ? 0 : (is_float($value) && self::isNegativeZero($value) ? -1 : 1);
     }
 
     /**
@@ -110,7 +140,88 @@ class Numbers
             throw new UnexpectedValueException("NaN is not allowed for either parameter.");
         }
 
-        $sign = self::isNegative($sign_source) ? -1 : 1;
-        return abs($num) * $sign;
+        return abs($num) * self::sign($sign_source, false);
+    }
+
+    /**
+     * Add two integers with overflow check.
+     *
+     * @param int $a The first integer.
+     * @param int $b The second integer.
+     * @return int The added integers.
+     * @throws OverflowException If the addition results in overflow.
+     */
+    public static function addIntegers(int $a, int $b): int
+    {
+        // Add the two integers.
+        $c = $a + $b;
+
+        // Check for overflow.
+        if (is_float($c)) {
+            throw new OverflowException("Overflow in addition.");
+        }
+
+        // Return the result.
+        return $c;
+    }
+
+    /**
+     * Multiply two integers with overflow check.
+     *
+     * @param int $a The first integer.
+     * @param int $b The second integer.
+     * @return int The multiplied integers.
+     * @throws OverflowException If the multiplication results in overflow.
+     */
+    public static function multiplyIntegers(int $a, int $b): int
+    {
+        // Multiply the two integers.
+        $c = $a * $b;
+
+        // Check for overflow.
+        if (is_float($c)) {
+            throw new OverflowException("Overflow in multiplication.");
+        }
+
+        // Return the result.
+        return $c;
+    }
+
+    /**
+     * Try to convert a string to an equivalent integer.
+     *
+     * This method is stricter than PHP's built-in intval() function or (int) cast. The string must look exactly like
+     * an integer, meaning digits only, and the string represent a valid integer for the current environment
+     * (i.e. in the range PHP_MIN_INT..PHP_MAX_INT).
+     *
+     * @param string $s The string to convert.
+     * @param int|null $i The converted integer, if successful, or null otherwise.
+     * @return bool True if the conversion was successful, false otherwise.
+     */
+    public static function tryParseInt(string $s, ?int &$i): bool
+    {
+        // Convert the string to an integer.
+        $j = (int)$s;
+
+        // Convert back to a string to confirm the string is a valid integer.
+        $ok = $s === (string)$j;
+
+        // Set the return value.
+        $i = $ok ? $j : null;
+
+        // Return the result.
+        return $ok;
+    }
+
+    /**
+     * Calculate the greatest common divisor of two integers.
+     *
+     * @param int $a The first integer.
+     * @param int $b The second integer.
+     * @return int The greatest common divisor.
+     */
+    public static function gcd(int $a, int $b): int
+    {
+        return $b === 0 ? $a : self::gcd($b, $a % $b);
     }
 }

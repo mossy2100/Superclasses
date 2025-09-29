@@ -99,6 +99,7 @@ class Matrix
         if ($row < 0 || $row >= $this->rows || $col < 0 || $col >= $this->cols) {
             throw new InvalidArgumentException("Matrix indices out of bounds");
         }
+
         return $this->data[$row][$col];
     }
 
@@ -208,7 +209,7 @@ class Matrix
      *
      * @return Matrix New matrix representing the transpose
      */
-    public function transpose(): Matrix
+    public function T(): Matrix
     {
         $result = new Matrix($this->cols, $this->rows);
         for ($i = 0; $i < $this->rows; $i++) {
@@ -281,12 +282,12 @@ class Matrix
     public function inv(): Matrix
     {
         if ($this->rows !== $this->cols) {
-            throw new DomainException("Inverse can only be calculated for square matrices");
+            throw new DomainException("Inverse can only be calculated for square matrices.");
         }
 
         $det = $this->det();
         if (abs($det) < 1e-10) {
-            throw new DomainException("Matrix is not invertible (determinant is zero)");
+            throw new DomainException("Matrix is not invertible (determinant is zero).");
         }
 
         $n = $this->rows;
@@ -306,18 +307,18 @@ class Matrix
     /**
      * Get the minor matrix by removing specified row and column.
      *
-     * @param int $excludeRow Row to exclude
-     * @param int $excludeCol Column to exclude
+     * @param int $exclude_row Row to exclude
+     * @param int $exclude_col Column to exclude
      * @return array
      */
-    private function getMinor(int $excludeRow, int $excludeCol): array
+    private function getMinor(int $exclude_row, int $exclude_col): array
     {
         $minor = [];
         for ($i = 0; $i < $this->rows; $i++) {
-            if ($i !== $excludeRow) {
+            if ($i !== $exclude_row) {
                 $row = [];
                 for ($j = 0; $j < $this->cols; $j++) {
-                    if ($j !== $excludeCol) {
+                    if ($j !== $exclude_col) {
                         $row[] = $this->data[$i][$j];
                     }
                 }
@@ -369,7 +370,7 @@ class Matrix
      * @param int $size Size of the identity matrix
      * @return Matrix Identity matrix
      */
-    public function identity(int $size): Matrix
+    public static function identity(int $size): Matrix
     {
         $result = new Matrix($size, $size);
         for ($i = 0; $i < $size; $i++) {
