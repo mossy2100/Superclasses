@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for C:\Users\shaun\OneDrive\Projects\PHP\Superclasses\src</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="_css/bootstrap.min.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="_css/nv.d3.min.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="_css/style.css?v=10.1.16" rel="stylesheet" type="text/css">
+  <link href="_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="index.html">C:\Users\shaun\OneDrive\Projects\PHP\Superclasses\src</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Collections/Dictionary.php.html#25">Superclasses\Collections\Dictionary</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/DictionaryOf.php.html#21">Superclasses\Collections\DictionaryOf</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/KeyValuePair.php.html#7">Superclasses\Collections\KeyValuePair</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#24">Superclasses\Collections\Sequence</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#84">Superclasses\Collections\SequenceOf</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#18">Superclasses\Collections\Set</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SetOf.php.html#15">Superclasses\Collections\SetOf</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#20">Superclasses\Color</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Exceptions/TypeException.php.html#12">Superclasses\Exceptions\TypeException</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#12">Superclasses\Math\Angle</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#10">Superclasses\Math\Matrix</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#9">Superclasses\Math\Numbers</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Rational.php.html#9">Superclasses\Math\Rational</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Stringify.php.html#20">Superclasses\Strings\Stringify</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Text.php.html#15">Superclasses\Text</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/Type.php.html#9">Superclasses\Types\Type</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#11">Superclasses\Types\TypeSet</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#16">Superclasses\Math\Complex</a></td><td class="text-right">18%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Math/Angle.php.html#12">Superclasses\Math\Angle</a></td><td class="text-right">9702</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#10">Superclasses\Math\Matrix</a></td><td class="text-right">9120</td></tr>
+       <tr><td><a href="Color.php.html#20">Superclasses\Color</a></td><td class="text-right">5256</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#24">Superclasses\Collections\Sequence</a></td><td class="text-right">4422</td></tr>
+       <tr><td><a href="Math/Complex.php.html#16">Superclasses\Math\Complex</a></td><td class="text-right">4120</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#11">Superclasses\Types\TypeSet</a></td><td class="text-right">2970</td></tr>
+       <tr><td><a href="Collections/Set.php.html#18">Superclasses\Collections\Set</a></td><td class="text-right">2256</td></tr>
+       <tr><td><a href="Math/Rational.php.html#9">Superclasses\Math\Rational</a></td><td class="text-right">870</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#84">Superclasses\Collections\SequenceOf</a></td><td class="text-right">650</td></tr>
+       <tr><td><a href="Strings/Stringify.php.html#20">Superclasses\Strings\Stringify</a></td><td class="text-right">650</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#9">Superclasses\Math\Numbers</a></td><td class="text-right">462</td></tr>
+       <tr><td><a href="Types/Type.php.html#9">Superclasses\Types\Type</a></td><td class="text-right">462</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#25">Superclasses\Collections\Dictionary</a></td><td class="text-right">420</td></tr>
+       <tr><td><a href="Strings/Text.php.html#15">Superclasses\Text</a></td><td class="text-right">306</td></tr>
+       <tr><td><a href="Collections/SetOf.php.html#15">Superclasses\Collections\SetOf</a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="Collections/DictionaryOf.php.html#21">Superclasses\Collections\DictionaryOf</a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Exceptions/TypeException.php.html#12">Superclasses\Exceptions\TypeException</a></td><td class="text-right">12</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Collections/Dictionary.php.html#37"><abbr title="Superclasses\Collections\Dictionary::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#47"><abbr title="Superclasses\Collections\Dictionary::fromIterable">fromIterable</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#64"><abbr title="Superclasses\Collections\Dictionary::keys">keys</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#72"><abbr title="Superclasses\Collections\Dictionary::values">values</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#80"><abbr title="Superclasses\Collections\Dictionary::entries">entries</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#88"><abbr title="Superclasses\Collections\Dictionary::clear">clear</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#96"><abbr title="Superclasses\Collections\Dictionary::isEmpty">isEmpty</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#107"><abbr title="Superclasses\Collections\Dictionary::hasKey">hasKey</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#118"><abbr title="Superclasses\Collections\Dictionary::hasValue">hasValue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#137"><abbr title="Superclasses\Collections\Dictionary::offsetSet">offsetSet</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#158"><abbr title="Superclasses\Collections\Dictionary::offsetGet">offsetGet</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#179"><abbr title="Superclasses\Collections\Dictionary::offsetExists">offsetExists</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#191"><abbr title="Superclasses\Collections\Dictionary::offsetUnset">offsetUnset</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#214"><abbr title="Superclasses\Collections\Dictionary::count">count</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#228"><abbr title="Superclasses\Collections\Dictionary::getIterator">getIterator</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/DictionaryOf.php.html#45"><abbr title="Superclasses\Collections\DictionaryOf::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/DictionaryOf.php.html#63"><abbr title="Superclasses\Collections\DictionaryOf::fromIterable">fromIterable</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/DictionaryOf.php.html#94"><abbr title="Superclasses\Collections\DictionaryOf::checkKeyType">checkKeyType</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/DictionaryOf.php.html#107"><abbr title="Superclasses\Collections\DictionaryOf::checkValueType">checkValueType</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/DictionaryOf.php.html#131"><abbr title="Superclasses\Collections\DictionaryOf::offsetSet">offsetSet</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/KeyValuePair.php.html#9"><abbr title="Superclasses\Collections\KeyValuePair::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#57"><abbr title="Superclasses\Collections\Sequence::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#82"><abbr title="Superclasses\Collections\Sequence::checkIndex">checkIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#111"><abbr title="Superclasses\Collections\Sequence::first">first</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#122"><abbr title="Superclasses\Collections\Sequence::last">last</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#143"><abbr title="Superclasses\Collections\Sequence::slice">slice</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#161"><abbr title="Superclasses\Collections\Sequence::search">search</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#176"><abbr title="Superclasses\Collections\Sequence::find">find</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#199"><abbr title="Superclasses\Collections\Sequence::append">append</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#223"><abbr title="Superclasses\Collections\Sequence::prepend">prepend</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#241"><abbr title="Superclasses\Collections\Sequence::insert">insert</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#276"><abbr title="Superclasses\Collections\Sequence::remove">remove</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#299"><abbr title="Superclasses\Collections\Sequence::removeByValue">removeByValue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#322"><abbr title="Superclasses\Collections\Sequence::removeFirst">removeFirst</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#341"><abbr title="Superclasses\Collections\Sequence::removeLast">removeLast</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#355"><abbr title="Superclasses\Collections\Sequence::clear">clear</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#370"><abbr title="Superclasses\Collections\Sequence::isEmpty">isEmpty</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#381"><abbr title="Superclasses\Collections\Sequence::hasIndex">hasIndex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#393"><abbr title="Superclasses\Collections\Sequence::hasValue">hasValue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#407"><abbr title="Superclasses\Collections\Sequence::all">all</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#421"><abbr title="Superclasses\Collections\Sequence::any">any</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#440"><abbr title="Superclasses\Collections\Sequence::sort">sort</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#457"><abbr title="Superclasses\Collections\Sequence::sortReverse">sortReverse</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#474"><abbr title="Superclasses\Collections\Sequence::sortBy">sortBy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#497"><abbr title="Superclasses\Collections\Sequence::chunk">chunk</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#515"><abbr title="Superclasses\Collections\Sequence::countValues">countValues</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#539"><abbr title="Superclasses\Collections\Sequence::fill">fill</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#563"><abbr title="Superclasses\Collections\Sequence::filter">filter</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#578"><abbr title="Superclasses\Collections\Sequence::map">map</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#590"><abbr title="Superclasses\Collections\Sequence::merge">merge</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#601"><abbr title="Superclasses\Collections\Sequence::reverse">reverse</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#619"><abbr title="Superclasses\Collections\Sequence::reduce">reduce</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#629"><abbr title="Superclasses\Collections\Sequence::product">product</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#639"><abbr title="Superclasses\Collections\Sequence::sum">sum</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#650"><abbr title="Superclasses\Collections\Sequence::join">join</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#672"><abbr title="Superclasses\Collections\Sequence::chooseRand">chooseRand</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#712"><abbr title="Superclasses\Collections\Sequence::removeRand">removeRand</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#751"><abbr title="Superclasses\Collections\Sequence::offsetSet">offsetSet</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#785"><abbr title="Superclasses\Collections\Sequence::offsetGet">offsetGet</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#802"><abbr title="Superclasses\Collections\Sequence::offsetExists">offsetExists</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#827"><abbr title="Superclasses\Collections\Sequence::offsetUnset">offsetUnset</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#847"><abbr title="Superclasses\Collections\Sequence::count">count</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#863"><abbr title="Superclasses\Collections\Sequence::getIterator">getIterator</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#102"><abbr title="Superclasses\Collections\SequenceOf::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#159"><abbr title="Superclasses\Collections\SequenceOf::checkItemType">checkItemType</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#179"><abbr title="Superclasses\Collections\SequenceOf::append">append</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#204"><abbr title="Superclasses\Collections\SequenceOf::prepend">prepend</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#232"><abbr title="Superclasses\Collections\SequenceOf::slice">slice</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#250"><abbr title="Superclasses\Collections\SequenceOf::filter">filter</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#279"><abbr title="Superclasses\Collections\SequenceOf::offsetSet">offsetSet</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#300"><abbr title="Superclasses\Collections\SequenceOf::offsetUnset">offsetUnset</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#43"><abbr title="Superclasses\Collections\Set::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#55"><abbr title="Superclasses\Collections\Set::isItemAllowed">isItemAllowed</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#65"><abbr title="Superclasses\Collections\Set::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#79"><abbr title="Superclasses\Collections\Set::addOne">addOne</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#102"><abbr title="Superclasses\Collections\Set::addAll">addAll</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#122"><abbr title="Superclasses\Collections\Set::add">add</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#134"><abbr title="Superclasses\Collections\Set::removeOne">removeOne</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#145"><abbr title="Superclasses\Collections\Set::removeAll">removeAll</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#165"><abbr title="Superclasses\Collections\Set::remove">remove</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#175"><abbr title="Superclasses\Collections\Set::clear">clear</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#193"><abbr title="Superclasses\Collections\Set::union">union</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#210"><abbr title="Superclasses\Collections\Set::intersect">intersect</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#231"><abbr title="Superclasses\Collections\Set::diff">diff</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#257"><abbr title="Superclasses\Collections\Set::containsOne">containsOne</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#269"><abbr title="Superclasses\Collections\Set::containsAll">containsAll</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#289"><abbr title="Superclasses\Collections\Set::contains">contains</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#300"><abbr title="Superclasses\Collections\Set::containsAny">containsAny</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#316"><abbr title="Superclasses\Collections\Set::containsNone">containsNone</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#331"><abbr title="Superclasses\Collections\Set::isEmpty">isEmpty</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#342"><abbr title="Superclasses\Collections\Set::equals">equals</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#355"><abbr title="Superclasses\Collections\Set::subset">subset</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#366"><abbr title="Superclasses\Collections\Set::properSubset">properSubset</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#377"><abbr title="Superclasses\Collections\Set::superset">superset</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#388"><abbr title="Superclasses\Collections\Set::properSuperset">properSuperset</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#399"><abbr title="Superclasses\Collections\Set::disjoint">disjoint</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#412"><abbr title="Superclasses\Collections\Set::__toString">__toString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#425"><abbr title="Superclasses\Collections\Set::count">count</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/Set.php.html#438"><abbr title="Superclasses\Collections\Set::getIterator">getIterator</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SetOf.php.html#29"><abbr title="Superclasses\Collections\SetOf::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SetOf.php.html#41"><abbr title="Superclasses\Collections\SetOf::isItemAllowed">isItemAllowed</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SetOf.php.html#58"><abbr title="Superclasses\Collections\SetOf::union">union</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SetOf.php.html#82"><abbr title="Superclasses\Collections\SetOf::intersect">intersect</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Collections/SetOf.php.html#107"><abbr title="Superclasses\Collections\SetOf::diff">diff</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#228"><abbr title="Superclasses\Color::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#245"><abbr title="Superclasses\Color::fromRgba">fromRgba</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#271"><abbr title="Superclasses\Color::fromHsla">fromHsla</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#296"><abbr title="Superclasses\Color::toRgba">toRgba</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#315"><abbr title="Superclasses\Color::toHsla">toHsla</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#327"><abbr title="Superclasses\Color::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#352"><abbr title="Superclasses\Color::equals">equals</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#369"><abbr title="Superclasses\Color::gamma">gamma</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#383"><abbr title="Superclasses\Color::contrastRatio">contrastRatio</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#400"><abbr title="Superclasses\Color::bestTextColor">bestTextColor</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#418"><abbr title="Superclasses\Color::mix">mix</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#448"><abbr title="Superclasses\Color::complement">complement</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#462"><abbr title="Superclasses\Color::average">average</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#513"><abbr title="Superclasses\Color::_setRgbaBytes">_setRgbaBytes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#526"><abbr title="Superclasses\Color::_setRgbaBytesFromHsl">_setRgbaBytesFromHsl</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#540"><abbr title="Superclasses\Color::_getByte">_getByte</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#555"><abbr title="Superclasses\Color::_setByte">_setByte</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#575"><abbr title="Superclasses\Color::_angleToString">_angleToString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#586"><abbr title="Superclasses\Color::_fracToPercentString">_fracToPercentString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#597"><abbr title="Superclasses\Color::_byteToFracString">_byteToFracString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#610"><abbr title="Superclasses\Color::toHexString">toHexString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#634"><abbr title="Superclasses\Color::toRgbString">toRgbString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#644"><abbr title="Superclasses\Color::toRgbaString">toRgbaString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#655"><abbr title="Superclasses\Color::toHslString">toHslString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#669"><abbr title="Superclasses\Color::toHslaString">toHslaString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#687"><abbr title="Superclasses\Color::__toString">__toString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#712"><abbr title="Superclasses\Color::rgbToHsl">rgbToHsl</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#775"><abbr title="Superclasses\Color::hslToRgb">hslToRgb</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#810"><abbr title="Superclasses\Color::isValidHexString">isValidHexString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#842"><abbr title="Superclasses\Color::isValidColorName">isValidColorName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#854"><abbr title="Superclasses\Color::isValidColorString">isValidColorString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#867"><abbr title="Superclasses\Color::normalizeHex">normalizeHex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#899"><abbr title="Superclasses\Color::hexStringToBytes">hexStringToBytes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#931"><abbr title="Superclasses\Color::colorNameToHex">colorNameToHex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#952"><abbr title="Superclasses\Color::colorNameToBytes">colorNameToBytes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#966"><abbr title="Superclasses\Color::colorStringToBytes">colorStringToBytes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#990"><abbr title="Superclasses\Color::_clamp">_clamp</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#1002"><abbr title="Superclasses\Color::_validateByte">_validateByte</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#1016"><abbr title="Superclasses\Color::_validateFrac">_validateFrac</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#1030"><abbr title="Superclasses\Color::_byteToFrac">_byteToFrac</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Color.php.html#1042"><abbr title="Superclasses\Color::_fracToByte">_fracToByte</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Exceptions/TypeException.php.html#22"><abbr title="Superclasses\Exceptions\TypeException::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Exceptions/TypeException.php.html#34"><abbr title="Superclasses\Exceptions\TypeException::create">create</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#56"><abbr title="Superclasses\Math\Angle::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#70"><abbr title="Superclasses\Math\Angle::fromRadians">fromRadians</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#81"><abbr title="Superclasses\Math\Angle::fromDegrees">fromDegrees</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#101"><abbr title="Superclasses\Math\Angle::fromDMS">fromDMS</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#114"><abbr title="Superclasses\Math\Angle::fromGradians">fromGradians</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#125"><abbr title="Superclasses\Math\Angle::fromTurns">fromTurns</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#138"><abbr title="Superclasses\Math\Angle::toRadians">toRadians</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#148"><abbr title="Superclasses\Math\Angle::toDegrees">toDegrees</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#168"><abbr title="Superclasses\Math\Angle::toDMS">toDMS</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#266"><abbr title="Superclasses\Math\Angle::toGradians">toGradians</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#276"><abbr title="Superclasses\Math\Angle::toTurns">toTurns</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#290"><abbr title="Superclasses\Math\Angle::add">add</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#301"><abbr title="Superclasses\Math\Angle::sub">sub</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#312"><abbr title="Superclasses\Math\Angle::mul">mul</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#323"><abbr title="Superclasses\Math\Angle::div">div</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#338"><abbr title="Superclasses\Math\Angle::abs">abs</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#359"><abbr title="Superclasses\Math\Angle::compare">compare</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#385"><abbr title="Superclasses\Math\Angle::equals">equals</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#401"><abbr title="Superclasses\Math\Angle::_inverse">_inverse</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#417"><abbr title="Superclasses\Math\Angle::sin">sin</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#427"><abbr title="Superclasses\Math\Angle::cos">cos</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#437"><abbr title="Superclasses\Math\Angle::tan">tan</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#457"><abbr title="Superclasses\Math\Angle::sec">sec</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#467"><abbr title="Superclasses\Math\Angle::csc">csc</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#477"><abbr title="Superclasses\Math\Angle::cot">cot</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#487"><abbr title="Superclasses\Math\Angle::sinh">sinh</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#497"><abbr title="Superclasses\Math\Angle::cosh">cosh</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#507"><abbr title="Superclasses\Math\Angle::tanh">tanh</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#517"><abbr title="Superclasses\Math\Angle::sech">sech</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#527"><abbr title="Superclasses\Math\Angle::csch">csch</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#537"><abbr title="Superclasses\Math\Angle::coth">coth</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#555"><abbr title="Superclasses\Math\Angle::wrap">wrap</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#570"><abbr title="Superclasses\Math\Angle::wrapThis">wrapThis</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#587"><abbr title="Superclasses\Math\Angle::_wrapScalar">_wrapScalar</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#620"><abbr title="Superclasses\Math\Angle::wrapRadians">wrapRadians</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#632"><abbr title="Superclasses\Math\Angle::wrapDegrees">wrapDegrees</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#644"><abbr title="Superclasses\Math\Angle::wrapGradians">wrapGradians</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#660"><abbr title="Superclasses\Math\Angle::_formatFloat">_formatFloat</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#686"><abbr title="Superclasses\Math\Angle::_formatDMS">_formatDMS</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#737"><abbr title="Superclasses\Math\Angle::format">format</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#776"><abbr title="Superclasses\Math\Angle::fromString">fromString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#837"><abbr title="Superclasses\Math\Angle::tryParse">tryParse</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Angle.php.html#856"><abbr title="Superclasses\Math\Angle::__toString">__toString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#171"><abbr title="Superclasses\Math\Complex::add">add</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#186"><abbr title="Superclasses\Math\Complex::sub">sub</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#202"><abbr title="Superclasses\Math\Complex::mul">mul</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#223"><abbr title="Superclasses\Math\Complex::div">div</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#247"><abbr title="Superclasses\Math\Complex::conj">conj</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#263"><abbr title="Superclasses\Math\Complex::ln">ln</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#299"><abbr title="Superclasses\Math\Complex::log">log</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#341"><abbr title="Superclasses\Math\Complex::exp">exp</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#387"><abbr title="Superclasses\Math\Complex::pow">pow</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#449"><abbr title="Superclasses\Math\Complex::roots">roots</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#479"><abbr title="Superclasses\Math\Complex::sqr">sqr</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#490"><abbr title="Superclasses\Math\Complex::sqrt">sqrt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#500"><abbr title="Superclasses\Math\Complex::cube">cube</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#511"><abbr title="Superclasses\Math\Complex::cbrt">cbrt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#526"><abbr title="Superclasses\Math\Complex::isReal">isReal</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#538"><abbr title="Superclasses\Math\Complex::equals">equals</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#554"><abbr title="Superclasses\Math\Complex::same">same</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#568"><abbr title="Superclasses\Math\Complex::i">i</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#579"><abbr title="Superclasses\Math\Complex::toComplex">toComplex</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#591"><abbr title="Superclasses\Math\Complex::fromPolar">fromPolar</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#695"><abbr title="Superclasses\Math\Complex::__toString">__toString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#732"><abbr title="Superclasses\Math\Complex::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#748"><abbr title="Superclasses\Math\Complex::offsetExists">offsetExists</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#760"><abbr title="Superclasses\Math\Complex::offsetGet">offsetGet</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#779"><abbr title="Superclasses\Math\Complex::offsetSet">offsetSet</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Complex.php.html#803"><abbr title="Superclasses\Math\Complex::offsetUnset">offsetUnset</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#33"><abbr title="Superclasses\Math\Matrix::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#51"><abbr title="Superclasses\Math\Matrix::fromArray">fromArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#97"><abbr title="Superclasses\Math\Matrix::get">get</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#113"><abbr title="Superclasses\Math\Matrix::set">set</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#131"><abbr title="Superclasses\Math\Matrix::add">add</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#153"><abbr title="Superclasses\Math\Matrix::subtract">subtract</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#175"><abbr title="Superclasses\Math\Matrix::multiply">multiply</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#201"><abbr title="Superclasses\Math\Matrix::divide">divide</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#211"><abbr title="Superclasses\Math\Matrix::transpose">transpose</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#228"><abbr title="Superclasses\Math\Matrix::determinant">determinant</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#243"><abbr title="Superclasses\Math\Matrix::calculateDeterminant">calculateDeterminant</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#281"><abbr title="Superclasses\Math\Matrix::inverse">inverse</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#313"><abbr title="Superclasses\Math\Matrix::getMinor">getMinor</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#338"><abbr title="Superclasses\Math\Matrix::pow">pow</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#372"><abbr title="Superclasses\Math\Matrix::identity">identity</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#388"><abbr title="Superclasses\Math\Matrix::dot">dot</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#412"><abbr title="Superclasses\Math\Matrix::cross">cross</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#433"><abbr title="Superclasses\Math\Matrix::toVector">toVector</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#449"><abbr title="Superclasses\Math\Matrix::__clone">__clone</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#463"><abbr title="Superclasses\Math\Matrix::__toString">__toString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#14"><abbr title="Superclasses\Math\Numbers::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#23"><abbr title="Superclasses\Math\Numbers::isNumber">isNumber</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#34"><abbr title="Superclasses\Math\Numbers::isUnsignedInt">isUnsignedInt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#52"><abbr title="Superclasses\Math\Numbers::isNegativeZero">isNegativeZero</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#70"><abbr title="Superclasses\Math\Numbers::isPositiveZero">isPositiveZero</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#83"><abbr title="Superclasses\Math\Numbers::isNegative">isNegative</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#95"><abbr title="Superclasses\Math\Numbers::isPositive">isPositive</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#108"><abbr title="Superclasses\Math\Numbers::sign">sign</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#125"><abbr title="Superclasses\Math\Numbers::copySign">copySign</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Rational.php.html#39"><abbr title="Superclasses\Math\Rational::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Rational.php.html#66"><abbr title="Superclasses\Math\Rational::fromFloat">fromFloat</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Rational.php.html#150"><abbr title="Superclasses\Math\Rational::toFloat">toFloat</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Rational.php.html#161"><abbr title="Superclasses\Math\Rational::parse">parse</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Rational.php.html#187"><abbr title="Superclasses\Math\Rational::__toString">__toString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Rational.php.html#207"><abbr title="Superclasses\Math\Rational::tryParseInt">tryParseInt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Rational.php.html#223"><abbr title="Superclasses\Math\Rational::gcd">gcd</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Math/Rational.php.html#234"><abbr title="Superclasses\Math\Rational::simplify">simplify</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Stringify.php.html#29"><abbr title="Superclasses\Strings\Stringify::stringify">stringify</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Stringify.php.html#64"><abbr title="Superclasses\Strings\Stringify::stringifyFloat">stringifyFloat</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Stringify.php.html#97"><abbr title="Superclasses\Strings\Stringify::stringifyArray">stringifyArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Stringify.php.html#122"><abbr title="Superclasses\Strings\Stringify::stringifyResource">stringifyResource</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Stringify.php.html#133"><abbr title="Superclasses\Strings\Stringify::stringifyObject">stringifyObject</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Text.php.html#39"><abbr title="Superclasses\Text::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Text.php.html#64"><abbr title="Superclasses\Text::toLower">toLower</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Text.php.html#70"><abbr title="Superclasses\Text::toUpper">toUpper</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Text.php.html#76"><abbr title="Superclasses\Text::toTitle">toTitle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Text.php.html#82"><abbr title="Superclasses\Text::caseFold">caseFold</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Text.php.html#88"><abbr title="Superclasses\Text::convertEncoding">convertEncoding</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Text.php.html#100"><abbr title="Superclasses\Text::equal">equal</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Text.php.html#123"><abbr title="Superclasses\Text::__toString">__toString</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Text.php.html#131"><abbr title="Superclasses\Text::setDefaultDetectedEncodings">setDefaultDetectedEncodings</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Strings/Text.php.html#148"><abbr title="Superclasses\Text::setDetectedEncodings">setDetectedEncodings</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/Type.php.html#18"><abbr title="Superclasses\Types\Type::getType">getType</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/Type.php.html#48"><abbr title="Superclasses\Types\Type::getClassName">getClassName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/Type.php.html#62"><abbr title="Superclasses\Types\Type::usesTrait">usesTrait</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/Type.php.html#71"><abbr title="Superclasses\Types\Type::getTraitsRecursive">getTraitsRecursive</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/Type.php.html#100"><abbr title="Superclasses\Types\Type::getStringKey">getStringKey</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#34"><abbr title="Superclasses\Types\TypeSet::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#74"><abbr title="Superclasses\Types\TypeSet::convertToTypeSet">convertToTypeSet</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#92"><abbr title="Superclasses\Types\TypeSet::isValid">isValid</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#123"><abbr title="Superclasses\Types\TypeSet::match">match</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#203"><abbr title="Superclasses\Types\TypeSet::add">add</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#227"><abbr title="Superclasses\Types\TypeSet::addValueType">addValueType</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#238"><abbr title="Superclasses\Types\TypeSet::remove">remove</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#261"><abbr title="Superclasses\Types\TypeSet::clear">clear</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#283"><abbr title="Superclasses\Types\TypeSet::contains">contains</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#294"><abbr title="Superclasses\Types\TypeSet::containsAll">containsAll</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#312"><abbr title="Superclasses\Types\TypeSet::containsAny">containsAny</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#327"><abbr title="Superclasses\Types\TypeSet::isEmpty">isEmpty</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#342"><abbr title="Superclasses\Types\TypeSet::count">count</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Types/TypeSet.php.html#123"><abbr title="Superclasses\Types\TypeSet::match">match</abbr></a></td><td class="text-right">600</td></tr>
+       <tr><td><a href="Math/Angle.php.html#168"><abbr title="Superclasses\Math\Angle::toDMS">toDMS</abbr></a></td><td class="text-right">420</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#102"><abbr title="Superclasses\Collections\SequenceOf::__construct">__construct</abbr></a></td><td class="text-right">182</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#51"><abbr title="Superclasses\Math\Matrix::fromArray">fromArray</abbr></a></td><td class="text-right">156</td></tr>
+       <tr><td><a href="Math/Angle.php.html#776"><abbr title="Superclasses\Math\Angle::fromString">fromString</abbr></a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="Math/Rational.php.html#66"><abbr title="Superclasses\Math\Rational::fromFloat">fromFloat</abbr></a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="Math/Complex.php.html#387"><abbr title="Superclasses\Math\Complex::pow">pow</abbr></a></td><td class="text-right">110</td></tr>
+       <tr><td><a href="Types/Type.php.html#100"><abbr title="Superclasses\Types\Type::getStringKey">getStringKey</abbr></a></td><td class="text-right">110</td></tr>
+       <tr><td><a href="Math/Complex.php.html#299"><abbr title="Superclasses\Math\Complex::log">log</abbr></a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#463"><abbr title="Superclasses\Math\Matrix::__toString">__toString</abbr></a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Math/Angle.php.html#686"><abbr title="Superclasses\Math\Angle::_formatDMS">_formatDMS</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#243"><abbr title="Superclasses\Math\Matrix::calculateDeterminant">calculateDeterminant</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Strings/Stringify.php.html#29"><abbr title="Superclasses\Strings\Stringify::stringify">stringify</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Strings/Stringify.php.html#133"><abbr title="Superclasses\Strings\Stringify::stringifyObject">stringifyObject</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Math/Complex.php.html#263"><abbr title="Superclasses\Math\Complex::ln">ln</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Math/Complex.php.html#341"><abbr title="Superclasses\Math\Complex::exp">exp</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Math/Complex.php.html#695"><abbr title="Superclasses\Math\Complex::__toString">__toString</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#113"><abbr title="Superclasses\Math\Matrix::set">set</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#82"><abbr title="Superclasses\Collections\Sequence::checkIndex">checkIndex</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#672"><abbr title="Superclasses\Collections\Sequence::chooseRand">chooseRand</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Color.php.html#712"><abbr title="Superclasses\Color::rgbToHsl">rgbToHsl</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Math/Angle.php.html#587"><abbr title="Superclasses\Math\Angle::_wrapScalar">_wrapScalar</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#281"><abbr title="Superclasses\Math\Matrix::inverse">inverse</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#338"><abbr title="Superclasses\Math\Matrix::pow">pow</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#34"><abbr title="Superclasses\Types\TypeSet::__construct">__construct</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Color.php.html#810"><abbr title="Superclasses\Color::isValidHexString">isValidHexString</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Color.php.html#867"><abbr title="Superclasses\Color::normalizeHex">normalizeHex</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Math/Angle.php.html#660"><abbr title="Superclasses\Math\Angle::_formatFloat">_formatFloat</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#97"><abbr title="Superclasses\Math\Matrix::get">get</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#131"><abbr title="Superclasses\Math\Matrix::add">add</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#153"><abbr title="Superclasses\Math\Matrix::subtract">subtract</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#175"><abbr title="Superclasses\Math\Matrix::multiply">multiply</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#313"><abbr title="Superclasses\Math\Matrix::getMinor">getMinor</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Math/Rational.php.html#161"><abbr title="Superclasses\Math\Rational::parse">parse</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Strings/Stringify.php.html#64"><abbr title="Superclasses\Strings\Stringify::stringifyFloat">stringifyFloat</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Strings/Text.php.html#39"><abbr title="Superclasses\Text::__construct">__construct</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Types/Type.php.html#18"><abbr title="Superclasses\Types\Type::getType">getType</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Color.php.html#462"><abbr title="Superclasses\Color::average">average</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Color.php.html#610"><abbr title="Superclasses\Color::toHexString">toHexString</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Math/Angle.php.html#359"><abbr title="Superclasses\Math\Angle::compare">compare</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Math/Complex.php.html#449"><abbr title="Superclasses\Math\Complex::roots">roots</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Math/Rational.php.html#234"><abbr title="Superclasses\Math\Rational::simplify">simplify</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#92"><abbr title="Superclasses\Types\TypeSet::isValid">isValid</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#203"><abbr title="Superclasses\Types\TypeSet::add">add</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Collections/DictionaryOf.php.html#63"><abbr title="Superclasses\Collections\DictionaryOf::fromIterable">fromIterable</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#515"><abbr title="Superclasses\Collections\Sequence::countValues">countValues</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#539"><abbr title="Superclasses\Collections\Sequence::fill">fill</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#751"><abbr title="Superclasses\Collections\Sequence::offsetSet">offsetSet</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#300"><abbr title="Superclasses\Collections\SequenceOf::offsetUnset">offsetUnset</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Set.php.html#79"><abbr title="Superclasses\Collections\Set::addOne">addOne</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Set.php.html#145"><abbr title="Superclasses\Collections\Set::removeAll">removeAll</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Set.php.html#210"><abbr title="Superclasses\Collections\Set::intersect">intersect</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Set.php.html#231"><abbr title="Superclasses\Collections\Set::diff">diff</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Set.php.html#269"><abbr title="Superclasses\Collections\Set::containsAll">containsAll</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Set.php.html#300"><abbr title="Superclasses\Collections\Set::containsAny">containsAny</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Set.php.html#316"><abbr title="Superclasses\Collections\Set::containsNone">containsNone</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Set.php.html#342"><abbr title="Superclasses\Collections\Set::equals">equals</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/SetOf.php.html#82"><abbr title="Superclasses\Collections\SetOf::intersect">intersect</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/SetOf.php.html#107"><abbr title="Superclasses\Collections\SetOf::diff">diff</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Color.php.html#418"><abbr title="Superclasses\Color::mix">mix</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Color.php.html#1002"><abbr title="Superclasses\Color::_validateByte">_validateByte</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Color.php.html#1016"><abbr title="Superclasses\Color::_validateFrac">_validateFrac</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Angle.php.html#323"><abbr title="Superclasses\Math\Angle::div">div</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Angle.php.html#737"><abbr title="Superclasses\Math\Angle::format">format</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Complex.php.html#760"><abbr title="Superclasses\Math\Complex::offsetGet">offsetGet</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Complex.php.html#779"><abbr title="Superclasses\Math\Complex::offsetSet">offsetSet</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Complex.php.html#803"><abbr title="Superclasses\Math\Complex::offsetUnset">offsetUnset</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#33"><abbr title="Superclasses\Math\Matrix::__construct">__construct</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#211"><abbr title="Superclasses\Math\Matrix::transpose">transpose</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#388"><abbr title="Superclasses\Math\Matrix::dot">dot</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#412"><abbr title="Superclasses\Math\Matrix::cross">cross</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#433"><abbr title="Superclasses\Math\Matrix::toVector">toVector</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#83"><abbr title="Superclasses\Math\Numbers::isNegative">isNegative</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#95"><abbr title="Superclasses\Math\Numbers::isPositive">isPositive</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#108"><abbr title="Superclasses\Math\Numbers::sign">sign</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#125"><abbr title="Superclasses\Math\Numbers::copySign">copySign</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Strings/Stringify.php.html#97"><abbr title="Superclasses\Strings\Stringify::stringifyArray">stringifyArray</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Strings/Text.php.html#100"><abbr title="Superclasses\Text::equal">equal</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Types/Type.php.html#71"><abbr title="Superclasses\Types\Type::getTraitsRecursive">getTraitsRecursive</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#238"><abbr title="Superclasses\Types\TypeSet::remove">remove</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#294"><abbr title="Superclasses\Types\TypeSet::containsAll">containsAll</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#312"><abbr title="Superclasses\Types\TypeSet::containsAny">containsAny</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#47"><abbr title="Superclasses\Collections\Dictionary::fromIterable">fromIterable</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#137"><abbr title="Superclasses\Collections\Dictionary::offsetSet">offsetSet</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#158"><abbr title="Superclasses\Collections\Dictionary::offsetGet">offsetGet</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#191"><abbr title="Superclasses\Collections\Dictionary::offsetUnset">offsetUnset</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Dictionary.php.html#228"><abbr title="Superclasses\Collections\Dictionary::getIterator">getIterator</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/DictionaryOf.php.html#94"><abbr title="Superclasses\Collections\DictionaryOf::checkKeyType">checkKeyType</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/DictionaryOf.php.html#107"><abbr title="Superclasses\Collections\DictionaryOf::checkValueType">checkValueType</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#57"><abbr title="Superclasses\Collections\Sequence::__construct">__construct</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#199"><abbr title="Superclasses\Collections\Sequence::append">append</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#241"><abbr title="Superclasses\Collections\Sequence::insert">insert</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#322"><abbr title="Superclasses\Collections\Sequence::removeFirst">removeFirst</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#341"><abbr title="Superclasses\Collections\Sequence::removeLast">removeLast</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#497"><abbr title="Superclasses\Collections\Sequence::chunk">chunk</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#712"><abbr title="Superclasses\Collections\Sequence::removeRand">removeRand</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Sequence.php.html#802"><abbr title="Superclasses\Collections\Sequence::offsetExists">offsetExists</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#159"><abbr title="Superclasses\Collections\SequenceOf::checkItemType">checkItemType</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#179"><abbr title="Superclasses\Collections\SequenceOf::append">append</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/SequenceOf.php.html#204"><abbr title="Superclasses\Collections\SequenceOf::prepend">prepend</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Set.php.html#102"><abbr title="Superclasses\Collections\Set::addAll">addAll</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Set.php.html#355"><abbr title="Superclasses\Collections\Set::subset">subset</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/Set.php.html#366"><abbr title="Superclasses\Collections\Set::properSubset">properSubset</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/SetOf.php.html#29"><abbr title="Superclasses\Collections\SetOf::__construct">__construct</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Collections/SetOf.php.html#58"><abbr title="Superclasses\Collections\SetOf::union">union</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Color.php.html#369"><abbr title="Superclasses\Color::gamma">gamma</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Color.php.html#400"><abbr title="Superclasses\Color::bestTextColor">bestTextColor</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Color.php.html#854"><abbr title="Superclasses\Color::isValidColorString">isValidColorString</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Color.php.html#899"><abbr title="Superclasses\Color::hexStringToBytes">hexStringToBytes</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Color.php.html#931"><abbr title="Superclasses\Color::colorNameToHex">colorNameToHex</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Color.php.html#966"><abbr title="Superclasses\Color::colorStringToBytes">colorStringToBytes</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Exceptions/TypeException.php.html#34"><abbr title="Superclasses\Exceptions\TypeException::create">create</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Angle.php.html#401"><abbr title="Superclasses\Math\Angle::_inverse">_inverse</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Angle.php.html#437"><abbr title="Superclasses\Math\Angle::tan">tan</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Angle.php.html#837"><abbr title="Superclasses\Math\Angle::tryParse">tryParse</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Complex.php.html#223"><abbr title="Superclasses\Math\Complex::div">div</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Complex.php.html#538"><abbr title="Superclasses\Math\Complex::equals">equals</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Complex.php.html#579"><abbr title="Superclasses\Math\Complex::toComplex">toComplex</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Complex.php.html#748"><abbr title="Superclasses\Math\Complex::offsetExists">offsetExists</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#228"><abbr title="Superclasses\Math\Matrix::determinant">determinant</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#372"><abbr title="Superclasses\Math\Matrix::identity">identity</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Matrix.php.html#449"><abbr title="Superclasses\Math\Matrix::__clone">__clone</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#23"><abbr title="Superclasses\Math\Numbers::isNumber">isNumber</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#34"><abbr title="Superclasses\Math\Numbers::isUnsignedInt">isUnsignedInt</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#52"><abbr title="Superclasses\Math\Numbers::isNegativeZero">isNegativeZero</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Numbers.php.html#70"><abbr title="Superclasses\Math\Numbers::isPositiveZero">isPositiveZero</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Rational.php.html#39"><abbr title="Superclasses\Math\Rational::__construct">__construct</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Rational.php.html#187"><abbr title="Superclasses\Math\Rational::__toString">__toString</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Rational.php.html#207"><abbr title="Superclasses\Math\Rational::tryParseInt">tryParseInt</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Math/Rational.php.html#223"><abbr title="Superclasses\Math\Rational::gcd">gcd</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Strings/Text.php.html#88"><abbr title="Superclasses\Text::convertEncoding">convertEncoding</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Types/Type.php.html#48"><abbr title="Superclasses\Types\Type::getClassName">getClassName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Types/TypeSet.php.html#74"><abbr title="Superclasses\Types\TypeSet::convertToTypeSet">convertToTypeSet</abbr></a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 10.1.16</a> using <a href="https://www.php.net/" target="_top">PHP 8.4.10</a> and <a href="https://phpunit.de/">PHPUnit 10.5.52</a> at Fri Sep 26 7:36:01 UTC 2025.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="_js/jquery.min.js?v=10.1.16" type="text/javascript"></script>
+  <script src="_js/d3.min.js?v=10.1.16" type="text/javascript"></script>
+  <script src="_js/nv.d3.min.js?v=10.1.16" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([17,0,1,0,0,0,0,0,0,0,0,0], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([286,0,0,0,0,0,0,0,0,0,1,1], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,20,"<a href=\"Collections\/Dictionary.php.html#25\">Superclasses\\Collections\\Dictionary<\/a>"],[0,9,"<a href=\"Collections\/DictionaryOf.php.html#21\">Superclasses\\Collections\\DictionaryOf<\/a>"],[0,1,"<a href=\"Collections\/KeyValuePair.php.html#7\">Superclasses\\Collections\\KeyValuePair<\/a>"],[0,66,"<a href=\"Collections\/Sequence.php.html#24\">Superclasses\\Collections\\Sequence<\/a>"],[0,25,"<a href=\"Collections\/SequenceOf.php.html#84\">Superclasses\\Collections\\SequenceOf<\/a>"],[0,47,"<a href=\"Collections\/Set.php.html#18\">Superclasses\\Collections\\Set<\/a>"],[0,11,"<a href=\"Collections\/SetOf.php.html#15\">Superclasses\\Collections\\SetOf<\/a>"],[0,72,"<a href=\"Color.php.html#20\">Superclasses\\Color<\/a>"],[0,3,"<a href=\"Exceptions\/TypeException.php.html#12\">Superclasses\\Exceptions\\TypeException<\/a>"],[0,98,"<a href=\"Math\/Angle.php.html#12\">Superclasses\\Math\\Angle<\/a>"],[18.29268292682927,86,"<a href=\"Math\/Complex.php.html#16\">Superclasses\\Math\\Complex<\/a>"],[0,95,"<a href=\"Math\/Matrix.php.html#10\">Superclasses\\Math\\Matrix<\/a>"],[0,21,"<a href=\"Math\/Numbers.php.html#9\">Superclasses\\Math\\Numbers<\/a>"],[0,29,"<a href=\"Math\/Rational.php.html#9\">Superclasses\\Math\\Rational<\/a>"],[0,25,"<a href=\"Strings\/Stringify.php.html#20\">Superclasses\\Strings\\Stringify<\/a>"],[0,17,"<a href=\"Strings\/Text.php.html#15\">Superclasses\\Text<\/a>"],[0,21,"<a href=\"Types\/Type.php.html#9\">Superclasses\\Types\\Type<\/a>"],[0,54,"<a href=\"Types\/TypeSet.php.html#11\">Superclasses\\Types\\TypeSet<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"Collections\/Dictionary.php.html#37\">Superclasses\\Collections\\Dictionary::__construct<\/a>"],[0,2,"<a href=\"Collections\/Dictionary.php.html#47\">Superclasses\\Collections\\Dictionary::fromIterable<\/a>"],[0,1,"<a href=\"Collections\/Dictionary.php.html#64\">Superclasses\\Collections\\Dictionary::keys<\/a>"],[0,1,"<a href=\"Collections\/Dictionary.php.html#72\">Superclasses\\Collections\\Dictionary::values<\/a>"],[0,1,"<a href=\"Collections\/Dictionary.php.html#80\">Superclasses\\Collections\\Dictionary::entries<\/a>"],[0,1,"<a href=\"Collections\/Dictionary.php.html#88\">Superclasses\\Collections\\Dictionary::clear<\/a>"],[0,1,"<a href=\"Collections\/Dictionary.php.html#96\">Superclasses\\Collections\\Dictionary::isEmpty<\/a>"],[0,1,"<a href=\"Collections\/Dictionary.php.html#107\">Superclasses\\Collections\\Dictionary::hasKey<\/a>"],[0,1,"<a href=\"Collections\/Dictionary.php.html#118\">Superclasses\\Collections\\Dictionary::hasValue<\/a>"],[0,2,"<a href=\"Collections\/Dictionary.php.html#137\">Superclasses\\Collections\\Dictionary::offsetSet<\/a>"],[0,2,"<a href=\"Collections\/Dictionary.php.html#158\">Superclasses\\Collections\\Dictionary::offsetGet<\/a>"],[0,1,"<a href=\"Collections\/Dictionary.php.html#179\">Superclasses\\Collections\\Dictionary::offsetExists<\/a>"],[0,2,"<a href=\"Collections\/Dictionary.php.html#191\">Superclasses\\Collections\\Dictionary::offsetUnset<\/a>"],[0,1,"<a href=\"Collections\/Dictionary.php.html#214\">Superclasses\\Collections\\Dictionary::count<\/a>"],[0,2,"<a href=\"Collections\/Dictionary.php.html#228\">Superclasses\\Collections\\Dictionary::getIterator<\/a>"],[0,1,"<a href=\"Collections\/DictionaryOf.php.html#45\">Superclasses\\Collections\\DictionaryOf::__construct<\/a>"],[0,3,"<a href=\"Collections\/DictionaryOf.php.html#63\">Superclasses\\Collections\\DictionaryOf::fromIterable<\/a>"],[0,2,"<a href=\"Collections\/DictionaryOf.php.html#94\">Superclasses\\Collections\\DictionaryOf::checkKeyType<\/a>"],[0,2,"<a href=\"Collections\/DictionaryOf.php.html#107\">Superclasses\\Collections\\DictionaryOf::checkValueType<\/a>"],[0,1,"<a href=\"Collections\/DictionaryOf.php.html#131\">Superclasses\\Collections\\DictionaryOf::offsetSet<\/a>"],[0,1,"<a href=\"Collections\/KeyValuePair.php.html#9\">Superclasses\\Collections\\KeyValuePair::__construct<\/a>"],[0,2,"<a href=\"Collections\/Sequence.php.html#57\">Superclasses\\Collections\\Sequence::__construct<\/a>"],[0,6,"<a href=\"Collections\/Sequence.php.html#82\">Superclasses\\Collections\\Sequence::checkIndex<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#111\">Superclasses\\Collections\\Sequence::first<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#122\">Superclasses\\Collections\\Sequence::last<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#143\">Superclasses\\Collections\\Sequence::slice<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#161\">Superclasses\\Collections\\Sequence::search<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#176\">Superclasses\\Collections\\Sequence::find<\/a>"],[0,2,"<a href=\"Collections\/Sequence.php.html#199\">Superclasses\\Collections\\Sequence::append<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#223\">Superclasses\\Collections\\Sequence::prepend<\/a>"],[0,2,"<a href=\"Collections\/Sequence.php.html#241\">Superclasses\\Collections\\Sequence::insert<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#276\">Superclasses\\Collections\\Sequence::remove<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#299\">Superclasses\\Collections\\Sequence::removeByValue<\/a>"],[0,2,"<a href=\"Collections\/Sequence.php.html#322\">Superclasses\\Collections\\Sequence::removeFirst<\/a>"],[0,2,"<a href=\"Collections\/Sequence.php.html#341\">Superclasses\\Collections\\Sequence::removeLast<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#355\">Superclasses\\Collections\\Sequence::clear<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#370\">Superclasses\\Collections\\Sequence::isEmpty<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#381\">Superclasses\\Collections\\Sequence::hasIndex<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#393\">Superclasses\\Collections\\Sequence::hasValue<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#407\">Superclasses\\Collections\\Sequence::all<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#421\">Superclasses\\Collections\\Sequence::any<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#440\">Superclasses\\Collections\\Sequence::sort<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#457\">Superclasses\\Collections\\Sequence::sortReverse<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#474\">Superclasses\\Collections\\Sequence::sortBy<\/a>"],[0,2,"<a href=\"Collections\/Sequence.php.html#497\">Superclasses\\Collections\\Sequence::chunk<\/a>"],[0,3,"<a href=\"Collections\/Sequence.php.html#515\">Superclasses\\Collections\\Sequence::countValues<\/a>"],[0,3,"<a href=\"Collections\/Sequence.php.html#539\">Superclasses\\Collections\\Sequence::fill<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#563\">Superclasses\\Collections\\Sequence::filter<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#578\">Superclasses\\Collections\\Sequence::map<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#590\">Superclasses\\Collections\\Sequence::merge<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#601\">Superclasses\\Collections\\Sequence::reverse<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#619\">Superclasses\\Collections\\Sequence::reduce<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#629\">Superclasses\\Collections\\Sequence::product<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#639\">Superclasses\\Collections\\Sequence::sum<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#650\">Superclasses\\Collections\\Sequence::join<\/a>"],[0,6,"<a href=\"Collections\/Sequence.php.html#672\">Superclasses\\Collections\\Sequence::chooseRand<\/a>"],[0,2,"<a href=\"Collections\/Sequence.php.html#712\">Superclasses\\Collections\\Sequence::removeRand<\/a>"],[0,3,"<a href=\"Collections\/Sequence.php.html#751\">Superclasses\\Collections\\Sequence::offsetSet<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#785\">Superclasses\\Collections\\Sequence::offsetGet<\/a>"],[0,2,"<a href=\"Collections\/Sequence.php.html#802\">Superclasses\\Collections\\Sequence::offsetExists<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#827\">Superclasses\\Collections\\Sequence::offsetUnset<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#847\">Superclasses\\Collections\\Sequence::count<\/a>"],[0,1,"<a href=\"Collections\/Sequence.php.html#863\">Superclasses\\Collections\\Sequence::getIterator<\/a>"],[0,13,"<a href=\"Collections\/SequenceOf.php.html#102\">Superclasses\\Collections\\SequenceOf::__construct<\/a>"],[0,2,"<a href=\"Collections\/SequenceOf.php.html#159\">Superclasses\\Collections\\SequenceOf::checkItemType<\/a>"],[0,2,"<a href=\"Collections\/SequenceOf.php.html#179\">Superclasses\\Collections\\SequenceOf::append<\/a>"],[0,2,"<a href=\"Collections\/SequenceOf.php.html#204\">Superclasses\\Collections\\SequenceOf::prepend<\/a>"],[0,1,"<a href=\"Collections\/SequenceOf.php.html#232\">Superclasses\\Collections\\SequenceOf::slice<\/a>"],[0,1,"<a href=\"Collections\/SequenceOf.php.html#250\">Superclasses\\Collections\\SequenceOf::filter<\/a>"],[0,1,"<a href=\"Collections\/SequenceOf.php.html#279\">Superclasses\\Collections\\SequenceOf::offsetSet<\/a>"],[0,3,"<a href=\"Collections\/SequenceOf.php.html#300\">Superclasses\\Collections\\SequenceOf::offsetUnset<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#43\">Superclasses\\Collections\\Set::__construct<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#55\">Superclasses\\Collections\\Set::isItemAllowed<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#65\">Superclasses\\Collections\\Set::toArray<\/a>"],[0,3,"<a href=\"Collections\/Set.php.html#79\">Superclasses\\Collections\\Set::addOne<\/a>"],[0,2,"<a href=\"Collections\/Set.php.html#102\">Superclasses\\Collections\\Set::addAll<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#122\">Superclasses\\Collections\\Set::add<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#134\">Superclasses\\Collections\\Set::removeOne<\/a>"],[0,3,"<a href=\"Collections\/Set.php.html#145\">Superclasses\\Collections\\Set::removeAll<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#165\">Superclasses\\Collections\\Set::remove<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#175\">Superclasses\\Collections\\Set::clear<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#193\">Superclasses\\Collections\\Set::union<\/a>"],[0,3,"<a href=\"Collections\/Set.php.html#210\">Superclasses\\Collections\\Set::intersect<\/a>"],[0,3,"<a href=\"Collections\/Set.php.html#231\">Superclasses\\Collections\\Set::diff<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#257\">Superclasses\\Collections\\Set::containsOne<\/a>"],[0,3,"<a href=\"Collections\/Set.php.html#269\">Superclasses\\Collections\\Set::containsAll<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#289\">Superclasses\\Collections\\Set::contains<\/a>"],[0,3,"<a href=\"Collections\/Set.php.html#300\">Superclasses\\Collections\\Set::containsAny<\/a>"],[0,3,"<a href=\"Collections\/Set.php.html#316\">Superclasses\\Collections\\Set::containsNone<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#331\">Superclasses\\Collections\\Set::isEmpty<\/a>"],[0,3,"<a href=\"Collections\/Set.php.html#342\">Superclasses\\Collections\\Set::equals<\/a>"],[0,2,"<a href=\"Collections\/Set.php.html#355\">Superclasses\\Collections\\Set::subset<\/a>"],[0,2,"<a href=\"Collections\/Set.php.html#366\">Superclasses\\Collections\\Set::properSubset<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#377\">Superclasses\\Collections\\Set::superset<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#388\">Superclasses\\Collections\\Set::properSuperset<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#399\">Superclasses\\Collections\\Set::disjoint<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#412\">Superclasses\\Collections\\Set::__toString<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#425\">Superclasses\\Collections\\Set::count<\/a>"],[0,1,"<a href=\"Collections\/Set.php.html#438\">Superclasses\\Collections\\Set::getIterator<\/a>"],[0,2,"<a href=\"Collections\/SetOf.php.html#29\">Superclasses\\Collections\\SetOf::__construct<\/a>"],[0,1,"<a href=\"Collections\/SetOf.php.html#41\">Superclasses\\Collections\\SetOf::isItemAllowed<\/a>"],[0,2,"<a href=\"Collections\/SetOf.php.html#58\">Superclasses\\Collections\\SetOf::union<\/a>"],[0,3,"<a href=\"Collections\/SetOf.php.html#82\">Superclasses\\Collections\\SetOf::intersect<\/a>"],[0,3,"<a href=\"Collections\/SetOf.php.html#107\">Superclasses\\Collections\\SetOf::diff<\/a>"],[0,1,"<a href=\"Color.php.html#228\">Superclasses\\Color::__construct<\/a>"],[0,1,"<a href=\"Color.php.html#245\">Superclasses\\Color::fromRgba<\/a>"],[0,1,"<a href=\"Color.php.html#271\">Superclasses\\Color::fromHsla<\/a>"],[0,1,"<a href=\"Color.php.html#296\">Superclasses\\Color::toRgba<\/a>"],[0,1,"<a href=\"Color.php.html#315\">Superclasses\\Color::toHsla<\/a>"],[0,1,"<a href=\"Color.php.html#327\">Superclasses\\Color::toArray<\/a>"],[0,1,"<a href=\"Color.php.html#352\">Superclasses\\Color::equals<\/a>"],[0,2,"<a href=\"Color.php.html#369\">Superclasses\\Color::gamma<\/a>"],[0,1,"<a href=\"Color.php.html#383\">Superclasses\\Color::contrastRatio<\/a>"],[0,2,"<a href=\"Color.php.html#400\">Superclasses\\Color::bestTextColor<\/a>"],[0,3,"<a href=\"Color.php.html#418\">Superclasses\\Color::mix<\/a>"],[0,1,"<a href=\"Color.php.html#448\">Superclasses\\Color::complement<\/a>"],[0,4,"<a href=\"Color.php.html#462\">Superclasses\\Color::average<\/a>"],[0,1,"<a href=\"Color.php.html#513\">Superclasses\\Color::_setRgbaBytes<\/a>"],[0,1,"<a href=\"Color.php.html#526\">Superclasses\\Color::_setRgbaBytesFromHsl<\/a>"],[0,1,"<a href=\"Color.php.html#540\">Superclasses\\Color::_getByte<\/a>"],[0,1,"<a href=\"Color.php.html#555\">Superclasses\\Color::_setByte<\/a>"],[0,1,"<a href=\"Color.php.html#575\">Superclasses\\Color::_angleToString<\/a>"],[0,1,"<a href=\"Color.php.html#586\">Superclasses\\Color::_fracToPercentString<\/a>"],[0,1,"<a href=\"Color.php.html#597\">Superclasses\\Color::_byteToFracString<\/a>"],[0,4,"<a href=\"Color.php.html#610\">Superclasses\\Color::toHexString<\/a>"],[0,1,"<a href=\"Color.php.html#634\">Superclasses\\Color::toRgbString<\/a>"],[0,1,"<a href=\"Color.php.html#644\">Superclasses\\Color::toRgbaString<\/a>"],[0,1,"<a href=\"Color.php.html#655\">Superclasses\\Color::toHslString<\/a>"],[0,1,"<a href=\"Color.php.html#669\">Superclasses\\Color::toHslaString<\/a>"],[0,1,"<a href=\"Color.php.html#687\">Superclasses\\Color::__toString<\/a>"],[0,6,"<a href=\"Color.php.html#712\">Superclasses\\Color::rgbToHsl<\/a>"],[0,1,"<a href=\"Color.php.html#775\">Superclasses\\Color::hslToRgb<\/a>"],[0,5,"<a href=\"Color.php.html#810\">Superclasses\\Color::isValidHexString<\/a>"],[0,1,"<a href=\"Color.php.html#842\">Superclasses\\Color::isValidColorName<\/a>"],[0,2,"<a href=\"Color.php.html#854\">Superclasses\\Color::isValidColorString<\/a>"],[0,5,"<a href=\"Color.php.html#867\">Superclasses\\Color::normalizeHex<\/a>"],[0,2,"<a href=\"Color.php.html#899\">Superclasses\\Color::hexStringToBytes<\/a>"],[0,2,"<a href=\"Color.php.html#931\">Superclasses\\Color::colorNameToHex<\/a>"],[0,1,"<a href=\"Color.php.html#952\">Superclasses\\Color::colorNameToBytes<\/a>"],[0,2,"<a href=\"Color.php.html#966\">Superclasses\\Color::colorStringToBytes<\/a>"],[0,1,"<a href=\"Color.php.html#990\">Superclasses\\Color::_clamp<\/a>"],[0,3,"<a href=\"Color.php.html#1002\">Superclasses\\Color::_validateByte<\/a>"],[0,3,"<a href=\"Color.php.html#1016\">Superclasses\\Color::_validateFrac<\/a>"],[0,1,"<a href=\"Color.php.html#1030\">Superclasses\\Color::_byteToFrac<\/a>"],[0,1,"<a href=\"Color.php.html#1042\">Superclasses\\Color::_fracToByte<\/a>"],[0,1,"<a href=\"Exceptions\/TypeException.php.html#22\">Superclasses\\Exceptions\\TypeException::__construct<\/a>"],[0,2,"<a href=\"Exceptions\/TypeException.php.html#34\">Superclasses\\Exceptions\\TypeException::create<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#56\">Superclasses\\Math\\Angle::__construct<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#70\">Superclasses\\Math\\Angle::fromRadians<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#81\">Superclasses\\Math\\Angle::fromDegrees<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#101\">Superclasses\\Math\\Angle::fromDMS<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#114\">Superclasses\\Math\\Angle::fromGradians<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#125\">Superclasses\\Math\\Angle::fromTurns<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#138\">Superclasses\\Math\\Angle::toRadians<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#148\">Superclasses\\Math\\Angle::toDegrees<\/a>"],[0,20,"<a href=\"Math\/Angle.php.html#168\">Superclasses\\Math\\Angle::toDMS<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#266\">Superclasses\\Math\\Angle::toGradians<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#276\">Superclasses\\Math\\Angle::toTurns<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#290\">Superclasses\\Math\\Angle::add<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#301\">Superclasses\\Math\\Angle::sub<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#312\">Superclasses\\Math\\Angle::mul<\/a>"],[0,3,"<a href=\"Math\/Angle.php.html#323\">Superclasses\\Math\\Angle::div<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#338\">Superclasses\\Math\\Angle::abs<\/a>"],[0,4,"<a href=\"Math\/Angle.php.html#359\">Superclasses\\Math\\Angle::compare<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#385\">Superclasses\\Math\\Angle::equals<\/a>"],[0,2,"<a href=\"Math\/Angle.php.html#401\">Superclasses\\Math\\Angle::_inverse<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#417\">Superclasses\\Math\\Angle::sin<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#427\">Superclasses\\Math\\Angle::cos<\/a>"],[0,2,"<a href=\"Math\/Angle.php.html#437\">Superclasses\\Math\\Angle::tan<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#457\">Superclasses\\Math\\Angle::sec<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#467\">Superclasses\\Math\\Angle::csc<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#477\">Superclasses\\Math\\Angle::cot<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#487\">Superclasses\\Math\\Angle::sinh<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#497\">Superclasses\\Math\\Angle::cosh<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#507\">Superclasses\\Math\\Angle::tanh<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#517\">Superclasses\\Math\\Angle::sech<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#527\">Superclasses\\Math\\Angle::csch<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#537\">Superclasses\\Math\\Angle::coth<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#555\">Superclasses\\Math\\Angle::wrap<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#570\">Superclasses\\Math\\Angle::wrapThis<\/a>"],[0,6,"<a href=\"Math\/Angle.php.html#587\">Superclasses\\Math\\Angle::_wrapScalar<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#620\">Superclasses\\Math\\Angle::wrapRadians<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#632\">Superclasses\\Math\\Angle::wrapDegrees<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#644\">Superclasses\\Math\\Angle::wrapGradians<\/a>"],[0,5,"<a href=\"Math\/Angle.php.html#660\">Superclasses\\Math\\Angle::_formatFloat<\/a>"],[0,8,"<a href=\"Math\/Angle.php.html#686\">Superclasses\\Math\\Angle::_formatDMS<\/a>"],[0,3,"<a href=\"Math\/Angle.php.html#737\">Superclasses\\Math\\Angle::format<\/a>"],[0,11,"<a href=\"Math\/Angle.php.html#776\">Superclasses\\Math\\Angle::fromString<\/a>"],[0,2,"<a href=\"Math\/Angle.php.html#837\">Superclasses\\Math\\Angle::tryParse<\/a>"],[0,1,"<a href=\"Math\/Angle.php.html#856\">Superclasses\\Math\\Angle::__toString<\/a>"],[100,1,"<a href=\"Math\/Complex.php.html#154\">Superclasses\\Math\\Complex::__construct<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#171\">Superclasses\\Math\\Complex::add<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#186\">Superclasses\\Math\\Complex::sub<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#202\">Superclasses\\Math\\Complex::mul<\/a>"],[0,2,"<a href=\"Math\/Complex.php.html#223\">Superclasses\\Math\\Complex::div<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#247\">Superclasses\\Math\\Complex::conj<\/a>"],[0,7,"<a href=\"Math\/Complex.php.html#263\">Superclasses\\Math\\Complex::ln<\/a>"],[0,9,"<a href=\"Math\/Complex.php.html#299\">Superclasses\\Math\\Complex::log<\/a>"],[0,7,"<a href=\"Math\/Complex.php.html#341\">Superclasses\\Math\\Complex::exp<\/a>"],[0,10,"<a href=\"Math\/Complex.php.html#387\">Superclasses\\Math\\Complex::pow<\/a>"],[0,4,"<a href=\"Math\/Complex.php.html#449\">Superclasses\\Math\\Complex::roots<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#479\">Superclasses\\Math\\Complex::sqr<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#490\">Superclasses\\Math\\Complex::sqrt<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#500\">Superclasses\\Math\\Complex::cube<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#511\">Superclasses\\Math\\Complex::cbrt<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#526\">Superclasses\\Math\\Complex::isReal<\/a>"],[0,2,"<a href=\"Math\/Complex.php.html#538\">Superclasses\\Math\\Complex::equals<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#554\">Superclasses\\Math\\Complex::same<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#568\">Superclasses\\Math\\Complex::i<\/a>"],[0,2,"<a href=\"Math\/Complex.php.html#579\">Superclasses\\Math\\Complex::toComplex<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#591\">Superclasses\\Math\\Complex::fromPolar<\/a>"],[90.32258064516128,11,"<a href=\"Math\/Complex.php.html#617\">Superclasses\\Math\\Complex::parse<\/a>"],[0,7,"<a href=\"Math\/Complex.php.html#695\">Superclasses\\Math\\Complex::__toString<\/a>"],[0,1,"<a href=\"Math\/Complex.php.html#732\">Superclasses\\Math\\Complex::toArray<\/a>"],[0,2,"<a href=\"Math\/Complex.php.html#748\">Superclasses\\Math\\Complex::offsetExists<\/a>"],[0,3,"<a href=\"Math\/Complex.php.html#760\">Superclasses\\Math\\Complex::offsetGet<\/a>"],[0,3,"<a href=\"Math\/Complex.php.html#779\">Superclasses\\Math\\Complex::offsetSet<\/a>"],[0,3,"<a href=\"Math\/Complex.php.html#803\">Superclasses\\Math\\Complex::offsetUnset<\/a>"],[0,3,"<a href=\"Math\/Matrix.php.html#33\">Superclasses\\Math\\Matrix::__construct<\/a>"],[0,12,"<a href=\"Math\/Matrix.php.html#51\">Superclasses\\Math\\Matrix::fromArray<\/a>"],[0,5,"<a href=\"Math\/Matrix.php.html#97\">Superclasses\\Math\\Matrix::get<\/a>"],[0,7,"<a href=\"Math\/Matrix.php.html#113\">Superclasses\\Math\\Matrix::set<\/a>"],[0,5,"<a href=\"Math\/Matrix.php.html#131\">Superclasses\\Math\\Matrix::add<\/a>"],[0,5,"<a href=\"Math\/Matrix.php.html#153\">Superclasses\\Math\\Matrix::subtract<\/a>"],[0,5,"<a href=\"Math\/Matrix.php.html#175\">Superclasses\\Math\\Matrix::multiply<\/a>"],[0,1,"<a href=\"Math\/Matrix.php.html#201\">Superclasses\\Math\\Matrix::divide<\/a>"],[0,3,"<a href=\"Math\/Matrix.php.html#211\">Superclasses\\Math\\Matrix::transpose<\/a>"],[0,2,"<a href=\"Math\/Matrix.php.html#228\">Superclasses\\Math\\Matrix::determinant<\/a>"],[0,8,"<a href=\"Math\/Matrix.php.html#243\">Superclasses\\Math\\Matrix::calculateDeterminant<\/a>"],[0,6,"<a href=\"Math\/Matrix.php.html#281\">Superclasses\\Math\\Matrix::inverse<\/a>"],[0,5,"<a href=\"Math\/Matrix.php.html#313\">Superclasses\\Math\\Matrix::getMinor<\/a>"],[0,6,"<a href=\"Math\/Matrix.php.html#338\">Superclasses\\Math\\Matrix::pow<\/a>"],[0,2,"<a href=\"Math\/Matrix.php.html#372\">Superclasses\\Math\\Matrix::identity<\/a>"],[0,3,"<a href=\"Math\/Matrix.php.html#388\">Superclasses\\Math\\Matrix::dot<\/a>"],[0,3,"<a href=\"Math\/Matrix.php.html#412\">Superclasses\\Math\\Matrix::cross<\/a>"],[0,3,"<a href=\"Math\/Matrix.php.html#433\">Superclasses\\Math\\Matrix::toVector<\/a>"],[0,2,"<a href=\"Math\/Matrix.php.html#449\">Superclasses\\Math\\Matrix::__clone<\/a>"],[0,9,"<a href=\"Math\/Matrix.php.html#463\">Superclasses\\Math\\Matrix::__toString<\/a>"],[0,1,"<a href=\"Math\/Numbers.php.html#14\">Superclasses\\Math\\Numbers::__construct<\/a>"],[0,2,"<a href=\"Math\/Numbers.php.html#23\">Superclasses\\Math\\Numbers::isNumber<\/a>"],[0,2,"<a href=\"Math\/Numbers.php.html#34\">Superclasses\\Math\\Numbers::isUnsignedInt<\/a>"],[0,2,"<a href=\"Math\/Numbers.php.html#52\">Superclasses\\Math\\Numbers::isNegativeZero<\/a>"],[0,2,"<a href=\"Math\/Numbers.php.html#70\">Superclasses\\Math\\Numbers::isPositiveZero<\/a>"],[0,3,"<a href=\"Math\/Numbers.php.html#83\">Superclasses\\Math\\Numbers::isNegative<\/a>"],[0,3,"<a href=\"Math\/Numbers.php.html#95\">Superclasses\\Math\\Numbers::isPositive<\/a>"],[0,3,"<a href=\"Math\/Numbers.php.html#108\">Superclasses\\Math\\Numbers::sign<\/a>"],[0,3,"<a href=\"Math\/Numbers.php.html#125\">Superclasses\\Math\\Numbers::copySign<\/a>"],[0,2,"<a href=\"Math\/Rational.php.html#39\">Superclasses\\Math\\Rational::__construct<\/a>"],[0,11,"<a href=\"Math\/Rational.php.html#66\">Superclasses\\Math\\Rational::fromFloat<\/a>"],[0,1,"<a href=\"Math\/Rational.php.html#150\">Superclasses\\Math\\Rational::toFloat<\/a>"],[0,5,"<a href=\"Math\/Rational.php.html#161\">Superclasses\\Math\\Rational::parse<\/a>"],[0,2,"<a href=\"Math\/Rational.php.html#187\">Superclasses\\Math\\Rational::__toString<\/a>"],[0,2,"<a href=\"Math\/Rational.php.html#207\">Superclasses\\Math\\Rational::tryParseInt<\/a>"],[0,2,"<a href=\"Math\/Rational.php.html#223\">Superclasses\\Math\\Rational::gcd<\/a>"],[0,4,"<a href=\"Math\/Rational.php.html#234\">Superclasses\\Math\\Rational::simplify<\/a>"],[0,8,"<a href=\"Strings\/Stringify.php.html#29\">Superclasses\\Strings\\Stringify::stringify<\/a>"],[0,5,"<a href=\"Strings\/Stringify.php.html#64\">Superclasses\\Strings\\Stringify::stringifyFloat<\/a>"],[0,3,"<a href=\"Strings\/Stringify.php.html#97\">Superclasses\\Strings\\Stringify::stringifyArray<\/a>"],[0,1,"<a href=\"Strings\/Stringify.php.html#122\">Superclasses\\Strings\\Stringify::stringifyResource<\/a>"],[0,8,"<a href=\"Strings\/Stringify.php.html#133\">Superclasses\\Strings\\Stringify::stringifyObject<\/a>"],[0,5,"<a href=\"Strings\/Text.php.html#39\">Superclasses\\Text::__construct<\/a>"],[0,1,"<a href=\"Strings\/Text.php.html#64\">Superclasses\\Text::toLower<\/a>"],[0,1,"<a href=\"Strings\/Text.php.html#70\">Superclasses\\Text::toUpper<\/a>"],[0,1,"<a href=\"Strings\/Text.php.html#76\">Superclasses\\Text::toTitle<\/a>"],[0,1,"<a href=\"Strings\/Text.php.html#82\">Superclasses\\Text::caseFold<\/a>"],[0,2,"<a href=\"Strings\/Text.php.html#88\">Superclasses\\Text::convertEncoding<\/a>"],[0,3,"<a href=\"Strings\/Text.php.html#100\">Superclasses\\Text::equal<\/a>"],[0,1,"<a href=\"Strings\/Text.php.html#123\">Superclasses\\Text::__toString<\/a>"],[0,1,"<a href=\"Strings\/Text.php.html#131\">Superclasses\\Text::setDefaultDetectedEncodings<\/a>"],[0,1,"<a href=\"Strings\/Text.php.html#148\">Superclasses\\Text::setDetectedEncodings<\/a>"],[0,5,"<a href=\"Types\/Type.php.html#18\">Superclasses\\Types\\Type::getType<\/a>"],[0,2,"<a href=\"Types\/Type.php.html#48\">Superclasses\\Types\\Type::getClassName<\/a>"],[0,1,"<a href=\"Types\/Type.php.html#62\">Superclasses\\Types\\Type::usesTrait<\/a>"],[0,3,"<a href=\"Types\/Type.php.html#71\">Superclasses\\Types\\Type::getTraitsRecursive<\/a>"],[0,10,"<a href=\"Types\/Type.php.html#100\">Superclasses\\Types\\Type::getStringKey<\/a>"],[0,6,"<a href=\"Types\/TypeSet.php.html#34\">Superclasses\\Types\\TypeSet::__construct<\/a>"],[0,2,"<a href=\"Types\/TypeSet.php.html#74\">Superclasses\\Types\\TypeSet::convertToTypeSet<\/a>"],[0,4,"<a href=\"Types\/TypeSet.php.html#92\">Superclasses\\Types\\TypeSet::isValid<\/a>"],[0,24,"<a href=\"Types\/TypeSet.php.html#123\">Superclasses\\Types\\TypeSet::match<\/a>"],[0,4,"<a href=\"Types\/TypeSet.php.html#203\">Superclasses\\Types\\TypeSet::add<\/a>"],[0,1,"<a href=\"Types\/TypeSet.php.html#227\">Superclasses\\Types\\TypeSet::addValueType<\/a>"],[0,3,"<a href=\"Types\/TypeSet.php.html#238\">Superclasses\\Types\\TypeSet::remove<\/a>"],[0,1,"<a href=\"Types\/TypeSet.php.html#261\">Superclasses\\Types\\TypeSet::clear<\/a>"],[0,1,"<a href=\"Types\/TypeSet.php.html#283\">Superclasses\\Types\\TypeSet::contains<\/a>"],[0,3,"<a href=\"Types\/TypeSet.php.html#294\">Superclasses\\Types\\TypeSet::containsAll<\/a>"],[0,3,"<a href=\"Types\/TypeSet.php.html#312\">Superclasses\\Types\\TypeSet::containsAny<\/a>"],[0,1,"<a href=\"Types\/TypeSet.php.html#327\">Superclasses\\Types\\TypeSet::isEmpty<\/a>"],[0,1,"<a href=\"Types\/TypeSet.php.html#342\">Superclasses\\Types\\TypeSet::count<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

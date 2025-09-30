@@ -1,5 +1,3 @@
-/build/
-/vendor/
-/dev/
-.phpunit.result.cache
 .idea/
+vendor/
+.phpunit.result.cache
