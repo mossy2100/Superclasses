@@ -812,14 +812,14 @@ class Angle
                    . "(?:(?P<deg>{$num})°\s*)?"
                    . "(?:(?P<min>{$num})[′']\s*)?"
                    . "(?:(?P<sec>{$num})[″\"])?$/u";
-        if (preg_match($pattern, $value, $matches, PREG_UNMATCHED_AS_NULL)) {
+        if (preg_match($pattern, $value, $matches)) {
             // Require at least one component (deg/min/sec).
             if (empty($matches['deg']) && empty($matches['min']) && empty($matches['sec'])) {
                 throw new UnexpectedValueException($err_msg);
             }
 
             // Get the sign.
-            $sign = ($matches['sign'] ?? '') === '-' ? -1 : 1;
+            $sign = isset($matches['sign']) && $matches['sign'] === '-' ? -1 : 1;
 
             // Extract the parts.
             $d = isset($matches['deg']) ? $sign * (float)$matches['deg'] : 0.0;
