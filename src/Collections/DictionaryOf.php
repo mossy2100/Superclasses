@@ -48,8 +48,8 @@ class DictionaryOf extends Dictionary
         parent::__construct();
 
         // Convert provided types to TypeSet objects.
-        $this->keyTypes = TypeSet::convertToTypeSet($key_types);
-        $this->valueTypes = TypeSet::convertToTypeSet($value_types);
+        $this->keyTypes = TypeSet::toTypeSet($key_types);
+        $this->valueTypes = TypeSet::toTypeSet($value_types);
     }
 
     /**

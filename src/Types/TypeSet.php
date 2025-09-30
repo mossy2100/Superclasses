@@ -7,8 +7,11 @@ namespace Superclasses\Types;
 use Countable;
 use InvalidArgumentException;
 use Superclasses\Math\Numbers;
+use IteratorAggregate;
+use Traversable;
+use ArrayIterator;
 
-class TypeSet implements Countable
+class TypeSet implements Countable, IteratorAggregate
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // region Properties
@@ -68,10 +71,10 @@ class TypeSet implements Countable
     /**
      * Convert a string or iterable of types into a TypeSet, if necessary.
      *
-     * @param string|iterable $types The types to convert.
+     * @param string|iterable|self $types The value to convert.
      * @return self The converted TypeSet.
      */
-    public static function convertToTypeSet(string|iterable $types = ''): self
+    public static function toTypeSet(string|iterable|self $types = ''): self
     {
         return $types instanceof self ? $types : new self($types);
     }
@@ -286,36 +289,46 @@ class TypeSet implements Countable
     }
 
     /**
-     * Check if the set contains one or more given types provided as an iterable.
+     * Check if the set contains one or more given types.
      *
-     * @param iterable $types The types to check for.
-     * @return bool
+     * @param string|iterable|self $types The types to check for.
+     * @return bool If the set contains all of the types.
      */
-    public function containsAll(iterable $types): bool
+    public function containsAll(string|iterable|self $types): bool
     {
+        // Convert to a TypeSet if necessary.
+        $types = self::toTypeSet($types);
+
+        // Check each.
         foreach ($types as $type) {
             if (!$this->contains($type)) {
                 return false;
             }
         }
 
-        // If we got here, all types were found.
+        // All of the specified types were found.
         return true;
     }
 
     /**
-     * Check if the set contains any of the given types provided as an iterable.
+     * Check if the set contains any of the given types.
      *
-     * @param iterable $types The types to check for.
+     * @param string|iterable|self $types The types to check for.
      * @return bool If the set contains any of the types.
      */
-    public function containsAny(iterable $types): bool
+    public function containsAny(string|iterable|self $types): bool
     {
+        // Convert to a TypeSet if necessary.
+        $types = self::toTypeSet($types);
+
+        // Check each.
         foreach ($types as $it) {
             if ($this->contains($it)) {
                 return true;
             }
         }
+
+        // None of the specified types were found.
         return false;
     }
 
@@ -342,6 +355,21 @@ class TypeSet implements Countable
     public function count(): int
     {
         return count($this->types);
+    }
+
+    // endregion
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region IteratorAggregate implementation
+
+    /**
+     * Get iterator for foreach loops.
+     *
+     * @return Traversable The iterator.
+     */
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->types);
     }
 
     // endregion
