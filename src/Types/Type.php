@@ -8,52 +8,7 @@ use InvalidArgumentException;
 
 class Type
 {
-    /**
-     * Helper function to get a type name for a given value.
-     * A more specific type name (for example, a class name or resource type) is preferred when possible.
-     *
-     * @param mixed $value The value to get the type name for.
-     * @return string The type name for the value.
-     */
-    public static function getType(mixed $value): string
-    {
-        $type = get_debug_type($value);
-
-        // Resources.
-        if (str_starts_with($type, 'resource')) {
-            // Get the resource name if possible, otherwise generic 'resource'.
-            return is_resource($value) ? get_resource_type($value) : 'resource';
-        }
-
-        // Anonymous classes.
-        if (str_contains($type, '@anonymous')) {
-            // Return the base class or interface name if there is one, otherwise generic 'object'.
-            $class = substr($type, 0, -10);
-            return $class === 'class' ? 'object' : $class;
-        }
-
-        // Return null, bool, int, float, string, or array.
-        return $type;
-    }
-
-    /**
-     * Get the class name of an object.
-     *
-     * If it's an anonymous class, the class name will be truncated to the first null byte. This will return "class"
-     * for anonymous classes, or a parent class or interface name if known.
-     *
-     * @param object $value The object.
-     * @return string The class name.
-     */
-    public static function getClassName(object $value): string
-    {
-        $class  = get_class($value);
-        $nulpos = strpos($class, "\0");
-        if ($nulpos !== false) {
-            $class = substr($class, 0, $nulpos);
-        }
-        return $class;
-    }
+    // region Traits
 
     /**
      * Check if an object or class uses a given trait.
@@ -90,6 +45,10 @@ class Type
 
         return array_unique($traits);
     }
+
+    // endregion
+
+    // region Keys
 
     /**
      * Convert any PHP value into a unique string key.
@@ -138,4 +97,6 @@ class Type
         // get_debug_type() has no equivalent.
         throw new InvalidArgumentException("Key has unknown type.");
     }
+
+    // endregion
 }

@@ -38,7 +38,7 @@ use OutOfRangeException;
  * ### Specific Types
  * - Class names: 'DateTime', 'MyClass' (includes inheritance)
  * - Interface names: 'Countable', 'JsonSerializable' (includes implementations)
- * - Resource types: 'stream', 'curl' (specific resource types)
+ * - Resource types: 'resource (stream)', 'resource (curl)', etc.
  *
  * ### Union Types
  * Use pipe syntax to allow multiple types:
@@ -54,7 +54,7 @@ use OutOfRangeException;
  * ## Automatic Defaults
  * When no explicit default is provided, the following defaults are used:
  * - null or mixed → null
- * - int, number, or scalar → 0
+ * - int, uint, number, or scalar → 0
  * - float → 0.0
  * - string → '' (empty string)
  * - bool → false
@@ -88,7 +88,7 @@ class SequenceOf extends Sequence
      *
      * @var TypeSet
      */
-    public private(set) TypeSet $types;
+    private(set) TypeSet $types;
 
     /**
      * Create a new SequenceOf with specified type constraints and a default value.
@@ -141,12 +141,12 @@ class SequenceOf extends Sequence
             } elseif ($this->types->contains('array')) {
                 $default_value = [];
             } else {
-                throw new InvalidArgumentException("A default value must be provided for this item type.");
+                throw new InvalidArgumentException("A default value must be provided for this item type (or allow nulls).");
             }
             $this->defaultValue = $default_value;
         } elseif (!$this->types->match($default_value)) {
             // Default value is invalid for the specified type set.
-            throw new InvalidArgumentException("Default value has invalid type.");
+            throw new InvalidArgumentException("Default value has an invalid type.");
         }
     }
 
@@ -167,6 +167,7 @@ class SequenceOf extends Sequence
      * Add one or more items to the end of the array.
      *
      * @param mixed ...$items The items to add to the sequence.
+     * @return $this The sequence instance.
      * @throws InvalidArgumentException If any of the items have an invalid type.
      *
      * @example
@@ -177,7 +178,7 @@ class SequenceOf extends Sequence
      * $sequence->append(...$new_items);
      */
     #[Override]
-    public function append(mixed ...$items): void
+    public function append(mixed ...$items): static
     {
         // Validate all items.
         foreach ($items as $item) {
@@ -185,13 +186,14 @@ class SequenceOf extends Sequence
         }
 
         // Call the parent method.
-        parent::append(...$items);
+        return parent::append(...$items);
     }
 
     /**
      * Add one or more items to the start of the array.
      *
      * @param mixed ...$items The items to add to the sequence.
+     * @return $this The sequence instance.
      * @throws InvalidArgumentException If any of the items have an invalid type.
      *
      * @example
@@ -202,7 +204,7 @@ class SequenceOf extends Sequence
      * $sequence->prepend(...$new_items);
      */
     #[Override]
-    public function prepend(mixed ...$items): void
+    public function prepend(mixed ...$items): static
     {
         // Validate all items.
         foreach ($items as $item) {
@@ -210,7 +212,7 @@ class SequenceOf extends Sequence
         }
 
         // Call the parent method.
-        parent::prepend(...$items);
+        return parent::prepend(...$items);
     }
 
     /**

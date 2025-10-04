@@ -36,7 +36,7 @@ class TypeSet implements Countable, IteratorAggregate
      */
     public function __construct(string|iterable $types = '')
     {
-        // Convert union type syntax (e.g. 'string|int') into an array of type names.
+        // Convert a type string, including union type syntax (e.g. 'string|int'), into an array of type names.
         if (is_string($types)) {
             $types = explode('|', $types);
         }
@@ -120,17 +120,22 @@ class TypeSet implements Countable, IteratorAggregate
     /**
      * Check if a value matches one of the types in the TypeSet.
      *
+     * @see https://www.php.net/manual/en/function.get-debug-type.php
+     *
      * @param mixed $value The value to check.
      * @return bool True if the value's type matches one of the types in the TypeSet, false otherwise.
      */
     public function match(mixed $value): bool
     {
-        // If the types include 'mixed', any type is allowed.
-        if ($this->contains('mixed')) {
+        // Check if any type is allowed.
+        if ($this->isEmpty() || $this->contains('mixed')) {
             return true;
         }
 
-        // Check for a simple type or class name match.
+        // Check for a type or class name match.
+        // This supports "null", resource type strings like "resource (stream)", and anonymous classes.
+        // It does not support the old, longer type names like "integer", "double", or "boolean".
+        // See get_debug_type() for more details.
         if ($this->contains(get_debug_type($value))) {
             return true;
         }
@@ -147,6 +152,21 @@ class TypeSet implements Countable, IteratorAggregate
 
         // Check uint.
         if ($this->contains('uint') && Numbers::isUnsignedInt($value)) {
+            return true;
+        }
+
+        // Check iterable.
+        if ($this->contains('iterable') && is_iterable($value)) {
+            return true;
+        }
+
+        // Check callable.
+        if ($this->contains('callable') && is_callable($value)) {
+            return true;
+        }
+
+        // Check resource (unspecified type).
+        if ($this->contains('resource') && is_resource($value)) {
             return true;
         }
 
@@ -169,24 +189,6 @@ class TypeSet implements Countable, IteratorAggregate
                     return true;
                 }
             }
-        }
-
-        // Check for any resource or specific resource type.
-        if (is_resource($value) && (
-                $this->contains('resource') ||
-                $this->contains(get_resource_type($value))
-            )) {
-            return true;
-        }
-
-        // Check iterable.
-        if (is_iterable($value) && $this->contains('iterable')) {
-            return true;
-        }
-
-        // Check callable.
-        if (is_callable($value) && $this->contains('callable')) {
-            return true;
         }
 
         return false;
@@ -229,7 +231,7 @@ class TypeSet implements Countable, IteratorAggregate
      */
     public function addValueType(mixed $value): self
     {
-        return $this->add(Type::getType($value));
+        return $this->add(get_debug_type($value));
     }
 
     /**
