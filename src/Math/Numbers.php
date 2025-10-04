@@ -4,17 +4,24 @@ declare(strict_types = 1);
 
 namespace Superclasses\Math;
 
+use Random\RandomException;
 use UnexpectedValueException;
 use OverflowException;
 
 class Numbers
 {
+    // region Constructor
+
     /**
      * Private constructor to prevent instantiation.
      */
     private function __construct()
     {
     }
+
+    // endregion
+
+    // region Inspection methods
 
     /**
      * Check if a value is a number, i.e. an integer or a float.
@@ -103,6 +110,10 @@ class Numbers
         return !is_nan($value) && ($value > 0 || self::isPositiveZero($value));
     }
 
+    // endregion
+
+    // region Sign methods
+
     /**
      * Sign function.
      *
@@ -123,7 +134,7 @@ class Numbers
         }
 
         // Return result for 0.
-        return $zeroForZero ? 0 : (is_float($value) && self::isNegativeZero($value) ? -1 : 1);
+        return $zeroForZero ? 0 : (self::isNegativeZero($value) ? -1 : 1);
     }
 
     /**
@@ -143,22 +154,48 @@ class Numbers
         return abs($num) * self::sign($sign_source, false);
     }
 
+    // endregion
+
+    // region Integer arithmetic
+
     /**
      * Add two integers with overflow check.
      *
      * @param int $a The first integer.
      * @param int $b The second integer.
-     * @return int The added integers.
+     * @return int The added integers if no overflow occurs.
      * @throws OverflowException If the addition results in overflow.
      */
-    public static function addIntegers(int $a, int $b): int
+    public static function intAdd(int $a, int $b): int
     {
-        // Add the two integers.
+        // Do the addition.
         $c = $a + $b;
 
         // Check for overflow.
         if (is_float($c)) {
-            throw new OverflowException("Overflow in addition.");
+            throw new OverflowException("Overflow in integer addition.");
+        }
+
+        // Return the result.
+        return $c;
+    }
+
+    /**
+     * Subtract one integer from another with overflow check.
+     *
+     * @param int $a The first integer.
+     * @param int $b The second integer.
+     * @return int The result of subtracting the second integer from the first, if no overflow occurs.
+     * @throws OverflowException If the subtraction results in overflow.
+     */
+    public static function intSub(int $a, int $b): int
+    {
+        // Do the subtraction.
+        $c = $a - $b;
+
+        // Check for overflow.
+        if (is_float($c)) {
+            throw new OverflowException("Overflow in integer subtraction.");
         }
 
         // Return the result.
@@ -170,17 +207,17 @@ class Numbers
      *
      * @param int $a The first integer.
      * @param int $b The second integer.
-     * @return int The multiplied integers.
+     * @return int The multiplied integers if no overflow occurs.
      * @throws OverflowException If the multiplication results in overflow.
      */
-    public static function multiplyIntegers(int $a, int $b): int
+    public static function intMul(int $a, int $b): int
     {
-        // Multiply the two integers.
+        // Do the multiplication.
         $c = $a * $b;
 
         // Check for overflow.
         if (is_float($c)) {
-            throw new OverflowException("Overflow in multiplication.");
+            throw new OverflowException("Overflow in integer multiplication.");
         }
 
         // Return the result.
@@ -188,11 +225,37 @@ class Numbers
     }
 
     /**
+     * Raise one integer to the power of another with overflow check.
+     *
+     * @param int $a The first integer.
+     * @param int $b The second integer.
+     * @return int The result integer if no overflow occur.
+     * @throws OverflowException If the exponentiation results in overflow.
+     */
+    public static function intPow(int $a, int $b): int
+    {
+        // Do the exponentiation.
+        $c = $a ** $b;
+
+        // Check for overflow.
+        if (is_float($c)) {
+            throw new OverflowException("Overflow in exponentiation.");
+        }
+
+        // Return the result.
+        return $c;
+    }
+
+    // endregion
+
+    // region Other methods
+
+    /**
      * Try to convert a string to an equivalent integer.
      *
      * This method is stricter than PHP's built-in intval() function or (int) cast. The string must look exactly like
-     * an integer, meaning digits only, and the string represent a valid integer for the current environment
-     * (i.e. in the range PHP_MIN_INT..PHP_MAX_INT).
+     * an integer, meaning digits only, and the string must represent an integer within the valid range.
+     * (i.e. PHP_MIN_INT..PHP_MAX_INT).
      *
      * @param string $s The string to convert.
      * @param int|null $i The converted integer, if successful, or null otherwise.
@@ -201,13 +264,13 @@ class Numbers
     public static function tryParseInt(string $s, ?int &$i): bool
     {
         // Convert the string to an integer.
-        $j = (int)$s;
+        $parsed = (int)$s;
 
         // Convert back to a string to confirm the string is a valid integer.
-        $ok = $s === (string)$j;
+        $ok = $s === (string)$parsed;
 
-        // Set the return value.
-        $i = $ok ? $j : null;
+        // Set the parsed int value.
+        $i = $ok ? $parsed : null;
 
         // Return the result.
         return $ok;
@@ -224,4 +287,25 @@ class Numbers
     {
         return $b === 0 ? $a : self::gcd($b, $a % $b);
     }
+
+    // endregion
+
+    // region Random numbers
+
+    /**
+     * Generate a random float.
+     *
+     * @return float The random float.
+     * @throws RandomException If an appropriate source of randomness cannot be found.
+     */
+    public static function randomFloat(): float {
+        do {
+            $bytes = random_bytes(8);
+            $float = unpack('d', $bytes)[1];
+        } while (!is_finite($float));
+
+        return $float;
+    }
+
+    // endregion
 }

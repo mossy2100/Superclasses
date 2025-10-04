@@ -6,9 +6,8 @@ namespace Superclasses\Math;
 
 use Stringable;
 use ArrayAccess;
-use ArithmeticError;
-use DivisionByZeroError;
 use InvalidArgumentException;
+use Superclasses\Exceptions\ArithmeticException;
 
 /**
  * TODO Complete tests.
@@ -163,6 +162,16 @@ class Complex implements Stringable, ArrayAccess
     // region Arithmetic operations
 
     /**
+     * Negate a complex number.
+     *
+     * @return Complex A new complex number representing the negative of this one.
+     */
+    public function neg(): Complex
+    {
+        return new Complex(-$this->real, -$this->imag);
+    }
+
+    /**
      * Add another complex number to this one.
      *
      * @param Complex|int|float $other The real or complex number to add.
@@ -218,7 +227,7 @@ class Complex implements Stringable, ArrayAccess
      *
      * @param Complex|int|float $other The real or complex number to divide by.
      * @return Complex A new complex number representing the quotient.
-     * @throws DivisionByZeroError If the divisor is zero.
+     * @throws ArithmeticException If the divisor is zero.
      */
     public function div(Complex|int|float $other): Complex
     {
@@ -227,7 +236,7 @@ class Complex implements Stringable, ArrayAccess
 
         // Check for divide by zero.
         if ($other->equals(0)) {
-            throw new DivisionByZeroError("Cannot divide by 0.");
+            throw new ArithmeticException("Cannot divide by 0.");
         }
 
         // Do the division.
@@ -258,13 +267,13 @@ class Complex implements Stringable, ArrayAccess
      * Calculate the natural logarithm of a complex number.
      *
      * @return Complex A new complex number representing ln(z).
-     * @throws ArithmeticError If the complex number is 0.
+     * @throws ArithmeticException If the complex number is 0.
      */
     public function ln(): Complex
     {
         // Check for ln(0), which is undefined.
         if ($this->equals(0)) {
-            throw new ArithmeticError("The logarithm of 0 is undefined.");
+            throw new ArithmeticException("The logarithm of 0 is undefined.");
         }
 
         // Use shortcuts where possible.
@@ -294,7 +303,7 @@ class Complex implements Stringable, ArrayAccess
      *
      * @param Complex|int|float $base The base for the logarithm.
      * @return Complex A new complex number representing log_b(z).
-     * @throws ArithmeticError If the base is 0, 1, or if this number is 0.
+     * @throws ArithmeticException If the base is 0, 1, or if this number is 0.
      */
     public function log(Complex|int|float $base): Complex
     {
@@ -303,10 +312,10 @@ class Complex implements Stringable, ArrayAccess
 
         // Check for invalid base values.
         if ($base->equals(0)) {
-            throw new ArithmeticError("Logarithm base cannot be 0.");
+            throw new ArithmeticException("Logarithm base cannot be 0.");
         }
         if ($base->equals(1)) {
-            throw new ArithmeticError("Logarithm base cannot be 1.");
+            throw new ArithmeticException("Logarithm base cannot be 1.");
         }
 
         // Check for natural logarithm.
