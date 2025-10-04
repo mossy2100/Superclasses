@@ -9,7 +9,6 @@ use Countable;
 use InvalidArgumentException;
 use IteratorAggregate;
 use Stringable;
-use Superclasses\Types\Type;
 use Traversable;
 
 /**

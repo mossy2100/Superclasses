@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Superclasses\Collections;
 
 use Override;
-use Superclasses\Types\TypeSet;
 
 /**
  * SetOf class.
@@ -19,7 +18,7 @@ class SetOf extends Set
      *
      * @var TypeSet
      */
-    public protected(set) TypeSet $types;
+    protected(set) TypeSet $types;
 
     /**
      * Constructor.
@@ -61,7 +60,7 @@ class SetOf extends Set
         // Need to allow types from both sets.
         $types = $this->types;
         if ($other instanceof self) {
-            $types = $types->union($other->types);
+            $types = $types->addTypes($other->types);
         }
 
         // Construct the new set.

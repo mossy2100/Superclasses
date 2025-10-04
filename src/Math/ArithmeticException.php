@@ -1,10 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-namespace Superclasses\Exceptions;
+namespace Superclasses\Math;
 
-use Throwable;
 use RuntimeException;
+use Throwable;
 
 /**
  * Exception thrown when an arithmetic operation cannot be completed successfully, e.g. division by zero.

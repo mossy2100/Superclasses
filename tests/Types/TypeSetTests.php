@@ -2,13 +2,13 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses\Tests\Types;
+namespace Superclasses\Tests\Collections;
 
 use ArrayObject;
-use DateTime;
 use Countable;
-use Superclasses\Types\TypeSet;
-use Superclasses\Types\Type;
+use DateTime;
+use Superclasses\Collections\Type;
+use Superclasses\Collections\TypeSet;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -47,5 +47,3 @@ $x = new class () extends DateTime implements Countable {
         return count($this->items);
     }
 };
-
-echo Type::getType($x);

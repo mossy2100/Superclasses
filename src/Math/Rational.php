@@ -5,11 +5,8 @@ declare(strict_types = 1);
 namespace Superclasses\Math;
 
 use InvalidArgumentException;
-use Stringable;
 use OverflowException;
-use DivisionByZeroError;
-use OutOfRangeException;
-use Superclasses\Exceptions\ArithmeticException;
+use Stringable;
 
 class Rational implements Stringable
 {

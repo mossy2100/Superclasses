@@ -6,11 +6,10 @@ namespace Superclasses\Collections;
 
 use ArrayAccess;
 use Countable;
-use Traversable;
 use IteratorAggregate;
 use OutOfBoundsException;
 use Override;
-use Superclasses\Types\Type;
+use Traversable;
 
 /**
  * Dictionary class that permits keys and values of any type, including scalar, complex, nullable,

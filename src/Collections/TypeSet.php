@@ -2,14 +2,14 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses\Types;
+namespace Superclasses\Collections;
 
+use ArrayIterator;
 use Countable;
 use InvalidArgumentException;
-use Superclasses\Math\Numbers;
 use IteratorAggregate;
+use Superclasses\Math\Numbers;
 use Traversable;
-use ArrayIterator;
 
 class TypeSet implements Countable, IteratorAggregate
 {
@@ -48,17 +48,18 @@ class TypeSet implements Countable, IteratorAggregate
                 throw new InvalidArgumentException("Types must be provided as strings.");
             }
 
-            // Trim just in case they did something like 'string | int'.
+            // Trim just in case the user did something like 'string | int'.
             $type = trim($type);
 
             // Support the question mark nullable notation (e.g. '?string').
             if (strlen($type) > 1 && $type[0] === '?') {
                 // Add null and the type being made nullable.
-                $this->add('null', substr($type, 1));
+                $this->addType('null');
+                $this->addType(substr($type, 1));
             }
             else {
-                // This will throw if the type is blank or '?' or otherwise invalid.
-                $this->add($type);
+                // This will throw if the type is invalid.
+                $this->addType($type);
             }
         }
     }
@@ -89,32 +90,39 @@ class TypeSet implements Countable, IteratorAggregate
      * For valid class names:
      * @see https://www.php.net/manual/en/language.oop5.basic.php
      *
-     * @param mixed $type The type to check.
+     * @param string $type The type to check.
      * @return bool True if the type is a valid type, false otherwise.
      */
-    public function isValid(mixed $type): bool
+    public function isValid(string $type): bool
     {
-        // Check the type is a string.
-        if (!is_string($type)) {
-            return false;
-        }
-
         $type = trim($type);
 
-        // Ignore blanks.
+        // Check for empty string.
         if ($type === '') {
             return false;
         }
 
-        // Check for simple types, pseudotypes, and resource types.
-        if (preg_match("/^[a-zA-Z0-9._ ]+$/", $type)) {
+        // Check for core types, pseudotypes, and generic "resource" and "object".
+        $simple_types = [
+            'null', 'int', 'float', 'string', 'bool', 'array', 'object', 'resource', 'callable',
+            'iterable', 'mixed', 'scalar', 'number', 'uint'
+        ];
+        if (in_array($type, $simple_types, true)) {
             return true;
         }
 
-        // Check for class names.
+        // Check for class names. Anonymous classes are not supported.
         $class = "[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*";
-        $rx_class = "/^\\\\?({$class})(?:\\\\{$class})*$/";
-        return (bool)preg_match($rx_class, $type);
+        if (preg_match("/^\\\\?({$class})(?:\\\\{$class})*$/", $type)) {
+            return true;
+        }
+
+        // Check for resource types.
+        if (preg_match("/^resource \([\w. ]+\)$/", $type)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -133,8 +141,9 @@ class TypeSet implements Countable, IteratorAggregate
         }
 
         // Check for a type or class name match.
-        // This supports "null", resource type strings like "resource (stream)", and anonymous classes.
-        // It does not support the old, longer type names like "integer", "double", or "boolean".
+        // This will match any strings returned by get_debug_type(), including "null", resource type strings like
+        // "resource (stream)", and class names (including anonymous classes).
+        // It will not match the old, longer type names like "integer", "double", or "boolean" (unsupported).
         // See get_debug_type() for more details.
         if ($this->contains(get_debug_type($value))) {
             return true;
@@ -177,7 +186,7 @@ class TypeSet implements Countable, IteratorAggregate
                 return true;
             }
 
-            // Check value against classes, interfaces, and traits.
+            // Check value against parent classes, interfaces, and traits.
             foreach ($this->types as $type) {
                 // Check classes and interfaces.
                 if ((class_exists($type) || interface_exists($type)) && $value instanceof $type) {
@@ -194,29 +203,86 @@ class TypeSet implements Countable, IteratorAggregate
         return false;
     }
 
+    /**
+     * Try to get a sane default value for this type set.
+     *
+     * @param mixed $default_value The default value.
+     * @return bool True if a default value was found, false otherwise.
+     */
+    public function tryGetDefaultValue(mixed &$default_value): bool
+    {
+        $result = true;
+        if ($this->containsAny(['null', 'mixed'])) {
+            $default_value = null;
+        }
+        elseif ($this->containsAny(['int', 'uint', 'number'])) {
+            $default_value = 0;
+        }
+        elseif ($this->contains('float')) {
+            $default_value = 0.0;
+        }
+        elseif ($this->contains('string')) {
+            $default_value = '';
+        }
+        elseif ($this->contains('bool')) {
+            $default_value = false;
+        }
+        elseif ($this->containsAny(['array', 'iterable'])) {
+            $default_value = [];
+        }
+        else {
+            $result = false;
+        }
+
+        return $result;
+    }
+
     // endregion
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // region Add/remove methods
+    // region Add methods
 
     /**
-     * Add types to the set.
+     * Add a type to the set.
      *
-     * @param mixed ...$types The types to add to the set.
+     * @param string $type The type to add to the set.
      * @return $this The modified set.
+     * @throws InvalidArgumentException If the type is invalid (e.g. an empty string, '?', or an anonymous class).
+     * @see TypeSet::isValid()
      */
-    public function add(mixed ...$types): self
+    public function addType(string $type): self
     {
-        foreach ($types as $type) {
-            // Check if the type is allowed in the set.
-            if (!$this->isValid($type)) {
-                throw new InvalidArgumentException("Invalid type: $type.");
-            }
+        // Ignore blanks.
+        $type = trim($type);
+        if ($type === '') {
+            return $this;
+        }
 
-            // Add the type if new.
-            if (!in_array($type, $this->types, true)) {
-                $this->types[] = $type;
-            }
+        // Check if the type string is valid.
+        if (!$this->isValid($type)) {
+            throw new InvalidArgumentException("Invalid type: $type.");
+        }
+
+        // Add the type if new.
+        if (!in_array($type, $this->types, true)) {
+            $this->types[] = $type;
+        }
+
+        // Return $this for chaining.
+        return $this;
+    }
+
+    /**
+     * Add multiple types to the set.
+     *
+     * @param iterable $types The types to add to the set.
+     * @return self The modified set.
+     */
+    public function addTypes(iterable $types): self
+    {
+        // Add each type.
+        foreach ($types as $type) {
+            $this->addType($type);
         }
 
         // Return $this for chaining.
@@ -231,45 +297,7 @@ class TypeSet implements Countable, IteratorAggregate
      */
     public function addValueType(mixed $value): self
     {
-        return $this->add(get_debug_type($value));
-    }
-
-    /**
-     * Remove one or more types from the set.
-     *
-     * @param mixed ...$types The types to remove from the set, if present.
-     * @return $this The modified set.
-     */
-    public function remove(mixed ...$types): self
-    {
-        // No type check needed; if it's in the set, remove it.
-        foreach ($types as $type) {
-            $key = array_search($type, $this->types);
-            if ($key === false) {
-                continue;
-            }
-            unset($this->types[$key]);
-        }
-
-        // Reindex.
-        $this->types = array_values($this->types);
-
-        // Return $this for chaining.
-        return $this;
-    }
-
-    /**
-     * Remove all types from the set.
-     *
-     * @return $this
-     */
-    public function clear(): self
-    {
-        // Remove all the types.
-        $this->types = [];
-
-        // Return $this for chaining.
-        return $this;
+        return $this->addType(get_debug_type($value));
     }
 
     // endregion

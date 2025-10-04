@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses;
+namespace Superclasses\Color;
 
 use Stringable;
 use Superclasses\Math\Angle;

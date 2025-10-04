@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Superclasses\Types;
+namespace Superclasses\Collections;
 
 use InvalidArgumentException;
 

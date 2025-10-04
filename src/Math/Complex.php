@@ -4,10 +4,9 @@ declare(strict_types = 1);
 
 namespace Superclasses\Math;
 
-use Stringable;
 use ArrayAccess;
 use InvalidArgumentException;
-use Superclasses\Exceptions\ArithmeticException;
+use Stringable;
 
 /**
  * TODO Complete tests.

@@ -6,7 +6,7 @@ namespace Superclasses\Tests\Collections;
 
 use DateTime;
 use Superclasses\Collections\Dictionary;
-use Superclasses\Types\Type;
+use Superclasses\Collections\Type;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

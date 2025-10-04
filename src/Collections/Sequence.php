@@ -8,11 +8,10 @@ use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
-use Traversable;
-use UnderflowException;
 use OutOfRangeException;
 use Override;
-use Superclasses\Exceptions\TypeException;
+use Traversable;
+use UnderflowException;
 
 /**
  * A sequence implementation that is stricter than ordinary PHP arrays.
@@ -31,7 +30,7 @@ class Sequence implements ArrayAccess, Countable, IteratorAggregate
      *
      * @var array
      */
-    public protected(set) array $items = [];
+    protected(set) array $items = [];
 
     /**
      * The default value.

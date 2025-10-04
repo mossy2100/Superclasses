@@ -4,10 +4,9 @@ declare(strict_types = 1);
 
 namespace Superclasses\Collections;
 
-use Superclasses\Types\TypeSet;
-use Override;
 use InvalidArgumentException;
 use OutOfRangeException;
+use Override;
 
 /**
  * A type-safe list implementation that enforces item types at runtime.
@@ -121,27 +120,11 @@ class SequenceOf extends Sequence
             $this->types = $types instanceof TypeSet ? $types : new TypeSet($types);
         }
 
-        // If no types were specified, assume any are allowed.
-        if (count($this->types) === 0) {
-            $this->types->add('mixed');
-        }
-
         // If a default value isn't specified, use sane defaults for common types.
         if (func_num_args() === 2) {
-            if ($this->types->containsAny(['null', 'mixed'])) {
-                $default_value = null;
-            } elseif ($this->types->containsAny(['int', 'uint', 'number', 'scalar'])) {
-                $default_value = 0;
-            } elseif ($this->types->contains('float')) {
-                $default_value = 0.0;
-            } elseif ($this->types->contains('string')) {
-                $default_value = '';
-            } elseif ($this->types->contains('bool')) {
-                $default_value = false;
-            } elseif ($this->types->contains('array')) {
-                $default_value = [];
-            } else {
-                throw new InvalidArgumentException("A default value must be provided for this item type (or allow nulls).");
+            // Try to determine a sane default value.
+            if (!$this->types->tryGetDefaultValue($default_value)) {
+                throw new InvalidArgumentException("A default value must be provided (or allow nulls).");
             }
             $this->defaultValue = $default_value;
         } elseif (!$this->types->match($default_value)) {

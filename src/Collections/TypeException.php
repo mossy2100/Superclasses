@@ -1,10 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-namespace Superclasses\Exceptions;
+namespace Superclasses\Collections;
 
-use Throwable;
 use LogicException;
+use Throwable;
 
 /**
  * Exception thrown when a value has an invalid type.

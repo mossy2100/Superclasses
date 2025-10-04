@@ -9,8 +9,6 @@ use Countable;
 use InvalidArgumentException;
 use IteratorAggregate;
 use Stringable;
-use Superclasses\Types\Type;
-use Superclasses\Types\TypeSet;
 use Traversable;
 
 /**
@@ -35,7 +33,7 @@ class Set2 implements Stringable, Countable, IteratorAggregate
      *
      * @var TypeSet|null
      */
-    public protected(set) ?TypeSet $types;
+    protected(set) ?TypeSet $types;
 
     /**
      * Items in the set.
@@ -233,10 +231,10 @@ class Set2 implements Stringable, Countable, IteratorAggregate
         // Determine types for result set.
         $types = ($this->types === null && $other->types === null) ? null : new TypeSet();
         if ($this->types !== null) {
-            $types->add(...$this->types);
+            $types->addTypes($this->types);
         }
         if ($other->types !== null) {
-            $types->add(...$other->types);
+            $types->addTypes($other->types);
         }
 
         // Construct the new set.
