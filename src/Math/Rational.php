@@ -4,9 +4,11 @@ declare(strict_types = 1);
 
 namespace Superclasses\Math;
 
+use Stringable;
 use InvalidArgumentException;
 use OverflowException;
-use Stringable;
+use RangeException;
+use DomainException;
 
 class Rational implements Stringable
 {
@@ -329,7 +331,7 @@ class Rational implements Stringable
     {
         // Guard.
         if ($this->num === 0) {
-            throw new ArithmeticException("Cannot take reciprocal of zero.");
+            throw new DomainException("Cannot take reciprocal of zero.");
         }
 
         return new self($this->den, $this->num);
@@ -369,7 +371,7 @@ class Rational implements Stringable
      *
      * @param int|float|self $other The value to divide by.
      * @return self A new rational number representing the quotient.
-     * @throws ArithmeticException If dividing by zero.
+     * @throws DomainException If dividing by zero.
      * @throws OverflowException If the result would overflow an integer.
      */
     public function div(int|float|self $other): self
@@ -377,7 +379,7 @@ class Rational implements Stringable
         // Guard.
         $other = self::toRational($other);
         if ($other->num === 0) {
-            throw new ArithmeticException("Cannot divide by zero.");
+            throw new DomainException("Cannot divide by zero.");
         }
 
         return $this->mul($other->inv());
@@ -388,7 +390,7 @@ class Rational implements Stringable
      *
      * @param int $exponent The integer exponent.
      * @return self A new rational number representing the result.
-     * @throws ArithmeticException If raising zero to a negative power.
+     * @throws DomainException If raising zero to a negative power.
      * @throws OverflowException If the result would overflow an integer.
      */
     public function pow(int $exponent): self
@@ -403,7 +405,7 @@ class Rational implements Stringable
         if ($this->num === 0) {
             // 0 to the power of a negative exponent is invalid (effectively division by zero).
             if ($exponent < 0) {
-                throw new ArithmeticException("Cannot raise zero to a negative power.");
+                throw new DomainException("Cannot raise zero to a negative power.");
             }
 
             // 0 to the power of a positive exponent is 0.
@@ -625,14 +627,14 @@ class Rational implements Stringable
 
             // Since the canonical form has a positive denominator, we can't return this as-is, and have to throw an
             // exception.
-            throw new ArithmeticException("Cannot simplify a rational with a numerator of PHP_INT_MIN and a negative denominator.");
+            throw new RangeException("Cannot simplify a rational with a numerator of PHP_INT_MIN and a negative denominator.");
         }
 
         // Handle denominator of PHP_INT_MIN.
         if ($den === PHP_INT_MIN) {
             // Since the canonical form has a positive denominator, we can't return this as-is, and have to throw an
             // exception.
-            throw new ArithmeticException("Cannot simplify a rational with a denominator of PHP_INT_MIN.");
+            throw new RangeException("Cannot simplify a rational with a denominator of PHP_INT_MIN.");
         }
 
         // Calculate the GCD.

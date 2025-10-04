@@ -4,9 +4,11 @@ declare(strict_types = 1);
 
 namespace Superclasses\Math;
 
+use Stringable;
 use ArrayAccess;
 use InvalidArgumentException;
-use Stringable;
+use LogicException;
+use DomainException;
 
 /**
  * TODO Complete tests.
@@ -17,80 +19,18 @@ class Complex implements Stringable, ArrayAccess
     // region Properties
 
     /**
-     * The backing field for the real property.
-     *
-     * @var float
-     */
-    private float $_real = 0;
-
-    /**
      * The real part of the complex number.
      *
      * @var float
      */
-    public float $real {
-        get {
-            return $this->_real;
-        }
-
-        set(float|int $value) {
-            // Make sure value is a float.
-            $value = (float)$value;
-
-            // Make sure value is finite.
-            if (!is_finite($value)) {
-                throw new InvalidArgumentException("Complex numbers must have finite components.");
-            }
-
-            // Don't update unless necessary.
-            if ($value !== $this->_real) {
-                // Update backing field.
-                $this->_real = $value;
-
-                // Clear computed properties.
-                $this->_mag = null;
-                $this->_phase = null;
-            }
-        }
-    }
-
-    /**
-     * The backing field for the imag property.
-     *
-     * @var float
-     */
-    private float $_imag = 0;
+    private(set) float $real;
 
     /**
      * The imaginary part of the complex number.
      *
      * @var float
      */
-    public float $imag {
-        get {
-            return $this->_imag;
-        }
-
-        set(float|int $value) {
-            // Make sure value is a float.
-            $value = (float)$value;
-
-            // Make sure value is finite.
-            if (!is_finite($value)) {
-                throw new InvalidArgumentException("Complex numbers must have finite components.");
-            }
-
-            // Don't update unless necessary.
-            if ($value !== $this->_imag) {
-                // Update backing field.
-                $this->_imag = $value;
-
-                // Clear computed properties.
-                $this->_mag = null;
-                $this->_phase = null;
-            }
-        }
-    }
+    private(set) float $imag;
 
     /**
      * The backing field for the mag property.
@@ -138,6 +78,13 @@ class Complex implements Stringable, ArrayAccess
         }
     }
 
+    /**
+     * The backing field for the i property.
+     *
+     * @var Complex|null
+     */
+    private static ?self $_i = null;
+
     // endregion
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,51 +110,51 @@ class Complex implements Stringable, ArrayAccess
     /**
      * Negate a complex number.
      *
-     * @return Complex A new complex number representing the negative of this one.
+     * @return self A new complex number representing the negative of this one.
      */
-    public function neg(): Complex
+    public function neg(): self
     {
-        return new Complex(-$this->real, -$this->imag);
+        return new self(-$this->real, -$this->imag);
     }
 
     /**
      * Add another complex number to this one.
      *
-     * @param Complex|int|float $other The real or complex number to add.
-     * @return Complex A new complex number representing the sum.
+     * @param self|int|float $other The real or complex number to add.
+     * @return self A new complex number representing the sum.
      */
-    public function add(Complex|int|float $other): Complex
+    public function add(self|int|float $other): self
     {
         // Make sure $other is Complex.
         $other = self::toComplex($other);
 
         // Do the addition.
-        return new Complex($this->real + $other->real, $this->imag + $other->imag);
+        return new self($this->real + $other->real, $this->imag + $other->imag);
     }
 
     /**
      * Subtract another complex number from this one.
      *
-     * @param Complex|int|float $other The real or complex number to subtract.
-     * @return Complex A new complex number representing the difference.
+     * @param self|int|float $other The real or complex number to subtract.
+     * @return self A new complex number representing the difference.
      */
-    public function sub(Complex|int|float $other): Complex
+    public function sub(self|int|float $other): self
     {
         // Make sure $other is Complex.
         $other = self::toComplex($other);
 
         // Do the subtraction.
-        return new Complex($this->real - $other->real, $this->imag - $other->imag);
+        return new self($this->real - $other->real, $this->imag - $other->imag);
     }
 
     /**
      * Multiply this complex number by another.
      * Uses the formula: (a + bi)(c + di) = (ac - bd) + (ad + bc)i
      *
-     * @param Complex|int|float $other The real or complex number to multiply by.
-     * @return Complex A new complex number representing the product.
+     * @param self|int|float $other The real or complex number to multiply by.
+     * @return self A new complex number representing the product.
      */
-    public function mul(Complex|int|float $other): Complex
+    public function mul(self|int|float $other): self
     {
         // Make sure $other is Complex.
         $other = self::toComplex($other);
@@ -217,25 +164,25 @@ class Complex implements Stringable, ArrayAccess
         $b = $this->imag;
         $c = $other->real;
         $d = $other->imag;
-        return new Complex($a * $c - $b * $d, $a * $d + $b * $c);
+        return new self($a * $c - $b * $d, $a * $d + $b * $c);
     }
 
     /**
      * Divide this complex number by another.
      * Uses the formula: (a + bi)/(c + di) = [(ac + bd) + (bc - ad)i]/(c² + d²)
      *
-     * @param Complex|int|float $other The real or complex number to divide by.
-     * @return Complex A new complex number representing the quotient.
-     * @throws ArithmeticException If the divisor is zero.
+     * @param self|int|float $other The real or complex number to divide by.
+     * @return self A new complex number representing the quotient.
+     * @throws DomainException If the divisor is zero.
      */
-    public function div(Complex|int|float $other): Complex
+    public function div(self|int|float $other): self
     {
         // Make sure $other is Complex.
         $other = self::toComplex($other);
 
         // Check for divide by zero.
-        if ($other->equals(0)) {
-            throw new ArithmeticException("Cannot divide by 0.");
+        if ($other->eq(0)) {
+            throw new DomainException("Cannot divide by 0.");
         }
 
         // Do the division.
@@ -244,17 +191,17 @@ class Complex implements Stringable, ArrayAccess
         $c = $other->real;
         $d = $other->imag;
         $f = ($c * $c) + ($d * $d);
-        return new Complex(($a * $c + $b * $d) / $f, ($b * $c - $a * $d) / $f);
+        return new self(($a * $c + $b * $d) / $f, ($b * $c - $a * $d) / $f);
     }
 
     /**
      * Get the complex conjugate of this number.
      * s
-     * @return Complex A new complex number representing the conjugate.
+     * @return self A new complex number representing the conjugate.
      */
-    public function conj(): Complex
+    public function conj(): self
     {
-        return new Complex($this->real, -$this->imag);
+        return new self($this->real, -$this->imag);
     }
 
     // endregion
@@ -265,76 +212,76 @@ class Complex implements Stringable, ArrayAccess
     /**
      * Calculate the natural logarithm of a complex number.
      *
-     * @return Complex A new complex number representing ln(z).
-     * @throws ArithmeticException If the complex number is 0.
+     * @return self A new complex number representing ln(z).
+     * @throws DomainException If the complex number is 0.
      */
-    public function ln(): Complex
+    public function ln(): self
     {
         // Check for ln(0), which is undefined.
-        if ($this->equals(0)) {
-            throw new ArithmeticException("The logarithm of 0 is undefined.");
+        if ($this->eq(0)) {
+            throw new DomainException("The logarithm of 0 is undefined.");
         }
 
         // Use shortcuts where possible.
-        if ($this->equals(1)) {
-            return new Complex(0);
+        if ($this->eq(1)) {
+            return new self(0);
         }
-        elseif ($this->equals(2)) {
-            return new Complex(M_LN2);
+        elseif ($this->eq(2)) {
+            return new self(M_LN2);
         }
-        elseif ($this->equals(M_E)) {
-            return new Complex(1);
+        elseif ($this->eq(M_E)) {
+            return new self(1);
         }
-        elseif ($this->equals(M_PI)) {
-            return new Complex(M_LNPI);
+        elseif ($this->eq(M_PI)) {
+            return new self(M_LNPI);
         }
-        elseif ($this->equals(10)) {
-            return new Complex(M_LN10);
+        elseif ($this->eq(10)) {
+            return new self(M_LN10);
         }
 
         // Calculate ln(z) = ln|z| + i*arg(z)
-        return new Complex(log($this->mag), $this->phase);
+        return new self(log($this->mag), $this->phase);
     }
 
     /**
      * Calculate the logarithm of a complex number with the given base.
      * Uses the change of base formula: log_b(z) = ln(z) / ln(b)
      *
-     * @param Complex|int|float $base The base for the logarithm.
-     * @return Complex A new complex number representing log_b(z).
-     * @throws ArithmeticException If the base is 0, 1, or if this number is 0.
+     * @param self|int|float $base The base for the logarithm.
+     * @return self A new complex number representing log_b(z).
+     * @throws DomainException If the base is 0, 1, or if this number is 0.
      */
-    public function log(Complex|int|float $base): Complex
+    public function log(self|int|float $base): self
     {
         // Make sure $base is Complex.
         $base = self::toComplex($base);
 
         // Check for invalid base values.
-        if ($base->equals(0)) {
-            throw new ArithmeticException("Logarithm base cannot be 0.");
+        if ($base->eq(0)) {
+            throw new DomainException("Logarithm base cannot be 0.");
         }
-        if ($base->equals(1)) {
-            throw new ArithmeticException("Logarithm base cannot be 1.");
+        if ($base->eq(1)) {
+            throw new DomainException("Logarithm base cannot be 1.");
         }
 
         // Check for natural logarithm.
-        if ($base->equals(M_E)) {
+        if ($base->eq(M_E)) {
             return $this->ln();
         }
 
         // Use built-in constants for log_2(e) and log_10(e).
-        if ($this->equals(M_E)) {
-            if ($base->equals(2)) {
-                return new Complex(M_LOG2E);
+        if ($this->eq(M_E)) {
+            if ($base->eq(2)) {
+                return new self(M_LOG2E);
             }
-            elseif ($base->equals(10)) {
-                return new Complex(M_LOG10E);
+            elseif ($base->eq(10)) {
+                return new self(M_LOG10E);
             }
         }
 
         // Use built-in log() function when arguments are real.
         if ($this->isReal() && $base->isReal()) {
-            return new Complex(log($this->real, $base->real));
+            return new self(log($this->real, $base->real));
         }
 
         // Compute log_b(z) = ln(z) / ln(b)
@@ -344,30 +291,30 @@ class Complex implements Stringable, ArrayAccess
     /**
      * Calculate e^z where z is this complex number.
      *
-     * @return Complex A new complex number representing e^z.
+     * @return self A new complex number representing e^z.
      */
-    public function exp(): Complex
+    public function exp(): self
     {
         // Use shortcuts where possible.
-        if ($this->equals(0)) {
-            return new Complex(1);
+        if ($this->eq(0)) {
+            return new self(1);
         }
-        elseif ($this->equals(M_LN2)) {
-            return new Complex(2);
+        elseif ($this->eq(M_LN2)) {
+            return new self(2);
         }
-        elseif ($this->equals(1)) {
-            return new Complex(M_E);
+        elseif ($this->eq(1)) {
+            return new self(M_E);
         }
-        elseif ($this->equals(M_LNPI)) {
-            return new Complex(M_PI);
+        elseif ($this->eq(M_LNPI)) {
+            return new self(M_PI);
         }
-        elseif ($this->equals(M_LN10)) {
-            return new Complex(10);
+        elseif ($this->eq(M_LN10)) {
+            return new self(10);
         }
 
         // Check for Euler's identity e^iπ = -1
-        if ($this->equals(new Complex(0, M_PI))) {
-            return new Complex(-1);
+        if ($this->eq(new self(0, M_PI))) {
+            return new self(-1);
         }
 
         // Uses Euler's formula: e^(a + bi) = e^a * (cos(b) + i*sin(b))
@@ -388,17 +335,17 @@ class Complex implements Stringable, ArrayAccess
      * - Negative real base with fractional exponent: (-2)^(1/3)
      * - Any base with complex exponent: z^(a+bi) where b ≠ 0
      *
-     * @param Complex|int|float $other The real or complex number to raise this complex number to.
-     * @return Complex A new complex number representing the result.
+     * @param self|int|float $other The real or complex number to raise this complex number to.
+     * @return self A new complex number representing the result.
      * @throws InvalidArgumentException If attempting 0 raised to a negative or complex power.
      */
-    public function pow(Complex|int|float $other): Complex
+    public function pow(self|int|float $other): self
     {
         // Make sure $other is Complex.
         $other = self::toComplex($other);
 
         // Handle special cases.
-        if ($this->equals(0)) {
+        if ($this->eq(0)) {
             // Check for complex exponent.
             if (!$other->isReal()) {
                 throw new InvalidArgumentException("Cannot raise 0 to a complex number.");
@@ -410,35 +357,35 @@ class Complex implements Stringable, ArrayAccess
             }
 
             // Check for 0 exponent.
-            if ($other->equals(0)) {
+            if ($other->eq(0)) {
                 // Although mathematically 0^0 is undefined, return 1 for consistency with pow(0, 0).
                 // This is a common result in many programming languages.
                 // (Principle of least astonishment.)
                 // @see https://en.wikipedia.org/wiki/Zero_to_the_power_of_zero
-                return new Complex(1);
+                return new self(1);
             }
 
             // The exponent is a positive real number. 0 raised to any positive real number is 0.
-            return new Complex();
+            return new self();
         }
 
         // Handle exponent = 0. Any non-zero number to power 0 is 1.
-        if ($other->equals(0)) {
-            return new Complex(1);
+        if ($other->eq(0)) {
+            return new self(1);
         }
 
         // Handle exponent = 1. Any number to power 1 is itself.
-        if ($other->equals(1)) {
+        if ($other->eq(1)) {
             return clone $this;
         }
 
         // Handle i^2 = -1.
-        if ($this->equals(self::i()) && $other->equals(2)) {
-            return new Complex(-1);
+        if ($this->eq(self::i()) && $other->eq(2)) {
+            return new self(-1);
         }
 
         // Handle e^w. Skip unnecessary calls to ln() and mul().
-        if ($this->equals(M_E)) {
+        if ($this->eq(M_E)) {
             return $other->exp();
         }
 
@@ -451,7 +398,7 @@ class Complex implements Stringable, ArrayAccess
      * Returns all n complex roots using De Moivre's theorem.
      *
      * @param int $n The root to calculate (e.g., 2 for square root, 3 for cube root).
-     * @return Complex[] An array of Complex numbers representing all nth roots.
+     * @return self[] An array of Complex numbers representing all nth roots.
      * @throws InvalidArgumentException If n is not a positive integer.
      */
     public function roots(int $n): array
@@ -462,8 +409,8 @@ class Complex implements Stringable, ArrayAccess
         }
 
         // Handle special case of 0.
-        if ($this->equals(0)) {
-            return [new Complex()];
+        if ($this->eq(0)) {
+            return [new self()];
         }
 
         // Calculate the magnitude of the roots.
@@ -473,7 +420,7 @@ class Complex implements Stringable, ArrayAccess
         $roots = [];
         for ($k = 0; $k < $n; $k++) {
             $root_phase = ($this->phase + 2 * M_PI * $k) / $n;
-            $roots[] = Complex::fromPolar($root_mag, $root_phase);
+            $roots[] = self::fromPolar($root_mag, $root_phase);
         }
 
         return $roots;
@@ -539,11 +486,11 @@ class Complex implements Stringable, ArrayAccess
     /**
      * Check if this complex number equals another.
      *
-     * @param Complex|int|float $other The real or complex number to compare with.
+     * @param self|int|float $other The real or complex number to compare with.
      * @param float $epsilon The tolerance for floating-point comparison.
      * @return bool True if the numbers are equal within the tolerance.
      */
-    public function equals(Complex|int|float $other, float $epsilon = PHP_FLOAT_EPSILON): bool
+    public function eq(self|int|float $other, float $epsilon = PHP_FLOAT_EPSILON): bool
     {
         // Make sure $other is Complex.
         $other = self::toComplex($other);
@@ -553,40 +500,30 @@ class Complex implements Stringable, ArrayAccess
                abs($this->imag - $other->imag) < $epsilon;
     }
 
-    /**
-     * Check if this complex number is the same as another.
-     *
-     * @param Complex $other The complex number to compare with.
-     * @return bool True if the numbers are equal, otherwise false.
-     */
-    public function same(Complex $other): bool {
-        return $this === $other;
-    }
-
     // endregion
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // region Factory methods
 
     /**
-     * Get an imaginary unit.
+     * Get the imaginary unit.
      *
-     * @return Complex A new complex number equal to the imaginary unit.
+     * @return self A complex number equal to the imaginary unit.
      */
-    public static function i(): Complex
+    public static function i(): self
     {
-        return new Complex(0, 1);
+        return self::$_i ??= new self(0, 1);
     }
 
     /**
      * Convert the input value to a complex number, if not already.
      *
-     * @param Complex|int|float $z The real or complex value.
-     * @return Complex The equivalent complex value.
+     * @param self|int|float $z The real or complex value.
+     * @return self The equivalent complex value.
      */
-    public static function toComplex(Complex|int|float $z): Complex
+    public static function toComplex(self|int|float $z): self
     {
-        return $z instanceof Complex ? $z : new Complex($z);
+        return $z instanceof self ? $z : new self($z);
     }
 
     /**
@@ -594,12 +531,12 @@ class Complex implements Stringable, ArrayAccess
      *
      * @param int|float $mag The magnitude (distance from origin).
      * @param int|float $phase The phase angle in radians.
-     * @return Complex A new complex number.
+     * @return self A new complex number.
      */
-    public static function fromPolar(int|float $mag, int|float $phase): Complex
+    public static function fromPolar(int|float $mag, int|float $phase): self
     {
         // Construct the new Complex.
-        $z = new Complex($mag * cos($phase), $mag * sin($phase));
+        $z = new self($mag * cos($phase), $mag * sin($phase));
 
         // We may as well remember the magnitude and phase since we know them already.
         $z->_mag = $mag;
@@ -619,10 +556,10 @@ class Complex implements Stringable, ArrayAccess
      * - Either order: "4i+3", "-2j+5"
      *
      * @param string $str The string to parse
-     * @return Complex The parsed complex number
+     * @return self The parsed complex number
      * @throws InvalidArgumentException If the string cannot be parsed
      */
-    public static function parse(string $str): Complex
+    public static function parse(string $str): self
     {
         // Remove all whitespace
         $str = preg_replace('/\s+/', '', $str);
@@ -634,7 +571,7 @@ class Complex implements Stringable, ArrayAccess
 
         // Handle pure real numbers (no imaginary unit)
         if (is_numeric($str)) {
-            return new Complex((float)$str, 0);
+            return new self((float)$str, 0);
         }
 
         // Handle pure imaginary with or without coefficient: i, 3i, -2.5j, etc.
@@ -648,7 +585,7 @@ class Complex implements Stringable, ArrayAccess
                 $imag = -$imag;
             }
 
-            return new Complex(0, $imag);
+            return new self(0, $imag);
         }
 
         // Handle complex numbers with both real and imaginary parts.
@@ -687,7 +624,7 @@ class Complex implements Stringable, ArrayAccess
             $real = -$real;
         }
 
-        return new Complex($real, $imag);
+        return new self($real, $imag);
     }
 
     // endregion
@@ -777,50 +714,27 @@ class Complex implements Stringable, ArrayAccess
     }
 
     /**
-     * Set the value of the complex number at the given offset. Only 0 and 1 are valid offsets.
+     * Unsupported as this class is immutable.
      *
      * @param mixed $offset The offset to set.
      * @param mixed $value The value to set.
-     * @throws InvalidArgumentException If the offset is invalid.
+     * @throws LogicException If called.
      * @return void
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        // Guard.
-        if (!$this->offsetExists($offset)) {
-            throw new InvalidArgumentException("Invalid offset: $offset");
-        }
-
-        // Set the value.
-        if ($offset === 0) {
-            $this->real = $value;
-        }
-        else {
-            $this->imag = $value;
-        }
+        throw new LogicException("Complex values are immutable.");
     }
 
     /**
-     * Unset the value of the complex number at the given offset. Only 0 and 1 are valid offsets.
-     * In this context, unsetting means setting the value to 0, not null, and not removing the offset.
+     * Unsupported as this class is immutable.
      *
      * @param mixed $offset The offset to unset.
-     * @throws InvalidArgumentException If the offset is invalid.
+     * @throws LogicException If called.
      * @return void
      */
     public function offsetUnset(mixed $offset): void
     {
-        // Guard.
-        if (!$this->offsetExists($offset)) {
-            throw new InvalidArgumentException("Invalid offset: $offset");
-        }
-
-        // Unset the value.
-        if ($offset === 0) {
-            $this->real = 0;
-        }
-        else {
-            $this->imag = 0;
-        }
+        throw new LogicException("Complex values are immutable.");
     }
 }
