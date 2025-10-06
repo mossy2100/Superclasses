@@ -13,7 +13,7 @@ use DomainException;
 /**
  * TODO Complete tests.
  */
-class Complex implements Stringable, ArrayAccess
+final class Complex implements Stringable, ArrayAccess
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // region Properties

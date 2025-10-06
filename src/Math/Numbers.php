@@ -5,8 +5,8 @@ declare(strict_types = 1);
 namespace Superclasses\Math;
 
 use Random\RandomException;
-use UnexpectedValueException;
 use OverflowException;
+use InvalidArgumentException;
 
 class Numbers
 {
@@ -148,7 +148,7 @@ class Numbers
     {
         // Guard. This method is only valid for numbers.
         if (is_nan($num) || is_nan($sign_source)) {
-            throw new UnexpectedValueException("NaN is not allowed for either parameter.");
+            throw new InvalidArgumentException("NaN is not allowed for either parameter.");
         }
 
         return abs($num) * self::sign($sign_source, false);
@@ -228,12 +228,18 @@ class Numbers
      * Raise one integer to the power of another with overflow check.
      *
      * @param int $a The first integer.
-     * @param int $b The second integer.
+     * @param int $b The second integer. Must be non-negative.
      * @return int The result integer if no overflow occur.
+     * @throws InvalidArgumentException If $b is negative.
      * @throws OverflowException If the exponentiation results in overflow.
      */
     public static function intPow(int $a, int $b): int
     {
+        // Handle b < 0.
+        if ($b < 0) {
+            throw new InvalidArgumentException("Negative exponents are not supported.");
+        }
+
         // Do the exponentiation.
         $c = $a ** $b;
 
@@ -254,8 +260,8 @@ class Numbers
      * Try to convert a string to an equivalent integer.
      *
      * This method is stricter than PHP's built-in intval() function or (int) cast. The string must look exactly like
-     * an integer, meaning digits only, and the string must represent an integer within the valid range.
-     * (i.e. PHP_MIN_INT..PHP_MAX_INT).
+     * an integer, meaning digits only (with optional leading minus sign), and the string must represent an integer
+     * within the valid range (i.e. PHP_MIN_INT..PHP_MAX_INT).
      *
      * @param string $s The string to convert.
      * @param int|null $i The converted integer, if successful, or null otherwise.
@@ -285,6 +291,8 @@ class Numbers
      */
     public static function gcd(int $a, int $b): int
     {
+        $a = abs($a);
+        $b = abs($b);
         return $b === 0 ? $a : self::gcd($b, $a % $b);
     }
 
@@ -293,12 +301,14 @@ class Numbers
     // region Random numbers
 
     /**
-     * Generate a random float.
+     * Generate a random finite float.
      *
      * @return float The random float.
      * @throws RandomException If an appropriate source of randomness cannot be found.
      */
-    public static function randomFloat(): float {
+    public static function randFloat(): float {
+        // Generate random floats until a finite value is found.
+        // It's very unlikely the loop will repeat more than once or twice.
         do {
             $bytes = random_bytes(8);
             $float = unpack('d', $bytes)[1];

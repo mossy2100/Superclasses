@@ -10,7 +10,7 @@ use OverflowException;
 use RangeException;
 use DomainException;
 
-class Rational implements Stringable
+final class Rational implements Stringable
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // region Properties
@@ -351,8 +351,8 @@ class Rational implements Stringable
         // Cross-cancel before multiplying: (a/b) * (c/d)
         // Cancel gcd(a,d) from a and d
         // Cancel gcd(b,c) from b and c
-        $gcd1 = Numbers::gcd(abs($this->num), abs($other->den));
-        $gcd2 = Numbers::gcd(abs($this->den), abs($other->num));
+        $gcd1 = Numbers::gcd($this->num, $other->den);
+        $gcd2 = Numbers::gcd($this->den, $other->num);
 
         $a = intdiv($this->num, $gcd1);
         $b = intdiv($this->den, $gcd2);
@@ -638,7 +638,7 @@ class Rational implements Stringable
         }
 
         // Calculate the GCD.
-        $gcd = Numbers::gcd(abs($num), abs($den));
+        $gcd = Numbers::gcd($num, $den);
 
         // Reduce the fraction if necessary.
         if ($gcd > 1) {
