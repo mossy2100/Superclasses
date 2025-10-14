@@ -4,10 +4,12 @@ declare(strict_types = 1);
 
 namespace Superclasses\Tests\Math;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Superclasses\Math\Complex;
-use InvalidArgumentException;
+use DomainException;
 
+#[CoversClass(Complex::class)]
 class ComplexParseTest extends TestCase
 {
     /**
@@ -129,7 +131,7 @@ class ComplexParseTest extends TestCase
         ];
 
         foreach ($invalid_inputs as $input) {
-            $this->expectException(InvalidArgumentException::class);
+            $this->expectException(DomainException::class);
             Complex::parse($input);
         }
     }

@@ -7,7 +7,6 @@ namespace Superclasses\Math;
 use Throwable;
 use RangeException;
 use DomainException;
-use UnexpectedValueException;
 
 class Angle
 {
@@ -326,12 +325,13 @@ class Angle
      *
      * @param float $k The scale factor.
      * @return self The scaled angle.
+     * @throws DomainException If the divisor is 0, NaN, or ±∞.
      */
     public function div(float $k): self
     {
         // Guards.
         if (!is_finite($k) || $k == 0) {
-            throw new RangeException("Divisor cannot be 0, NaN, or ±∞.");
+            throw new DomainException("Divisor cannot be 0, NaN, or ±∞.");
         }
 
         return new self(fdiv($this->_radians, $k));
@@ -364,7 +364,7 @@ class Angle
      * @return int -1, 0, or 1
      * @throws DomainException If $eps is negative.
      */
-    public function compare(self $other, float $eps = self::RAD_EPSILON): int
+    public function cmp(self $other, float $eps = self::RAD_EPSILON): int
     {
         // Ensure epsilon is non-negative.
         if ($eps < 0) {
@@ -390,33 +390,14 @@ class Angle
      * @param float $eps The tolerance for equality.
      * @return bool True if angles are equal within $eps; false otherwise.
      */
-    public function equals(self $other, float $eps = self::RAD_EPSILON): bool
+    public function eq(self $other, float $eps = self::RAD_EPSILON): bool
     {
-        return $this->compare($other, $eps) === 0;
+        return $this->cmp($other, $eps) === 0;
     }
 
     // endregion
 
     // region Trigonometry methods
-
-    /**
-     * Static helper method to get the inverse of a value.
-     * If the value is close to 0, then the result will be ±INF, which helps give more correct results for
-     * trigonometric functions.
-     *
-     * @param float $x The value to invert.
-     * @return float The inverse of $x.
-     */
-    private static function _inverse(float $x): float
-    {
-        // Treat |x| ≤ ε as zero and use signed zero, so fdiv returns ±INF.
-        if (abs($x) <= self::TRIG_EPSILON) {
-            $x = Numbers::copySign(0.0, $x);
-        }
-
-        // IEEE-754 division (no errors/exceptions).
-        return fdiv(1.0, $x);
-    }
 
     /**
      * Sine of the angle.
@@ -450,42 +431,12 @@ class Angle
 
         // If cos is effectively zero, return ±INF (sign chosen by the side, i.e., sign of sin).
         // The built-in tan() function normally doesn't ever return ±INF.
-        if (abs($c) <= self::TRIG_EPSILON) {
+        if (abs($c) < self::TRIG_EPSILON) {
             return Numbers::copySign(INF, $s);
         }
 
         // Otherwise do IEEE‑754 division (no warnings/exceptions).
         return fdiv($s, $c);
-    }
-
-    /**
-     * Secant of the angle (1 / cos).
-     *
-     * @return float The secant value.
-     */
-    public function sec(): float
-    {
-        return self::_inverse(cos($this->_radians));
-    }
-
-    /**
-     * Cosecant of the angle (1 / sin).
-     *
-     * @return float The cosecant value.
-     */
-    public function csc(): float
-    {
-        return self::_inverse(sin($this->_radians));
-    }
-
-    /**
-     * Cotangent of the angle (1 / tan).
-     *
-     * @return float The cotangent value.
-     */
-    public function cot(): float
-    {
-        return self::_inverse($this->tan());
     }
 
     /**
@@ -518,43 +469,12 @@ class Angle
         return tanh($this->_radians);
     }
 
-    /**
-     * Get the hyperbolic secant of the angle (1 / cosh).
-     *
-     * @return float
-     */
-    public function sech(): float
-    {
-        return self::_inverse(cosh($this->_radians));
-    }
-
-    /**
-     * Get the hyperbolic cosecant of the angle (1 / sinh).
-     *
-     * @return float
-     */
-    public function csch(): float
-    {
-        return self::_inverse(sinh($this->_radians));
-    }
-
-    /**
-     * Get the hyperbolic cotangent of the angle (1 / tanh).
-     *
-     * @return float
-     */
-    public function coth(): float
-    {
-        return self::_inverse(tanh($this->_radians));
-    }
-
     // endregion
 
     // region Wrap methods
 
     /**
      * Normalize an angle to a specified range.
-     * Non-mutating version.
      *
      * If $signed is false (default), the range is [0, τ).
      * If $signed is true, the range is [-π, π).
@@ -565,22 +485,6 @@ class Angle
     public function wrap(bool $signed = false): self
     {
         return new self(self::wrapRadians($this->_radians, $signed));
-    }
-
-    /**
-     * Normalize an angle to a specified range.
-     * Mutating version.
-     *
-     * If $signed is false (default), the range is [0, τ).
-     * If $signed is true, the range is [-π, π).
-     *
-     * @param bool $signed Whether to return a signed range instead of the default positive range.
-     * @return self The calling angle object, updated.
-     */
-    public function wrapThis(bool $signed = false): self
-    {
-        $this->_radians = self::wrapRadians($this->_radians, $signed);
-        return $this;
     }
 
     /**
@@ -782,7 +686,7 @@ class Angle
      *
      * @param string $value The string to parse.
      * @return self A new angle equivalent to the provided string.
-     * @throws UnexpectedValueException If the string does not represent a valid angle.
+     * @throws DomainException If the string does not represent a valid angle.
      */
     public static function fromString(string $value): self
     {
@@ -792,7 +696,7 @@ class Angle
         // Reject empty input.
         $value = trim($value);
         if ($value === '') {
-            throw new UnexpectedValueException($err_msg);
+            throw new DomainException($err_msg);
         }
 
         // Check for the DMS pattern as returned by toDMSString().
@@ -805,7 +709,7 @@ class Angle
         if (preg_match($pattern, $value, $matches)) {
             // Require at least one component (deg/min/sec).
             if (empty($matches['deg']) && empty($matches['min']) && empty($matches['sec'])) {
-                throw new UnexpectedValueException($err_msg);
+                throw new DomainException($err_msg);
             }
 
             // Get the sign.
@@ -832,7 +736,7 @@ class Angle
         }
 
         // No valid units.
-        throw new UnexpectedValueException($err_msg);
+        throw new DomainException($err_msg);
     }
 
     /**

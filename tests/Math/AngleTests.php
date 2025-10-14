@@ -4,9 +4,8 @@ declare(strict_types = 1);
 
 namespace Superclasses\Tests\Math;
 
-use InvalidArgumentException;
+use DomainException;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Superclasses\Math\Angle;
 
@@ -20,7 +19,7 @@ final class AngleTests extends TestCase
 
     private function assertAngleEquals(Angle $a, Angle $b): void
     {
-        $this->assertTrue($a->equals($b), "Angles differ: {$a} vs {$b}");
+        $this->assertTrue($a->eq($b), "Angles differ: {$a} vs {$b}");
     }
 
     /**
@@ -28,8 +27,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function factoriesAndGettersRoundtrip(): void
+    public function testFactoriesAndGettersRoundtrip(): void
     {
         $a = Angle::fromDegrees(180.0);
         $this->assertFloatEquals(M_PI, $a->toRadians());
@@ -43,8 +41,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function dmsRoundtripAndCarry(): void
+    public function testDmsRoundtripAndCarry(): void
     {
         $a = Angle::fromDMS(12, 34, 56);
         [$d, $m, $s] = $a->toDMS(2, 6);
@@ -66,7 +63,7 @@ final class AngleTests extends TestCase
         $this->assertFloatEquals(0.0, $m3);
 
         // Test invalid smallest unit index.
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DomainException::class);
         $x = $b->toDMS(3, 3);
     }
 
@@ -75,8 +72,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function parsingCssUnitsAndDms(): void
+    public function testParsingCssUnitsAndDms(): void
     {
         $this->assertAngleEquals(Angle::fromDegrees(12), Angle::fromString('12deg'));
         $this->assertAngleEquals(Angle::fromDegrees(12), Angle::fromString('12 DEG'));
@@ -94,10 +90,9 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function parseRejectsBadInputs(): void
+    public function testParseRejectsBadInputs(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DomainException::class);
         Angle::fromString('');
     }
 
@@ -106,8 +101,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function wrapUnsignedAndSigned(): void
+    public function testWrapUnsignedAndSigned(): void
     {
         $a = Angle::fromRadians(2 * M_PI)->wrap(); // pure
         $this->assertFloatEquals(0.0, $a->toRadians());
@@ -122,13 +116,12 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function arithmeticAndCompare(): void
+    public function testArithmeticAndCompare(): void
     {
         $a = Angle::fromDegrees(10);
         $b = Angle::fromDegrees(370);
         // 10° vs. 370° differ by 0° on a circle.
-        $this->assertSame(0, $a->compare($b));
+        $this->assertSame(0, $a->cmp($b));
 
         $sum = $a->add(Angle::fromDegrees(20));
         $this->assertFloatEquals(30.0, $sum->toDegrees());
@@ -145,8 +138,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function trigAndReciprocalsBehaviour(): void
+    public function testTrigAndReciprocalsBehaviour(): void
     {
         $a = Angle::fromDegrees(60);
         $this->assertFloatEquals(sqrt(3) / 2, $a->sin());
@@ -158,18 +150,6 @@ final class AngleTests extends TestCase
         // Tan(90°) = ∞.
         $t = Angle::fromDegrees(90);
         $this->assertTrue(is_infinite($t->tan()));
-
-        // Csc(180°) = ∞.
-        $b = Angle::fromDegrees(180);
-        $this->assertTrue(is_infinite($b->csc()));
-
-        // Sec(90°) = ∞.
-        $c = Angle::fromDegrees(90);
-        $this->assertTrue(is_infinite($c->sec())); // cos(90°)=0 ⇒ sec=∞
-
-        // Cot(0) = ∞.
-        $d = Angle::fromDegrees(0);
-        $this->assertTrue(is_infinite($d->cot()));
     }
 
     /**
@@ -177,8 +157,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function formatVariants(): void
+    public function testFormatVariants(): void
     {
         $a = Angle::fromDegrees(12.5);
         $this->assertSame('0.2181661565rad', $a->format('rad', 10));
@@ -190,7 +169,7 @@ final class AngleTests extends TestCase
         $this->assertSame("12° 30′ 0″", $a->format('dms', 0));
 
         // Invalid decimals value.
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DomainException::class);
         $a->format('rad', -1);
     }
 
@@ -211,8 +190,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function randomRoundtripsRadiansDegreesGradiansTurns(): void
+    public function testRandomRoundtripsRadiansDegreesGradiansTurns(): void
     {
         for ($i = 0; $i < 500; $i++) {
             // Span a large range, including huge magnitudes.
@@ -238,8 +216,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function formatThenParseRoundtripVariousStyles(): void
+    public function testFormatThenParseRoundtripVariousStyles(): void
     {
         $styles = ['rad', 'deg', 'grad', 'turn', 'd', 'dm', 'dms'];
 
@@ -253,7 +230,7 @@ final class AngleTests extends TestCase
                 $b = Angle::fromString($s);
 
                 $this->assertTrue(
-                    $a->equals($b),
+                    $a->eq($b),
                     "Format/fromString mismatch for style '{$style}': {$s} → {$b} vs {$a}"
                 );
             }
@@ -265,8 +242,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function wrapBoundariesSignedAndUnsigned(): void
+    public function testWrapBoundariesSignedAndUnsigned(): void
     {
         $twoPi = 2 * M_PI;
 
@@ -294,8 +270,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function dmsExtremesAndOutOfRangeParts(): void
+    public function testDmsExtremesAndOutOfRangeParts(): void
     {
         // Minutes/seconds beyond their usual ranges should still compute correctly.
         $a = Angle::fromDMS(10, 120, 120); // 10° + 2° + 0.033...° = 12.033...
@@ -318,41 +293,20 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function parsingWhitespaceAndCaseAndAsciiUnicodeSymbols(): void
+    public function testParsingWhitespaceAndCaseAndAsciiUnicodeSymbols(): void
     {
-        $this->assertTrue(Angle::fromDegrees(12)->equals(Angle::fromString('12 DEG')));
-        $this->assertTrue(Angle::fromTurns(0.25)->equals(Angle::fromString(' 0.25   turn ')));
-        $this->assertTrue(Angle::fromRadians(M_PI)->equals(Angle::fromString(sprintf('%.12frad', M_PI))));
+        $this->assertTrue(Angle::fromDegrees(12)->eq(Angle::fromString('12 DEG')));
+        $this->assertTrue(Angle::fromTurns(0.25)->eq(Angle::fromString(' 0.25   turn ')));
+        $this->assertTrue(Angle::fromRadians(M_PI)->eq(Angle::fromString(sprintf('%.12frad', M_PI))));
 
         // Unicode DMS.
-        $this->assertTrue(Angle::fromDMS(12, 34, 56)->equals(Angle::fromString('12° 34′ 56″')));
+        $this->assertTrue(Angle::fromDMS(12, 34, 56)->eq(Angle::fromString('12° 34′ 56″')));
         // ASCII DMS.
-        $this->assertTrue(Angle::fromDMS(-12, -34, -56)->equals(Angle::fromString("-12°34'56\"")));
+        $this->assertTrue(Angle::fromDMS(-12, -34, -56)->eq(Angle::fromString("-12°34'56\"")));
 
         // Invalid DMS format.
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DomainException::class);
         $a = Angle::fromString('-');
-    }
-
-    /**
-     * Test reciprocalsNearSingularitiesWithEpsilonHandling scenario.
-     *
-     * @return void
-     */
-    #[Test]
-    public function reciprocalsNearSingularitiesWithEpsilonHandling(): void
-    {
-        // Sec(90°) → ±INF.
-        $this->assertTrue(is_infinite(Angle::fromDegrees(90)->sec()));
-        // Csc(0°) → ±INF.
-        $this->assertTrue(is_infinite(Angle::fromDegrees(0)->csc()));
-        // Cot(0°) → ±INF.
-        $this->assertTrue(is_infinite(Angle::fromDegrees(0)->cot()));
-
-        // Tiny offsets either side keep the sign logic consistent.
-        $this->assertGreaterThan(0, Angle::fromRadians(1e-14)->csc());
-        $this->assertLessThan(0, Angle::fromRadians(-1e-14)->csc());
     }
 
     /**
@@ -360,8 +314,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function tryParseSuccessAndFailure(): void
+    public function testTryParseSuccessAndFailure(): void
     {
         $ok = Angle::tryParse('12deg', $a);
         $this->assertTrue($ok);
@@ -377,11 +330,10 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function divisionByZero(): void
+    public function testDivisionByZero(): void
     {
         $a = Angle::fromDegrees(90);
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DomainException::class);
         $a->div(0.0);
     }
 
@@ -390,38 +342,20 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function compareWithEpsilonAndDelta(): void
+    public function testCompareWithEpsilonAndDelta(): void
     {
         $a = Angle::fromDegrees(10);
         $b = Angle::fromDegrees(20);
 
         // Delta is negative -> a < b.
-        $this->assertSame(-1, $a->compare($b));
+        $this->assertSame(-1, $a->cmp($b));
 
         // Delta is positive -> b > a.
-        $this->assertSame(1, $b->compare($a));
+        $this->assertSame(1, $b->cmp($a));
 
         // Epsilon negative -> invalid argument.
-        $this->expectException(InvalidArgumentException::class);
-        $a->compare($b, -1e-9);
-    }
-
-    /**
-     * Test wrapThis normalizes the internal angle.
-     *
-     * @return void
-     */
-    #[Test]
-    public function wrapThisBehaviour(): void
-    {
-        $a = Angle::fromDegrees(370);
-        $a->wrapThis(false);
-        $this->assertFloatEquals(10.0, $a->toDegrees());
-
-        $b = Angle::fromDegrees(-190);
-        $b->wrapThis(true);
-        $this->assertFloatEquals(170.0, $b->toDegrees());
+        $this->expectException(DomainException::class);
+        $a->cmp($b, -1e-9);
     }
 
     /**
@@ -429,8 +363,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function wrapGradiansBehaviour(): void
+    public function testWrapGradiansBehaviour(): void
     {
         $this->assertFloatEquals(50.0, Angle::wrapGradians(450.0, false));
         $this->assertFloatEquals(190.0, Angle::wrapGradians(-210.0, true));
@@ -441,8 +374,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function wrapDegreesBehaviour(): void
+    public function testWrapDegreesBehaviour(): void
     {
         $this->assertFloatEquals(50.0, Angle::wrapDegrees(410.0, false));
         $this->assertFloatEquals(150.0, Angle::wrapDegrees(-210.0, true));
@@ -453,8 +385,7 @@ final class AngleTests extends TestCase
      *
      * @return void
      */
-    #[Test]
-    public function hyperbolicTrigFunctions(): void
+    public function testHyperbolicTrigFunctions(): void
     {
         $x = 0.5;
         $a = Angle::fromRadians($x);
@@ -462,8 +393,5 @@ final class AngleTests extends TestCase
         $this->assertFloatEquals(sinh($x), $a->sinh());
         $this->assertFloatEquals(cosh($x), $a->cosh());
         $this->assertFloatEquals(tanh($x), $a->tanh());
-        $this->assertFloatEquals(1 / sinh($x), $a->csch());
-        $this->assertFloatEquals(1 / cosh($x), $a->sech());
-        $this->assertFloatEquals(1 / tanh($x), $a->coth());
     }
 }

@@ -278,20 +278,22 @@ final class Vector implements ArrayAccess
      *
      * @param self $other The vector to compare with.
      * @param float $epsilon The tolerance for floating-point comparison.
-     * @return bool True if the numbers are equal within the tolerance.
+     * @return bool True if the vectors are the same size and the numbers are equal within the tolerance.
      */
     public function eq(self $other, float $epsilon = 1E-10): bool
     {
         // Check if vectors have the same size.
         if ($this->size !== $other->size) {
-            throw new InvalidArgumentException("Vectors must have the same size for dot product.");
+            return false;
         }
 
-        $equal = true;
+        // Check if all elements are equal within the tolerance.
         for ($i = 0; $i < $this->size; $i++) {
-            $equal &= abs($this->data[$i] - $other->data[$i]) < $epsilon;
+            if (abs($this->data[$i] - $other->data[$i]) >= $epsilon) {
+                return false;
+            }
         }
-        return $equal;
+        return true;
     }
 
     // endregion
