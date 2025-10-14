@@ -124,44 +124,6 @@ final class Matrix
 
         return $matrix;
     }
-    /**
-     * Create a row vector from a 1D array.
-     *
-     * @param array $data 1D list of numbers
-     * @return self Row vector (1×n matrix)
-     * @throws InvalidArgumentException If data is invalid
-     */
-    public static function createRowVector(array $data): self
-    {
-        // Check if data is empty.
-        if (empty($data) || !array_is_list($data)) {
-            throw new InvalidArgumentException("Vector data must be a non-empty list (array with sequential indices).");
-        }
-
-        return self::fromArray([$data]);
-    }
-
-    /**
-     * Create a column vector from a 1D array.
-     *
-     * @param array $data 1D array of numbers
-     * @return self Column vector (n×1 matrix)
-     * @throws InvalidArgumentException If data is invalid
-     */
-    public static function createColVector(array $data): self
-    {
-        // Check if data is empty.
-        if (empty($data) || !array_is_list($data)) {
-            throw new InvalidArgumentException("Vector data must be a non-empty list (array with sequential indices).");
-        }
-
-        $column = [];
-        foreach ($data as $value) {
-            $column[] = [$value];
-        }
-
-        return self::fromArray($column);
-    }
 
     /**
      * Create an identity matrix of the specified size.
@@ -218,30 +180,30 @@ final class Matrix
         $this->data[$row][$col] = $value;
     }
     /**
-     * Get a row as a row vector.
+     * Get a row as a vector.
      *
      * @param int $row Row index (0-based)
-     * @return self Row vector
+     * @return Vector Row vector
      * @throws InvalidArgumentException If row index is out of bounds
      */
-    public function getRow(int $row): self
+    public function getRowVector(int $row): Vector
     {
         // Check if row index is within bounds.
         if ($row < 0 || $row >= $this->rowCount) {
             throw new InvalidArgumentException("Row index out of bounds.");
         }
 
-        return self::fromArray([$this->data[$row]]);
+        return Vector::fromArray($this->data[$row]);
     }
 
     /**
-     * Get a column as a column vector.
+     * Get a column as a vector.
      *
      * @param int $col Column index (0-based)
-     * @return self Column vector
+     * @return Vector vector
      * @throws InvalidArgumentException If column index is out of bounds
      */
-    public function getCol(int $col): self
+    public function getColumnVector(int $col): Vector
     {
         // Check if column index is within bounds.
         if ($col < 0 || $col >= $this->colCount) {
@@ -250,11 +212,12 @@ final class Matrix
 
         $column = [];
         for ($i = 0; $i < $this->rowCount; $i++) {
-            $column[] = [$this->data[$i][$col]];
+            $column[] = $this->data[$i][$col];
         }
 
-        return self::fromArray($column);
+        return Vector::fromArray($column);
     }
+
     // endregion
 
     // region Inspection methods
@@ -267,51 +230,6 @@ final class Matrix
      */
     public function isSquare(?int $size = null): bool {
         return ($this->rowCount === $this->colCount) && ($size === null || $this->rowCount === $size);
-    }
-
-    /**
-     * Check if the matrix is a row vector.
-     *
-     * @param int|null $size If specified, check for exact size, otherwise any size.
-     * @return bool True if row vector (optionally of specified size).
-     */
-    public function isRowVector(?int $size = null): bool
-    {
-        // Check if there's only one row.
-        if ($this->rowCount !== 1) {
-            return false;
-        }
-
-        // Check if the row is the correct size.
-        return $size === null || $this->colCount === $size;
-    }
-
-    /**
-     * Check if the matrix is a column vector.
-     *
-     * @param int|null $size If specified, check for exact size, otherwise any size.
-     * @return bool True if column vector (optionally of specified size).
-     */
-    public function isColVector(?int $size = null): bool
-    {
-        // Check if there's only one column.
-        if ($this->colCount !== 1) {
-            return false;
-        }
-
-        // Check if the column is the correct size.
-        return $size === null || $this->rowCount === $size;
-    }
-
-    /**
-     * Check if the matrix is a vector (row or column).
-     *
-     * @param int|null $size If specified, check for exact size, otherwise any size.
-     * @return bool True if vector (optionally of specified size).
-     */
-    public function isVector(?int $size = null): bool
-    {
-        return $this->isRowVector($size) || $this->isColVector($size);
     }
 
     // endregion
@@ -408,7 +326,7 @@ final class Matrix
      */
     public function mul(int|float|self $other): self
     {
-        // Check if operand is a number.
+        // Check if multiplying matrix by a number.
         if (Numbers::isNumber($other)) {
             $scaled = new self($this->rowCount, $this->colCount);
             for ($i = 0; $i < $this->rowCount; $i++) {
@@ -419,9 +337,10 @@ final class Matrix
             return $scaled;
         }
 
+        // Multiplying a matrix by a matrix.
         // Check if dimensions are compatible for multiplication.
         if ($this->colCount !== $other->rowCount) {
-            throw new InvalidArgumentException("Matrix A columns must equal Matrix B rows for multiplication");
+            throw new InvalidArgumentException("The number of columns in the first matrix must equal the number of rows in the second matrix.");
         }
 
         // Multiply the matrices.
@@ -521,78 +440,6 @@ final class Matrix
         }
 
         return $this->calcDet($this->data);
-    }
-
-    /**
-     * Calculate the dot product of this matrix with another matrix. Operands must be column vectors of equal size.
-     *
-     * @param self $other Vector to calculate dot product with.
-     * @return float The dot product.
-     * @throws InvalidArgumentException If matrices are not column vectors of equal size.
-     */
-    public function dot(self $other): float
-    {
-        // Check if both are column vectors and have the same size.
-        if (!$this->isColVector()) {
-            throw new InvalidArgumentException("First operand must be a column vector.");
-        }
-        if (!$other->isColVector()) {
-            throw new InvalidArgumentException("Second operand must be a column vector.");
-        }
-        if ($this->rowCount !== $other->rowCount) {
-            throw new InvalidArgumentException("Column vectors must have the same size for dot product.");
-        }
-
-        // Compute the dot product.
-        $result = 0.0;
-        for ($i = 0; $i < $this->rowCount; $i++) {
-            $result += $this->data[$i][0] * $other->data[$i][0];
-        }
-
-        return $result;
-    }
-    /**
-     * Calculate the cross product of this matrix with another matrix (both operands must be column vectors of size 3).
-     *
-     * @param self $other Vector to calculate cross product with.
-     * @return self New vector representing the cross product.
-     * @throws InvalidArgumentException If matrices are not column vectors of size 3.
-     */
-    public function cross(self $other): self
-    {
-        // Check if both are column vectors of length 3.
-        if (!$this->isColVector(3)) {
-            throw new InvalidArgumentException("First operand must be a column vector of size 3.");
-        }
-        if (!$other->isColVector(3)) {
-            throw new InvalidArgumentException("Second operand must be a column vector of size 3.");
-        }
-
-        // Calculate cross product.
-        return self::fromArray([
-            [ $this->data[1][0] * $other->data[2][0] - $this->data[2][0] * $other->data[1][0] ],
-            [ $this->data[2][0] * $other->data[0][0] - $this->data[0][0] * $other->data[2][0] ],
-            [ $this->data[0][0] * $other->data[1][0] - $this->data[1][0] * $other->data[0][0] ]
-        ]);
-    }
-
-    /**
-     * Calculate the magnitude of this matrix, which must be a column vector.
-     *
-     * @return float The magnitude.
-     * @throws InvalidArgumentException If matrix is not a column vector.
-     */
-    public function mag(): float {
-        // Ensure matrix is a vector.
-        if (!$this->isVector()) {
-            throw new InvalidArgumentException("Matrix must be a vector.");
-        }
-
-        // Convert to a column vector if necessary.
-        $a = $this->isColVector() ? $this : $this->T();
-
-        // Calculate magnitude.
-        return sqrt($a->dot($a));
     }
 
     // endregion

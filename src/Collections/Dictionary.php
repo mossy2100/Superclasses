@@ -6,6 +6,7 @@ namespace Superclasses\Collections;
 
 use ArrayAccess;
 use Countable;
+use http\Exception\RuntimeException;
 use IteratorAggregate;
 use OutOfBoundsException;
 use Override;
@@ -230,5 +231,33 @@ class Dictionary implements ArrayAccess, Countable, IteratorAggregate
         foreach ($this->_items as $item) {
             yield $item->key => $item->value;
         }
+    }
+
+    /**
+     * Swaps keys with values.
+     *
+     * If the dictionary contains duplicate values, a RuntimeException will be thrown.
+     *
+     * @return self
+     */
+    public function flip(): self {
+        // Create a new dictionary to hold the result.
+        $result = new self();
+
+        // Iterate over the items in the current dictionary.
+        foreach ($this->_items as $item) {
+            $key = Type::getStringKey($item->value);
+
+            // Check for duplicate values.
+            if (key_exists($key, $result->_items)) {
+                throw new RuntimeException("Duplicate value: $item->value");
+            }
+
+            // Add the new key-value pair to the result.
+            $result[$key] = new KeyValuePair($item->value, $item->key);
+        }
+
+        // Return the result.
+        return $result;
     }
 }

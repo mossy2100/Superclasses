@@ -6,16 +6,15 @@ namespace Superclasses\Math;
 
 use Stringable;
 use ArrayAccess;
-use InvalidArgumentException;
 use LogicException;
 use DomainException;
+use OutOfRangeException;
 
 /**
  * TODO Complete tests.
  */
 final class Complex implements Stringable, ArrayAccess
 {
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // region Properties
 
     /**
@@ -78,16 +77,8 @@ final class Complex implements Stringable, ArrayAccess
         }
     }
 
-    /**
-     * The backing field for the i property.
-     *
-     * @var Complex|null
-     */
-    private static ?self $_i = null;
-
     // endregion
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // region Constructor
 
     /**
@@ -104,7 +95,128 @@ final class Complex implements Stringable, ArrayAccess
 
     // endregion
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Factory methods
+
+    /**
+     * Convert the input value to a complex number, if not already.
+     *
+     * @param self|int|float $z The real or complex value.
+     * @return self The equivalent complex value.
+     */
+    public static function toComplex(self|int|float $z): self
+    {
+        return $z instanceof self ? $z : new self($z);
+    }
+
+    /**
+     * Create a complex number from polar coordinates.
+     *
+     * @param int|float $mag The magnitude (distance from origin).
+     * @param int|float $phase The phase angle in radians.
+     * @return self A new complex number.
+     * @throws DomainException If the magnitude is not positive.
+     */
+    public static function fromPolar(int|float $mag, int|float $phase): self
+    {
+        // Check for valid magnitude.
+        if ($mag < 0) {
+            throw new DomainException("Magnitude must not be negative.");
+        }
+
+        // Construct the new Complex.
+        $z = new self($mag * cos($phase), $mag * sin($phase));
+
+        // We may as well remember the magnitude and phase since we know them already.
+        $z->_mag = $mag;
+        $z->_phase = $phase;
+
+        return $z;
+    }
+
+    /**
+     * Parse a string representation of a complex number.
+     *
+     * Supports various formats:
+     * - Real numbers: "5", "-3.14", "0"
+     * - Pure imaginary: "i", "-i", "3i", "-2.5j", "I", "J"
+     * - Complex: "3+4i", "5-2j", "-1+i", "2.5-3.7I"
+     * - Spaces allowed: "3 + 4i", "5 - 2j"
+     * - Either order: "4i+3", "-2j+5"
+     *
+     * @param string $str The string to parse
+     * @return self The parsed complex number
+     * @throws DomainException If the string cannot be parsed
+     */
+    public static function parse(string $str): self
+    {
+        // Remove all whitespace
+        $str = preg_replace('/\s+/', '', $str);
+
+        // Handle empty string
+        if ($str === '') {
+            throw new DomainException("Cannot parse empty string as complex number.");
+        }
+
+        // Handle pure real numbers (no imaginary unit)
+        if (is_numeric($str)) {
+            return new self((float)$str, 0);
+        }
+
+        // Handle pure imaginary with or without coefficient: i, 3i, -2.5j, etc.
+        $rx_num = '(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?';
+        if (preg_match("/^([+-]?)((?:$rx_num)?)[ijIJ]$/", $str, $matches)) {
+            // Handle cases where coefficient is omitted (like i or -i).
+            $imag = $matches[2] === '' ? 1 : (float)$matches[2];
+
+            // Apply signs to get final value.
+            if ($matches[1] === '-') {
+                $imag = -$imag;
+            }
+
+            return new self(0, $imag);
+        }
+
+        // Handle complex numbers with both real and imaginary parts.
+        // Pattern real±imag.
+        $pattern_real_first = "/^([+-]?)($rx_num)([+-])((?:$rx_num)?)[ijIJ]\$/";
+        // Pattern imag±real.
+        $pattern_imag_first = "/^([+-]?)((?:$rx_num)?)[ijIJ]([+-])($rx_num)\$/";
+
+        if (preg_match($pattern_real_first, $str, $matches)) {
+            $real_sign = $matches[1];
+            $real_val = $matches[2];
+            $imag_sign = $matches[3];
+            $imag_val = $matches[4];
+        }
+        elseif (preg_match($pattern_imag_first, $str, $matches)) {
+            $imag_sign = $matches[1];
+            $imag_val = $matches[2];
+            $real_sign = $matches[3];
+            $real_val = $matches[4];
+        }
+        else {
+            throw new DomainException("Cannot parse '$str' as complex number.");
+        }
+
+        // Get the imaginary part. Handle cases where imaginary coefficient is omitted (like +i or -i).
+        $imag = $imag_val === '' ? 1 :  (float)$imag_val;
+
+        // Get the real part.
+        $real = (float)$real_val;
+
+        // Apply signs to get final values.
+        if ($imag_sign === '-') {
+            $imag = -$imag;
+        }
+        if ($real_sign === '-') {
+            $real = -$real;
+        }
+
+        return new self($real, $imag);
+    }
+
+    // endregion
+
     // region Arithmetic operations
 
     /**
@@ -195,8 +307,18 @@ final class Complex implements Stringable, ArrayAccess
     }
 
     /**
+     * Calculate the reciprocal of this complex number.
+     *
+     * @return self A new complex number representing the reciprocal.
+     */
+    public function inv(): self
+    {
+        return new self(1)->div($this);
+    }
+
+    /**
      * Get the complex conjugate of this number.
-     * s
+     *
      * @return self A new complex number representing the conjugate.
      */
     public function conj(): self
@@ -206,7 +328,6 @@ final class Complex implements Stringable, ArrayAccess
 
     // endregion
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // region Transcendental operations
 
     /**
@@ -337,7 +458,7 @@ final class Complex implements Stringable, ArrayAccess
      *
      * @param self|int|float $other The real or complex number to raise this complex number to.
      * @return self A new complex number representing the result.
-     * @throws InvalidArgumentException If attempting 0 raised to a negative or complex power.
+     * @throws DomainException If attempting 0 raised to a negative or complex power.
      */
     public function pow(self|int|float $other): self
     {
@@ -348,12 +469,12 @@ final class Complex implements Stringable, ArrayAccess
         if ($this->eq(0)) {
             // Check for complex exponent.
             if (!$other->isReal()) {
-                throw new InvalidArgumentException("Cannot raise 0 to a complex number.");
+                throw new DomainException("Cannot raise 0 to a complex number.");
             }
 
             // Check for negative real exponent.
             if ($other->real < 0) {
-                throw new InvalidArgumentException("Cannot raise 0 to a negative real number.");
+                throw new DomainException("Cannot raise 0 to a negative real number.");
             }
 
             // Check for 0 exponent.
@@ -376,11 +497,11 @@ final class Complex implements Stringable, ArrayAccess
 
         // Handle exponent = 1. Any number to power 1 is itself.
         if ($other->eq(1)) {
-            return clone $this;
+            return $this;
         }
 
         // Handle i^2 = -1.
-        if ($this->eq(self::i()) && $other->eq(2)) {
+        if ($this->eq(i) && $other->eq(2)) {
             return new self(-1);
         }
 
@@ -399,13 +520,13 @@ final class Complex implements Stringable, ArrayAccess
      *
      * @param int $n The root to calculate (e.g., 2 for square root, 3 for cube root).
      * @return self[] An array of Complex numbers representing all nth roots.
-     * @throws InvalidArgumentException If n is not a positive integer.
+     * @throws DomainException If n is not a positive integer.
      */
     public function roots(int $n): array
     {
-        // Check for negative.
+        // Check for negative number of roots.
         if ($n <= 0) {
-            throw new InvalidArgumentException("Root index must be a positive integer");
+            throw new DomainException("Root index must be a positive integer");
         }
 
         // Handle special case of 0.
@@ -418,8 +539,10 @@ final class Complex implements Stringable, ArrayAccess
 
         // Calculate all n roots.
         $roots = [];
+        $theta = $this->phase / $n;
+        $delta = Angle::TAU / $n;
         for ($k = 0; $k < $n; $k++) {
-            $root_phase = ($this->phase + 2 * M_PI * $k) / $n;
+            $root_phase = $theta + $k * $delta;
             $roots[] = self::fromPolar($root_mag, $root_phase);
         }
 
@@ -470,7 +593,95 @@ final class Complex implements Stringable, ArrayAccess
 
     // endregion
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // region Trigonometric functions
+
+    /**
+     * Calculate the sine of this complex number.
+     *
+     * @return self A new complex number representing the sine of this complex number.
+     * @see https://en.wikipedia.org/wiki/Trigonometric_functions#In_the_complex_plane
+     */
+    public function sin(): self {
+        // sin(z) = sin(x)cosh(y) + i·cos(x)sinh(y)
+        // where z = x + iy
+        $x = $this->real;
+        $y = $this->imag;
+        return new self(sin($x) * cosh($y), cos($x) * sinh($y));
+    }
+
+    /**
+     * Calculate the cosine of this complex number.
+     *
+     * @return self A new complex number representing the cosine of this complex number.
+     * @see https://en.wikipedia.org/wiki/Trigonometric_functions#In_the_complex_plane
+     */
+    public function cos(): self {
+        // cos(z) = cos(x)cosh(y) - i·sin(x)sinh(y)
+        // where z = x + iy
+        $x = $this->real;
+        $y = $this->imag;
+        return new self(cos($x) * cosh($y), -sin($x) * sinh($y));
+    }
+
+    /**
+     * Calculate the tangent of this complex number.
+     *
+     * @return self A new complex number representing the tangent of this complex number.
+     * @see https://en.wikipedia.org/wiki/Trigonometric_functions#In_the_complex_plane
+     */
+    public function tan(): self {
+        // tan(z) = sin(z) / cos(z)
+        return $this->sin()->div($this->cos());
+    }
+
+    /**
+     * Calculate the inverse sine of this complex number.
+     *
+     * @return self A new complex number representing the inverse sine of this complex number.
+     */
+    public function asin(): self {
+        // a = -i
+        $a = new self(0, -1);
+        // b = √(1-z²)
+        $b = new self(1)->sub($this->pow(2))->sqrt();
+        // c = iz
+        $c = i->mul($this);
+        // = -i·ln(√(1-z²) + iz)
+        return $b->add($c)->ln()->mul($a);
+    }
+
+    /**
+     * Calculate the inverse cosine of this complex number.
+     *
+     * @return self A new complex number representing the inverse cosine of this complex number.
+     */
+    public function acos(): self {
+        // a = π/2
+        $a = new self(M_PI / 2);
+        // b = arcsin(z)
+        $b = $this->asin();
+        // = π/2 - arcsin(z)
+        return $a->sub($b);
+    }
+
+    /**
+     * Calculate the inverse tangent of this complex number.
+     *
+     * @return self A new complex number representing the inverse tangent this complex number.
+     */
+    public function atan(): self {
+        // a = -i/2
+        $a = new self(0, -0.5);
+        // b = i - z
+        $b = i->sub($this);
+        // c = i + z
+        $c = i->add($this);
+        // = (-i/2)·ln((i-z)/(i+z))
+        return $b->div($c)->ln()->mul($a);
+    }
+
+    // endregion
+
     // region Comparison methods
 
     /**
@@ -490,7 +701,7 @@ final class Complex implements Stringable, ArrayAccess
      * @param float $epsilon The tolerance for floating-point comparison.
      * @return bool True if the numbers are equal within the tolerance.
      */
-    public function eq(self|int|float $other, float $epsilon = PHP_FLOAT_EPSILON): bool
+    public function eq(self|int|float $other, float $epsilon = 1E-10): bool
     {
         // Make sure $other is Complex.
         $other = self::toComplex($other);
@@ -502,135 +713,7 @@ final class Complex implements Stringable, ArrayAccess
 
     // endregion
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // region Factory methods
-
-    /**
-     * Get the imaginary unit.
-     *
-     * @return self A complex number equal to the imaginary unit.
-     */
-    public static function i(): self
-    {
-        return self::$_i ??= new self(0, 1);
-    }
-
-    /**
-     * Convert the input value to a complex number, if not already.
-     *
-     * @param self|int|float $z The real or complex value.
-     * @return self The equivalent complex value.
-     */
-    public static function toComplex(self|int|float $z): self
-    {
-        return $z instanceof self ? $z : new self($z);
-    }
-
-    /**
-     * Create a complex number from polar coordinates.
-     *
-     * @param int|float $mag The magnitude (distance from origin).
-     * @param int|float $phase The phase angle in radians.
-     * @return self A new complex number.
-     */
-    public static function fromPolar(int|float $mag, int|float $phase): self
-    {
-        // Construct the new Complex.
-        $z = new self($mag * cos($phase), $mag * sin($phase));
-
-        // We may as well remember the magnitude and phase since we know them already.
-        $z->_mag = $mag;
-        $z->_phase = $phase;
-
-        return $z;
-    }
-
-    /**
-     * Parse a string representation of a complex number.
-     *
-     * Supports various formats:
-     * - Real numbers: "5", "-3.14", "0"
-     * - Pure imaginary: "i", "-i", "3i", "-2.5j", "I", "J"
-     * - Complex: "3+4i", "5-2j", "-1+i", "2.5-3.7I"
-     * - Spaces allowed: "3 + 4i", "5 - 2j"
-     * - Either order: "4i+3", "-2j+5"
-     *
-     * @param string $str The string to parse
-     * @return self The parsed complex number
-     * @throws InvalidArgumentException If the string cannot be parsed
-     */
-    public static function parse(string $str): self
-    {
-        // Remove all whitespace
-        $str = preg_replace('/\s+/', '', $str);
-
-        // Handle empty string
-        if ($str === '') {
-            throw new InvalidArgumentException("Cannot parse empty string as complex number.");
-        }
-
-        // Handle pure real numbers (no imaginary unit)
-        if (is_numeric($str)) {
-            return new self((float)$str, 0);
-        }
-
-        // Handle pure imaginary with or without coefficient: i, 3i, -2.5j, etc.
-        $rx_num = '(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?';
-        if (preg_match("/^([+-]?)((?:$rx_num)?)[ijIJ]$/", $str, $matches)) {
-            // Handle cases where coefficient is omitted (like i or -i).
-            $imag = $matches[2] === '' ? 1 : (float)$matches[2];
-
-            // Apply signs to get final value.
-            if ($matches[1] === '-') {
-                $imag = -$imag;
-            }
-
-            return new self(0, $imag);
-        }
-
-        // Handle complex numbers with both real and imaginary parts.
-        // Pattern real±imag.
-        $pattern_real_first = "/^([+-]?)($rx_num)([+-])((?:$rx_num)?)[ijIJ]\$/";
-        // Pattern imag±real.
-        $pattern_imag_first = "/^([+-]?)((?:$rx_num)?)[ijIJ]([+-])($rx_num)\$/";
-
-        if (preg_match($pattern_real_first, $str, $matches)) {
-            $real_sign = $matches[1];
-            $real_val = $matches[2];
-            $imag_sign = $matches[3];
-            $imag_val = $matches[4];
-        }
-        elseif (preg_match($pattern_imag_first, $str, $matches)) {
-            $imag_sign = $matches[1];
-            $imag_val = $matches[2];
-            $real_sign = $matches[3];
-            $real_val = $matches[4];
-        }
-        else {
-            throw new InvalidArgumentException("Cannot parse '$str' as complex number.");
-        }
-
-        // Get the imaginary part. Handle cases where imaginary coefficient is omitted (like +i or -i).
-        $imag = $imag_val === '' ? 1 :  (float)$imag_val;
-
-        // Get the real part.
-        $real = (float)$real_val;
-
-        // Apply signs to get final values.
-        if ($imag_sign === '-') {
-            $imag = -$imag;
-        }
-        if ($real_sign === '-') {
-            $real = -$real;
-        }
-
-        return new self($real, $imag);
-    }
-
-    // endregion
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // region Stringable implementation
+    // region Conversion methods
 
     /**
      * Convert the complex number to a string representation.
@@ -664,11 +747,6 @@ final class Complex implements Stringable, ArrayAccess
         return $this->real . $op . $imag . 'i';
     }
 
-    // endregion
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // region Conversion methods
-
     /**
      * Convert the complex number to an array.
      *
@@ -681,7 +759,6 @@ final class Complex implements Stringable, ArrayAccess
 
     // endregion
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // region ArrayAccess implementation
 
     /**
@@ -700,13 +777,13 @@ final class Complex implements Stringable, ArrayAccess
      *
      * @param mixed $offset The offset to retrieve.
      * @return int|float The value at the given offset.
-     * @throws InvalidArgumentException If the offset is invalid.
+     * @throws OutOfRangeException If the offset is invalid.
      */
     public function offsetGet(mixed $offset): int|float
     {
         // Guard.
         if (!$this->offsetExists($offset)) {
-            throw new InvalidArgumentException("Invalid offset: $offset");
+            throw new OutOfRangeException("Invalid offset: $offset");
         }
 
         // Return the appropriate value.
@@ -738,3 +815,10 @@ final class Complex implements Stringable, ArrayAccess
         throw new LogicException("Complex values are immutable.");
     }
 }
+
+/**
+ * The imaginary unit.
+ *
+ * @var Complex
+ */
+const i = new Complex(0, 1);
